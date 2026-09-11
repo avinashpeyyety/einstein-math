@@ -1,0 +1,739 @@
+{
+  "meta": {
+    "title": "Einstein Math",
+    "subtitle": "Cosmic Adventures in Numbers!",
+    "version": "1.0.0",
+    "gradeBand": "US grades 1\u20133",
+    "audienceAge": 8
+  },
+  "units": [
+    {
+      "id": "unit-number-sense",
+      "title": "Number Sense & Place Value",
+      "icon": "\ud83d\udd22",
+      "color": "#FF6B35",
+      "description": "Understand how big numbers work \u2014 ones, tens, and hundreds!",
+      "lessons": [
+        "ns-place-value-basics",
+        "ns-compare-numbers"
+      ]
+    },
+    {
+      "id": "unit-add-sub",
+      "title": "Add & Subtract Fluency",
+      "icon": "\u2795",
+      "color": "#4ECDC4",
+      "description": "Become a flash with addition and subtraction within 1000!",
+      "lessons": [
+        "as-add-within-100",
+        "as-sub-within-100"
+      ]
+    },
+    {
+      "id": "unit-mult-div",
+      "title": "Multiply & Divide Ideas",
+      "icon": "\u2716\ufe0f",
+      "color": "#FFE66D",
+      "description": "Equal groups, arrays, and sharing \u2014 the secret of times tables!",
+      "lessons": [
+        "md-equal-groups"
+      ]
+    },
+    {
+      "id": "unit-fractions",
+      "title": "Early Fractions",
+      "icon": "\ud83c\udf55",
+      "color": "#FF6B9D",
+      "description": "Halves, thirds, and fourths \u2014 pieces of the whole!",
+      "lessons": [
+        "fr-halves-fourths"
+      ]
+    },
+    {
+      "id": "unit-measurement",
+      "title": "Measurement Basics",
+      "icon": "\ud83d\udccf",
+      "color": "#95E1D3",
+      "description": "Length, time, and money \u2014 measure the world!",
+      "lessons": []
+    },
+    {
+      "id": "unit-word-problems",
+      "title": "Word Problem Heroes",
+      "icon": "\ud83e\uddb8",
+      "color": "#A78BFA",
+      "description": "Read the story, find the math, save the day!",
+      "lessons": []
+    }
+  ],
+  "diagnostic": {
+    "id": "diagnostic-warmup",
+    "title": "Cosmic Warm-Up",
+    "einsteinIntro": "Hello, young mathematician! Before we blast off, let's see what powers you already have. No pressure \u2014 just a fun warm-up!",
+    "questions": [
+      {
+        "id": "d1",
+        "type": "mc",
+        "prompt": "What is 7 + 5?",
+        "choices": [
+          "10",
+          "12",
+          "13",
+          "11"
+        ],
+        "answer": "12",
+        "skill": "add-within-20",
+        "unitHint": "unit-add-sub"
+      },
+      {
+        "id": "d2",
+        "type": "mc",
+        "prompt": "In the number  thirty-four (34), which digit is in the TENS place?",
+        "choices": [
+          "3",
+          "4",
+          "34",
+          "0"
+        ],
+        "answer": "3",
+        "skill": "place-value-tens",
+        "unitHint": "unit-number-sense"
+      },
+      {
+        "id": "d3",
+        "type": "mc",
+        "prompt": "Which is MORE: 48 or 84?",
+        "choices": [
+          "48",
+          "84",
+          "They are the same",
+          "I don't know"
+        ],
+        "answer": "84",
+        "skill": "compare-2digit",
+        "unitHint": "unit-number-sense"
+      },
+      {
+        "id": "d4",
+        "type": "mc",
+        "prompt": "3 groups of 2 apples. How many apples in all?",
+        "choices": [
+          "5",
+          "6",
+          "32",
+          "2"
+        ],
+        "answer": "6",
+        "skill": "equal-groups",
+        "unitHint": "unit-mult-div"
+      },
+      {
+        "id": "d5",
+        "type": "mc",
+        "prompt": "A pizza is cut into 2 equal pieces. One piece is\u2026",
+        "choices": [
+          "a whole",
+          "a half",
+          "a fourth",
+          "three"
+        ],
+        "answer": "a half",
+        "skill": "fractions-half",
+        "unitHint": "unit-fractions"
+      }
+    ]
+  },
+  "lessons": {
+    "ns-place-value-basics": {
+      "id": "ns-place-value-basics",
+      "unitId": "unit-number-sense",
+      "title": "Ones, Tens & Hundreds",
+      "durationMin": 8,
+      "prerequisites": [],
+      "skills": [
+        "place-value-ones",
+        "place-value-tens",
+        "place-value-hundreds"
+      ],
+      "einsteinIntro": "Numbers are like cosmic building blocks! Ones, tens, and hundreds stack up to make ANY number. Let me show you the secret!",
+      "explain": {
+        "panels": [
+          {
+            "speech": "Look at 247. That's TWO hundreds, FOUR tens, and SEVEN ones!",
+            "visual": "place-value-247",
+            "state": "explain"
+          },
+          {
+            "speech": "The place of a digit tells you its POWER. A 4 in the tens place means 40 \u2014 not just 4!",
+            "visual": "place-value-power",
+            "state": "think"
+          },
+          {
+            "speech": "So 247 = 200 + 40 + 7. That's expanded form \u2014 like exploding a number into parts!",
+            "visual": "expanded-247",
+            "state": "cheer"
+          }
+        ]
+      },
+      "workedExample": {
+        "title": "Worked Example",
+        "speech": "Watch me build 135: 1 hundred + 3 tens + 5 ones. Easy as relativity!",
+        "steps": [
+          "Hundreds digit: 1 \u2192 100",
+          "Tens digit: 3 \u2192 30",
+          "Ones digit: 5 \u2192 5",
+          "Add them: 100 + 30 + 5 = 135"
+        ]
+      },
+      "practice": [
+        {
+          "id": "pv-p1",
+          "type": "mc",
+          "prompt": "In 582, which digit is in the TENS place?",
+          "choices": [
+            "5",
+            "8",
+            "2",
+            "58"
+          ],
+          "answer": "8",
+          "hint": "Tens are in the middle when you have hundreds-tens-ones.",
+          "feedbackCorrect": "Yes! The 8 is in the tens place \u2014 that's 80!",
+          "feedbackWrong": "Not quite. In 582: 5=hundreds, 8=tens, 2=ones. Try again!"
+        },
+        {
+          "id": "pv-p2",
+          "type": "mc",
+          "prompt": "What is the value of the 6 in 640?",
+          "choices": [
+            "6",
+            "60",
+            "600",
+            "640"
+          ],
+          "answer": "600",
+          "hint": "The 6 is all the way on the left \u2014 that's the hundreds place!",
+          "feedbackCorrect": "Brilliant! 6 in the hundreds place means 600!",
+          "feedbackWrong": "Hmm\u2026 the 6 is in the hundreds place, so its value is 600."
+        },
+        {
+          "id": "pv-p3",
+          "type": "fill",
+          "prompt": "Write 400 + 20 + 3 as a standard number.",
+          "answer": "423",
+          "accept": [
+            "423"
+          ],
+          "hint": "Put the hundreds, tens, and ones digits together.",
+          "feedbackCorrect": "Perfect! 400 + 20 + 3 = 423!",
+          "feedbackWrong": "Add the parts: 400 + 20 + 3 makes 423."
+        },
+        {
+          "id": "pv-p4",
+          "type": "mc",
+          "prompt": "Which shows 305 in expanded form?",
+          "choices": [
+            "300 + 5",
+            "300 + 50",
+            "30 + 5",
+            "3 + 0 + 5"
+          ],
+          "answer": "300 + 5",
+          "hint": "There's a zero in the tens place \u2014 so no tens!",
+          "feedbackCorrect": "Exactly! Zero tens means we skip the tens part: 300 + 5.",
+          "feedbackWrong": "305 has 3 hundreds, 0 tens, and 5 ones \u2192 300 + 5."
+        }
+      ],
+      "quickCheck": [
+        {
+          "id": "pv-q1",
+          "type": "mc",
+          "prompt": "In 719, the 1 is worth\u2026",
+          "choices": [
+            "1",
+            "10",
+            "100",
+            "710"
+          ],
+          "answer": "10"
+        },
+        {
+          "id": "pv-q2",
+          "type": "fill",
+          "prompt": "200 + 90 + 4 = ?",
+          "answer": "294",
+          "accept": [
+            "294"
+          ]
+        }
+      ]
+    },
+    "as-add-within-100": {
+      "id": "as-add-within-100",
+      "unitId": "unit-add-sub",
+      "title": "Adding Within 100",
+      "durationMin": 10,
+      "prerequisites": [
+        "ns-place-value-basics"
+      ],
+      "skills": [
+        "add-2digit",
+        "regroup-tens"
+      ],
+      "einsteinIntro": "Addition is putting amounts together \u2014 like combining star energy! We'll add two-digit numbers and sometimes make a NEW ten. Exciting!",
+      "explain": {
+        "panels": [
+          {
+            "speech": "To add 37 + 25, line them up by place: ones under ones, tens under tens!",
+            "visual": "add-align",
+            "state": "explain"
+          },
+          {
+            "speech": "Ones first: 7 + 5 = 12. That's 1 ten and 2 ones! Write 2, carry the 1 ten.",
+            "visual": "add-carry",
+            "state": "think"
+          },
+          {
+            "speech": "Tens: 3 + 2 + the carried 1 = 6. So 37 + 25 = 62. Cosmic!",
+            "visual": "add-result",
+            "state": "cheer"
+          }
+        ]
+      },
+      "workedExample": {
+        "title": "Worked Example",
+        "speech": "Let's add 48 + 36 together, step by step.",
+        "steps": [
+          "Line up: 48 on top, 36 below",
+          "Ones: 8 + 6 = 14 \u2192 write 4, carry 1",
+          "Tens: 4 + 3 + 1 = 8",
+          "Answer: 84"
+        ]
+      },
+      "practice": [
+        {
+          "id": "add-p1",
+          "type": "mc",
+          "prompt": "23 + 41 = ?",
+          "choices": [
+            "54",
+            "64",
+            "63",
+            "74"
+          ],
+          "answer": "64",
+          "hint": "Ones: 3+1=4. Tens: 2+4=6. No carrying needed!",
+          "feedbackCorrect": "Yes! 23 + 41 = 64. Smooth sailing!",
+          "feedbackWrong": "Try ones first (3+1), then tens (2+4). You should get 64."
+        },
+        {
+          "id": "add-p2",
+          "type": "mc",
+          "prompt": "57 + 28 = ?",
+          "choices": [
+            "75",
+            "85",
+            "95",
+            "78"
+          ],
+          "answer": "85",
+          "hint": "Ones: 7+8=15 \u2192 write 5, carry 1. Tens: 5+2+1=8.",
+          "feedbackCorrect": "Fantastic! You carried the ten and got 85!",
+          "feedbackWrong": "Remember to carry: 7+8=15, so ones digit is 5 and carry 1 to tens."
+        },
+        {
+          "id": "add-p3",
+          "type": "fill",
+          "prompt": "34 + 29 = ?",
+          "answer": "63",
+          "accept": [
+            "63"
+          ],
+          "hint": "Ones make 13 \u2014 write 3, carry 1. Then 3+2+1.",
+          "feedbackCorrect": "Yes! 34 + 29 = 63!",
+          "feedbackWrong": "4+9=13 \u2192 write 3 carry 1; 3+2+1=6 \u2192 63."
+        },
+        {
+          "id": "add-p4",
+          "type": "mc",
+          "prompt": "You have 46 stickers and get 37 more. How many now?",
+          "choices": [
+            "73",
+            "83",
+            "713",
+            "93"
+          ],
+          "answer": "83",
+          "hint": "This is 46 + 37. Ones: 6+7=13.",
+          "feedbackCorrect": "83 stickers! What a collection!",
+          "feedbackWrong": "Word problems are just stories about adding. 46 + 37 = 83."
+        }
+      ],
+      "quickCheck": [
+        {
+          "id": "add-q1",
+          "type": "mc",
+          "prompt": "19 + 45 = ?",
+          "choices": [
+            "54",
+            "64",
+            "63",
+            "55"
+          ],
+          "answer": "64"
+        },
+        {
+          "id": "add-q2",
+          "type": "fill",
+          "prompt": "68 + 17 = ?",
+          "answer": "85",
+          "accept": [
+            "85"
+          ]
+        }
+      ]
+    },
+    "md-equal-groups": {
+      "id": "md-equal-groups",
+      "unitId": "unit-mult-div",
+      "title": "Equal Groups",
+      "durationMin": 8,
+      "prerequisites": [],
+      "skills": [
+        "equal-groups",
+        "intro-multiplication"
+      ],
+      "einsteinIntro": "Multiplication is just FAST adding of equal groups! Like 3 bags with 4 stars each\u2026",
+      "explain": {
+        "panels": [
+          {
+            "speech": "3 groups of 4 = 4 + 4 + 4 = 12. We write that as 3 \u00d7 4 = 12!",
+            "visual": "groups-3x4",
+            "state": "explain"
+          },
+          {
+            "speech": "An array is a neat rectangle of rows and columns. 2 rows of 5 is 2 \u00d7 5!",
+            "visual": "array-2x5",
+            "state": "think"
+          }
+        ]
+      },
+      "workedExample": {
+        "title": "Worked Example",
+        "speech": "4 plates with 3 cookies each. How many cookies?",
+        "steps": [
+          "Equal groups: 4 groups of 3",
+          "Add: 3 + 3 + 3 + 3 = 12",
+          "Or multiply: 4 \u00d7 3 = 12"
+        ]
+      },
+      "practice": [
+        {
+          "id": "eg-p1",
+          "type": "mc",
+          "prompt": "2 groups of 6. How many in all?",
+          "choices": [
+            "8",
+            "12",
+            "26",
+            "6"
+          ],
+          "answer": "12",
+          "hint": "Add 6 + 6, or think 2 \u00d7 6.",
+          "feedbackCorrect": "12! Two sixes make a dozen!",
+          "feedbackWrong": "2 groups of 6 means 6 + 6 = 12."
+        },
+        {
+          "id": "eg-p2",
+          "type": "mc",
+          "prompt": "Which matches 5 \u00d7 3?",
+          "choices": [
+            "5 + 3",
+            "3 + 3 + 3 + 3 + 3",
+            "5 + 5 + 5 + 5 + 5",
+            "53"
+          ],
+          "answer": "3 + 3 + 3 + 3 + 3",
+          "hint": "5 \u00d7 3 means five groups of three.",
+          "feedbackCorrect": "Yes! Five threes added together!",
+          "feedbackWrong": "5 \u00d7 3 = five groups of 3 \u2192 3+3+3+3+3."
+        },
+        {
+          "id": "eg-p3",
+          "type": "fill",
+          "prompt": "3 \u00d7 4 = ?",
+          "answer": "12",
+          "accept": [
+            "12"
+          ],
+          "hint": "3 groups of 4, or 4+4+4.",
+          "feedbackCorrect": "12 \u2014 you're multiplying like a pro!",
+          "feedbackWrong": "4 + 4 + 4 = 12."
+        }
+      ],
+      "quickCheck": [
+        {
+          "id": "eg-q1",
+          "type": "mc",
+          "prompt": "4 groups of 2 = ?",
+          "choices": [
+            "6",
+            "8",
+            "42",
+            "24"
+          ],
+          "answer": "8"
+        }
+      ]
+    },
+    "fr-halves-fourths": {
+      "id": "fr-halves-fourths",
+      "unitId": "unit-fractions",
+      "title": "Halves & Fourths",
+      "durationMin": 8,
+      "prerequisites": [],
+      "skills": [
+        "fractions-half",
+        "fractions-fourth"
+      ],
+      "einsteinIntro": "Fractions are fair shares! Cut a whole into equal pieces and name one piece.",
+      "explain": {
+        "panels": [
+          {
+            "speech": "Cut a sandwich into 2 EQUAL parts \u2014 each is one-half, written 1/2!",
+            "visual": "half-sandwich",
+            "state": "explain"
+          },
+          {
+            "speech": "Cut into 4 equal parts \u2014 each is one-fourth, or 1/4. Two fourths make a half!",
+            "visual": "fourths",
+            "state": "cheer"
+          }
+        ]
+      },
+      "workedExample": {
+        "title": "Worked Example",
+        "speech": "A chocolate bar split into 4 equal squares. You eat 1 square.",
+        "steps": [
+          "Whole = 4 equal parts",
+          "You ate 1 of 4 \u2192 1/4",
+          "Left over: 3/4"
+        ]
+      },
+      "practice": [
+        {
+          "id": "fr-p1",
+          "type": "mc",
+          "prompt": "A circle split into 2 equal parts. One part is\u2026",
+          "choices": [
+            "1/2",
+            "1/4",
+            "2/1",
+            "1/3"
+          ],
+          "answer": "1/2",
+          "hint": "Two equal parts \u2192 halves.",
+          "feedbackCorrect": "One-half! Spot on!",
+          "feedbackWrong": "Two equal pieces mean each is 1/2."
+        },
+        {
+          "id": "fr-p2",
+          "type": "mc",
+          "prompt": "Which is bigger: 1/2 or 1/4 of the same pizza?",
+          "choices": [
+            "1/2",
+            "1/4",
+            "Same size",
+            "Can't tell"
+          ],
+          "answer": "1/2",
+          "hint": "Fewer equal pieces means each piece is bigger.",
+          "feedbackCorrect": "Yes! Half is bigger than a fourth of the same pizza!",
+          "feedbackWrong": "A half is two fourths \u2014 so 1/2 > 1/4."
+        },
+        {
+          "id": "fr-p3",
+          "type": "fill",
+          "prompt": "How many fourths make one whole? (just the number)",
+          "answer": "4",
+          "accept": [
+            "4",
+            "four"
+          ],
+          "hint": "Fourth means cut into 4 equal parts.",
+          "feedbackCorrect": "Four fourths = one whole!",
+          "feedbackWrong": "It takes 4 fourths to rebuild the whole."
+        }
+      ],
+      "quickCheck": [
+        {
+          "id": "fr-q1",
+          "type": "mc",
+          "prompt": "2/4 of a bar is the same as\u2026",
+          "choices": [
+            "1/4",
+            "1/2",
+            "2/2",
+            "4/2"
+          ],
+          "answer": "1/2"
+        }
+      ]
+    },
+    "ns-compare-numbers": {
+      "id": "ns-compare-numbers",
+      "unitId": "unit-number-sense",
+      "title": "Compare Numbers",
+      "durationMin": 7,
+      "prerequisites": [
+        "ns-place-value-basics"
+      ],
+      "skills": [
+        "compare-2digit",
+        "compare-3digit"
+      ],
+      "einsteinIntro": "Which number is greater? We compare place by place \u2014 hundreds first!",
+      "explain": {
+        "panels": [
+          {
+            "speech": "Compare 73 and 68. Look at tens first: 7 tens beats 6 tens, so 73 > 68!",
+            "visual": "compare-tens",
+            "state": "explain"
+          }
+        ]
+      },
+      "workedExample": {
+        "title": "Worked Example",
+        "speech": "Is 245 greater than 254?",
+        "steps": [
+          "Hundreds same: both 2",
+          "Tens: 4 vs 5 \u2192 4 < 5",
+          "So 245 < 254"
+        ]
+      },
+      "practice": [
+        {
+          "id": "cmp-p1",
+          "type": "mc",
+          "prompt": "Which is greater: 56 or 65?",
+          "choices": [
+            "56",
+            "65",
+            "Equal"
+          ],
+          "answer": "65",
+          "hint": "Compare the tens digits first.",
+          "feedbackCorrect": "65 is greater \u2014 more tens!",
+          "feedbackWrong": "6 tens beats 5 tens, so 65 > 56."
+        },
+        {
+          "id": "cmp-p2",
+          "type": "mc",
+          "prompt": "92 \u25cb 89  \u2014 what goes in the circle?",
+          "choices": [
+            ">",
+            "<",
+            "="
+          ],
+          "answer": ">",
+          "hint": "9 tens vs 8 tens.",
+          "feedbackCorrect": "92 > 89. Correct!",
+          "feedbackWrong": "92 has more tens, so 92 > 89."
+        }
+      ],
+      "quickCheck": [
+        {
+          "id": "cmp-q1",
+          "type": "mc",
+          "prompt": "Which is least: 108, 180, 118?",
+          "choices": [
+            "108",
+            "180",
+            "118"
+          ],
+          "answer": "108"
+        }
+      ]
+    },
+    "as-sub-within-100": {
+      "id": "as-sub-within-100",
+      "unitId": "unit-add-sub",
+      "title": "Subtract Within 100",
+      "durationMin": 10,
+      "prerequisites": [
+        "as-add-within-100"
+      ],
+      "skills": [
+        "sub-2digit",
+        "regroup-borrow"
+      ],
+      "einsteinIntro": "Subtraction is taking away \u2014 or finding the difference. Sometimes we borrow a ten. You've got this!",
+      "explain": {
+        "panels": [
+          {
+            "speech": "52 \u2212 18. Ones: 2 is smaller than 8, so borrow a ten! 12 \u2212 8 = 4.",
+            "visual": "sub-borrow",
+            "state": "explain"
+          },
+          {
+            "speech": "Tens left: 4 \u2212 1 = 3. Answer: 34!",
+            "visual": "sub-result",
+            "state": "cheer"
+          }
+        ]
+      },
+      "workedExample": {
+        "title": "Worked Example",
+        "speech": "70 \u2212 25.",
+        "steps": [
+          "Ones: 0 < 5, borrow \u2192 10 \u2212 5 = 5",
+          "Tens: 6 \u2212 2 = 4",
+          "Answer: 45"
+        ]
+      },
+      "practice": [
+        {
+          "id": "sub-p1",
+          "type": "mc",
+          "prompt": "45 \u2212 12 = ?",
+          "choices": [
+            "33",
+            "57",
+            "32",
+            "23"
+          ],
+          "answer": "33",
+          "hint": "No borrowing needed. Ones then tens.",
+          "feedbackCorrect": "33 \u2014 clean subtract!",
+          "feedbackWrong": "5\u22122=3 ones, 4\u22121=3 tens \u2192 33."
+        },
+        {
+          "id": "sub-p2",
+          "type": "fill",
+          "prompt": "60 \u2212 24 = ?",
+          "answer": "36",
+          "accept": [
+            "36"
+          ],
+          "hint": "Borrow for the ones: 10\u22124=6, then 5\u22122=3.",
+          "feedbackCorrect": "36! Borrowing like a champ!",
+          "feedbackWrong": "Borrow: 10\u22124=6 ones; 5\u22122=3 tens \u2192 36."
+        }
+      ],
+      "quickCheck": [
+        {
+          "id": "sub-q1",
+          "type": "mc",
+          "prompt": "81 \u2212 37 = ?",
+          "choices": [
+            "44",
+            "54",
+            "43",
+            "118"
+          ],
+          "answer": "44"
+        }
+      ]
+    }
+  }
+}

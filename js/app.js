@@ -23,11 +23,30 @@
   }
 
 
-  function refreshStudentCast() {
+
+  function wireStudentMirror() {
+    if (typeof Einstein === 'undefined' || typeof Student === 'undefined') return;
+    if (Einstein._studentMirrorWired) return;
+    Einstein._studentMirrorWired = true;
+    const origMount = Einstein.mount.bind(Einstein);
+    Einstein.mount = function (el, state) {
+      origMount(el, state);
+      try { Student.mirrorState(state || 'idle'); } catch (_) {}
+    };
+    const origSet = Einstein.setState && Einstein.setState.bind(Einstein);
+    if (origSet) {
+      Einstein.setState = function (el, state) {
+        origSet(el, state);
+        try { Student.mirrorState(state || 'idle'); } catch (_) {}
+      };
+    }
+  }
+
+  function refreshStudentCast(state) {
     if (typeof Student === 'undefined') return;
     const u = activeUser();
     const name = (u && u.displayName) || 'Explorer';
-    Student.refreshAll(name);
+    Student.refreshAll(name, state);
   }
 
   function syncProgressFromStore() {
@@ -1489,7 +1508,8 @@
     store = Storage.loadStore();
     syncProgressFromStore();
     syncSpeechFromStore();
-    refreshStudentCast();
+    wireStudentMirror();
+    refreshStudentCast('idle');
     wireNav();
     renderLanding();
     showScreen('screen-landing');

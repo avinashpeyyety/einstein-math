@@ -1023,6 +1023,12 @@ h1, h2, h3, .logo, .burst-text {
 }
 .student-caption .student-role { color: var(--burst-pink, #ff6b9d); }
 
+.student-stage.state-idle .student-panel { animation: panelIdle 3.2s ease-in-out infinite; }
+.student-stage.state-explain .student-panel { animation: explainBounce 0.65s ease-in-out infinite alternate; }
+.student-stage.state-cheer .student-panel { animation: cheerJump 0.45s ease-in-out infinite alternate; }
+.student-stage.state-think .student-panel { animation: thinkSway 2.2s ease-in-out infinite; }
+
+
 .teacher-row {
   grid-template-columns: auto 1fr;
 }

@@ -9,7 +9,7 @@ Public interactive math program for **ages 5–10** (US K–5), delivered by **E
   - **Ages 7–8 (grades 2–3)** — place value, rounding & estimation, regrouping fluency, mult/div ideas (facts, quotative), fractions of a set, perimeter, elapsed time, bar graphs, multi-step & money WP
   - **Ages 9–10 (grades 4–5)** — multi-digit ops + long mult/div ideas, factors/primes, order of ops, fraction × whole & mixed add/sub (like denoms), decimal add/sub, area/volume, coordinate plane, multi-step WP
 - **Mastery + spaced review** (device-local) — check ≥ ~80% → mastered & schedule review; fail &lt; 60% → needs_review + **Retry weak spots**
-- **Today's path** — Mission Map + Home suggest the next 1–3 missions (due reviews → needs_review → diagnostic path → next ready)
+- **Today's path** — Mission Map + Home suggest the next 1–3 missions (due reviews → needs_review → diagnostic path → next ready); friendly empty-state when nothing is queued
 - **Parent / Family summary** on the Progress screen — stars, done/mastered, reviews due, unit mastery, weak spots, recent activity; **Print / Save as PDF** + **Download JSON**
 - **Multi-device handoff** — **Export all profiles** / **Import profiles** (merge by id or replace-all) until real sync exists
 - **PWA / offline** — installable app shell; service worker caches curriculum + panels after first online visit
@@ -164,7 +164,7 @@ Localhost works for PWA install in Chromium.
 
 ## Smoke demo (2.3 trusted-home sprint)
 
-1. Load once online → DevTools → Application → Service Worker registered; Cache Storage shows `einstein-math-v2.3.3` (or the current `CACHE` in `sw.js`).
+1. Load once online → DevTools → Application → Service Worker registered; Cache Storage shows `einstein-math-v2.3.4` (or the current `CACHE` in `sw.js`).
 2. Go offline (DevTools Network → Offline) → reload → landing / Mission Map still usable.
 3. Create two explorers, earn progress → **Export all profiles** → clear site data → **Import** merge → both kids restored.
 4. Toggle **Read aloud** → Einstein bubbles speak; **Replay** repeats the last line.

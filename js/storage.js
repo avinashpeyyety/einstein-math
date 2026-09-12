@@ -780,7 +780,7 @@ const Storage = {
     // 1) Due reviews
     this.getDueReviews(tp).forEach(d => {
       if (out.length >= limit) return;
-      push(d.lessonId, 'review due', 'review');
+      push(d.lessonId, 'Spaced review — keep it sticky!', 'review');
     });
 
     // 2) needs_review (not already listed)
@@ -788,7 +788,7 @@ const Storage = {
       if (out.length >= limit) return;
       const L = this.normalizeLesson(raw);
       if (L.masteryLevel === 'needs_review' || (L.status === 'done' && L.mastery < 0.6)) {
-        push(id, 'needs review', 'remediate');
+        push(id, 'Strengthen weak spots', 'remediate');
       }
     });
 
@@ -802,11 +802,11 @@ const Storage = {
         if (out.length >= limit) return true;
         const st = this.lessonStatus(tp, lid, track);
         if (st === 'in_progress') {
-          push(lid, 'suggested path (resume)', 'lesson');
+          push(lid, 'Resume your suggested path', 'lesson');
           return true;
         }
         if (st === 'ready') {
-          push(lid, 'suggested path', 'lesson');
+          push(lid, 'On your suggested path', 'lesson');
           return true;
         }
         return false;
@@ -820,11 +820,11 @@ const Storage = {
         if (out.length >= limit) return true;
         const st = this.lessonStatus(tp, lid, track);
         if (st === 'in_progress') {
-          push(lid, 'resume', 'lesson');
+          push(lid, 'Pick up where you left off', 'lesson');
           return true;
         }
         if (st === 'ready') {
-          push(lid, 'next lesson', 'lesson');
+          push(lid, 'Next up on the map', 'lesson');
           return true;
         }
         return false;

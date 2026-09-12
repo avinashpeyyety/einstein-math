@@ -117,15 +117,20 @@
     }
     const track = activeTrack();
     const suggestions = Storage.getSuggestedPath(progress, track, 3);
+    host.classList.remove('hidden');
     if (!suggestions.length) {
-      host.classList.add('hidden');
-      host.innerHTML = '';
+      host.innerHTML = `
+      <div class="todays-path-inner todays-path-empty">
+        <h3 class="todays-path-title">Today's path</h3>
+        <p class="todays-path-lede">You're all caught up for now.</p>
+        <p class="todays-path-empty-copy">No reviews due and no next mission queued. Open the <strong>Mission Map</strong> and pick any lesson — or check back later when a spaced review pops up!</p>
+      </div>`;
       return;
     }
-    host.classList.remove('hidden');
     host.innerHTML = `
       <div class="todays-path-inner">
         <h3 class="todays-path-title">Today's path</h3>
+        <p class="todays-path-lede">Up to 3 missions — reviews first, then new learning.</p>
         <ol class="todays-path-list">
           ${suggestions.map((s, i) => `
             <li>

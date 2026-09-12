@@ -1,7 +1,10 @@
-/* Einstein comic teacher — Imagine expression panels */
+/* Einstein comic teacher — Imagine expression panels + optional Web Speech read-aloud */
 const Einstein = {
   states: ['idle', 'explain', 'cheer', 'think'],
   panelBase: 'assets/panels/',
+  _speechEnabled: false,
+  _lastSpoken: '',
+  _utterance: null,
 
   panelSrc(state) {
     const s = this.states.includes(state) ? state : 'idle';
@@ -33,12 +36,65 @@ const Einstein = {
     }
   },
 
+  setSpeechEnabled(on) {
+    this._speechEnabled = !!on;
+    if (!this._speechEnabled) this.cancelSpeech();
+  },
+
+  isSpeechEnabled() {
+    return !!this._speechEnabled;
+  },
+
+  speechSupported() {
+    return typeof window !== 'undefined' && 'speechSynthesis' in window && typeof window.SpeechSynthesisUtterance === 'function';
+  },
+
+  cancelSpeech() {
+    try {
+      if (this.speechSupported()) window.speechSynthesis.cancel();
+    } catch (_) { /* Safari quirks */ }
+    this._utterance = null;
+  },
+
+  /** Strip UI-ish punctuation noise for kid-friendly TTS */
+  _cleanForSpeech(text) {
+    return String(text || '')
+      .replace(/[★⚡⏱→←]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+  },
+
+  speakAloud(text, opts = {}) {
+    if (!this._speechEnabled && !opts.force) return;
+    if (!this.speechSupported()) return;
+    const cleaned = this._cleanForSpeech(text);
+    if (!cleaned) return;
+    try {
+      this.cancelSpeech();
+      const u = new SpeechSynthesisUtterance(cleaned);
+      u.rate = typeof opts.rate === 'number' ? opts.rate : 0.95;
+      u.pitch = 1;
+      u.volume = 1;
+      this._utterance = u;
+      this._lastSpoken = cleaned;
+      window.speechSynthesis.speak(u);
+    } catch (_) {
+      /* graceful no-op */
+    }
+  },
+
+  replayLast() {
+    if (this._lastSpoken) this.speakAloud(this._lastSpoken, { force: true, rate: 0.95 });
+  },
+
   speak(bubbleEl, text, variant) {
     if (!bubbleEl) return;
     bubbleEl.textContent = text;
     bubbleEl.classList.remove('correction', 'success');
     if (variant === 'correction') bubbleEl.classList.add('correction');
     if (variant === 'success') bubbleEl.classList.add('success');
+    // Auto-speak when bubble text changes if read-aloud is on
+    this.speakAloud(text);
   },
 
   pow(anchorEl, word = 'POW!') {

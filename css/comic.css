@@ -599,3 +599,388 @@ h1, h2, h3, .logo, .burst-text {
 }
 
 .hidden { display: none !important; }
+
+/* —— Multi-user / age tracks —— */
+.top-bar-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.user-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0.65rem 0.25rem 0.25rem;
+  border: 3px solid var(--ink);
+  border-radius: 999px;
+  background: var(--panel);
+  box-shadow: 2px 2px 0 var(--ink);
+  cursor: pointer;
+  font-family: 'Comic Neue', cursive, sans-serif;
+  font-weight: 700;
+}
+.user-chip:hover { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink); }
+
+.user-avatar {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  border: 2px solid var(--ink);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Bangers', Impact, sans-serif;
+  font-size: 1.1rem;
+  color: #fff;
+  text-shadow: 1px 1px 0 var(--ink);
+  flex-shrink: 0;
+}
+
+.user-chip-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+  text-align: left;
+  font-size: 0.85rem;
+}
+.user-chip-text #user-name { font-family: 'Bangers', Impact, sans-serif; font-size: 1rem; }
+
+.muted { opacity: 0.65; font-weight: 700; font-size: 0.8rem; }
+
+.track-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+.track-grid.compact .track-btn-blurb { display: none; }
+
+.track-btn {
+  text-align: left;
+  padding: 0.85rem 1rem;
+  border: 3px solid var(--ink);
+  border-radius: 8px;
+  background: var(--panel);
+  box-shadow: 3px 3px 0 var(--ink);
+  cursor: pointer;
+  font-family: 'Comic Neue', cursive, sans-serif;
+  transition: transform 0.1s, box-shadow 0.1s, background 0.1s;
+}
+.track-btn:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+.track-btn.selected {
+  background: var(--burst-yellow);
+  box-shadow: 4px 4px 0 var(--ink), inset 0 0 0 3px var(--burst-orange);
+}
+.track-btn-label {
+  display: block;
+  font-family: 'Bangers', Impact, sans-serif;
+  font-size: 1.25rem;
+  letter-spacing: 0.03em;
+}
+.track-btn-grade {
+  display: block;
+  font-weight: 700;
+  color: var(--burst-orange);
+  margin: 0.15rem 0;
+}
+.track-btn-blurb {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 700;
+  opacity: 0.8;
+  line-height: 1.3;
+}
+
+.field-label {
+  display: block;
+  font-weight: 700;
+  margin-bottom: 0.35rem;
+}
+
+.text-input {
+  width: 100%;
+  max-width: 320px;
+  padding: 0.55rem 0.75rem;
+  font-size: 1.1rem;
+  font-family: 'Comic Neue', cursive, sans-serif;
+  font-weight: 700;
+  border: 3px solid var(--ink);
+  border-radius: 6px;
+  background: #fff;
+  box-shadow: 2px 2px 0 var(--ink);
+}
+
+.privacy-note {
+  margin-top: 0.85rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  opacity: 0.7;
+}
+
+.user-picker-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.user-card {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.65rem 0.85rem;
+  border: 3px solid var(--ink);
+  border-radius: 8px;
+  background: var(--panel);
+  box-shadow: 2px 2px 0 var(--ink);
+  cursor: pointer;
+  text-align: left;
+  font-family: 'Comic Neue', cursive, sans-serif;
+  width: 100%;
+}
+.user-card:hover { background: var(--burst-cyan); }
+.user-card.active {
+  background: var(--burst-yellow);
+  box-shadow: 3px 3px 0 var(--ink), inset 0 0 0 2px var(--burst-orange);
+}
+.user-card-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+.user-card-text strong {
+  font-family: 'Bangers', Impact, sans-serif;
+  font-size: 1.15rem;
+  letter-spacing: 0.03em;
+}
+
+.hub-track {
+  font-size: 1rem;
+  color: var(--ink);
+  text-shadow: none;
+  font-family: 'Comic Neue', cursive, sans-serif;
+  font-weight: 700;
+  opacity: 0.75;
+  margin-left: 0.35rem;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(26, 26, 46, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 1rem;
+}
+.modal-panel {
+  max-width: 420px;
+  width: 100%;
+  margin: 0;
+  max-height: 80vh;
+  overflow: auto;
+}
+
+
+/* Mastery / review polish */
+.badge.review { background: var(--pink, #FF6B9D); color: #fff; }
+.badge.needs-review { background: #FFB347; color: #1a1a2e; }
+.unit-card.recommended { box-shadow: 6px 6px 0 rgba(255, 107, 53, 0.35); }
+.rec-pill {
+  display: inline-block;
+  font-size: 0.65rem;
+  background: var(--cyan, #4ECDC4);
+  color: #1a1a2e;
+  padding: 0.15rem 0.45rem;
+  border: 2px solid var(--ink, #1a1a2e);
+  border-radius: 999px;
+  vertical-align: middle;
+  font-family: 'Comic Neue', cursive, sans-serif;
+  font-weight: 700;
+}
+.strengthen-tag {
+  display: inline-block;
+  margin-left: 0.35rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #8B4513;
+  background: #FFE66D;
+  border: 2px solid var(--ink, #1a1a2e);
+  padding: 0.1rem 0.35rem;
+  border-radius: 6px;
+}
+.unit-mastery-line {
+  font-size: 0.8rem;
+  font-weight: 700;
+  opacity: 0.75;
+  margin-bottom: 0.5rem;
+}
+.review-panel {
+  margin-bottom: 1rem;
+  border-color: #FF6B9D;
+}
+
+
+/* ——— Parent / Family summary ——— */
+.parent-family-section {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 4px dashed var(--ink, #1a1a2e);
+}
+.parent-title { color: #2d3436; }
+.parent-lede {
+  font-weight: 600;
+  opacity: 0.85;
+  margin-bottom: 0.75rem;
+}
+.parent-card {
+  background: #fffdf7;
+  border: 3px solid var(--ink, #1a1a2e);
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 4px 4px 0 rgba(0,0,0,0.12);
+}
+.parent-identity {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+.parent-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
+.parent-stats .stat-box { min-width: 5.5rem; }
+
+
+
+/* ——— Speech toggle ——— */
+.speech-toggle[aria-pressed="true"] {
+  background: var(--burst-cyan);
+  color: var(--ink);
+}
+.speech-toggle:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* ——— Today's path strip ——— */
+.todays-path {
+  margin-top: 0.85rem;
+}
+.todays-path.comic-panel {
+  margin-bottom: 1rem;
+  border-color: var(--burst-orange);
+  background: linear-gradient(135deg, #fff8e7 0%, #ffe8d6 100%);
+}
+.todays-path-inner { position: relative; z-index: 1; }
+.todays-path-title {
+  font-family: 'Bangers', Impact, sans-serif;
+  font-size: 1.35rem;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.5rem;
+}
+.todays-path-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0;
+}
+.todays-path-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  text-align: left;
+  border: 3px solid var(--ink);
+  border-radius: 10px;
+  background: #fffef5;
+  box-shadow: 3px 3px 0 var(--ink);
+  padding: 0.45rem 0.65rem;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+}
+.todays-path-btn:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0 var(--ink);
+  background: #fff;
+}
+.todays-path-n {
+  font-family: 'Bangers', Impact, sans-serif;
+  font-size: 1.25rem;
+  width: 1.6rem;
+  height: 1.6rem;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--burst-yellow);
+  border: 2px solid var(--ink);
+  flex-shrink: 0;
+}
+.todays-path-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+}
+.todays-path-text strong { line-height: 1.2; }
+.hero-copy .todays-path {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  border: 3px solid var(--ink);
+  border-radius: 10px;
+  background: #fff8e7;
+  box-shadow: 3px 3px 0 var(--ink);
+}
+
+/* ——— Multi-device handoff ——— */
+.handoff-section {
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 2px dashed rgba(26,26,46,0.25);
+}
+.handoff-section code {
+  font-size: 0.85em;
+  background: rgba(0,0,0,0.06);
+  padding: 0.05em 0.3em;
+  border-radius: 4px;
+}
+
+@media (max-width: 720px) {
+  .top-bar-right { flex-wrap: wrap; justify-content: flex-end; }
+  .speech-toggle, .speech-replay { font-size: 0.85rem; }
+}
+
+@media print {
+  body * { visibility: hidden !important; }
+  body.print-parent .parent-family-section,
+  body.print-parent .parent-family-section * {
+    visibility: visible !important;
+  }
+  body.print-parent .parent-family-section {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    margin: 0;
+  }
+  body.print-parent .no-print,
+  body.print-parent .parent-actions {
+    display: none !important;
+  }
+  body.print-parent .top-bar,
+  body.print-parent .site-footer,
+  body.print-parent .nav-btns {
+    display: none !important;
+  }
+}

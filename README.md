@@ -30,12 +30,18 @@ No accounts, no passwords, no server sync API. Clearing site data erases progres
 1. Serve over **http://** or **https://** (not `file://`) — see Run locally below.
 2. Open the site once **online** so the service worker can cache:
    - `index.html`, `css/comic.css`, `js/*`, `data/curriculum.json`
-   - `assets/panels/*`, `assets/icons/*`, `manifest.webmanifest`
+   - `assets/panels/*` (Einstein), `assets/student/panels/*` (pupil idle/explain/cheer/think), `assets/student/portrait.jpg`
+   - `assets/icons/*`, `manifest.webmanifest`
 3. In **Chromium** (Chrome/Edge): address-bar install icon / menu → **Install Einstein Math**. Localhost is allowed for install.
 4. After that first visit, reload offline — app shell + lessons should still load from cache.
-5. Updates: bump the SW cache name (in `sw.js`) when shipping asset changes so clients refresh.
+5. Updates: bump the SW cache name (in `sw.js`) when shipping CSS/JS/panel changes so clients pick up a new precache.
+6. **Hard-refresh after SW cache bumps** — a normal reload can keep a stale shell/panels while the old worker is still in control. After a `CACHE` bump (or if student/Einstein panels look wrong), do a hard refresh (**Cmd+Shift+R** / **Ctrl+Shift+R**) once online, or DevTools → Application → Clear storage, then reload so the new worker installs and the pupil likeness panels swap correctly.
 
 Safari / iOS: Add to Home Screen works; offline cache behavior depends on the browser — speech and install UX vary.
+
+## Student panels (likeness QA)
+
+Pupil stages mirror Einstein moods via `js/student.js` → `assets/student/panels/{idle,explain,cheer,think}.png` (same four states). Crop uses `object-fit: cover` + `object-position: center top` so the face stays in the 3:4 frame like the teacher panels. After any panel or CSS ship, bump `sw.js` `CACHE` and **hard-refresh** (see Install / offline).
 
 ## Multi-device handoff (import / export)
 
@@ -158,7 +164,7 @@ Localhost works for PWA install in Chromium.
 
 ## Smoke demo (2.3 trusted-home sprint)
 
-1. Load once online → DevTools → Application → Service Worker registered; Cache Storage shows `einstein-math-v2.3.0`.
+1. Load once online → DevTools → Application → Service Worker registered; Cache Storage shows `einstein-math-v2.3.3` (or the current `CACHE` in `sw.js`).
 2. Go offline (DevTools Network → Offline) → reload → landing / Mission Map still usable.
 3. Create two explorers, earn progress → **Export all profiles** → clear site data → **Import** merge → both kids restored.
 4. Toggle **Read aloud** → Einstein bubbles speak; **Replay** repeats the last line.
@@ -212,7 +218,9 @@ einstein-math/
   js/einstein.js
   js/app.js
   data/curriculum.json
-  assets/panels/*.png
+  assets/panels/*.png          # Einstein idle/explain/cheer/think
+  assets/student/portrait.jpg
+  assets/student/panels/*.png  # pupil likeness panels (same four states)
   assets/icons/icon-192.png
   assets/icons/icon-512.png
   assets/icons/icon.svg

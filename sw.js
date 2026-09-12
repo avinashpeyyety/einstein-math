@@ -1,5 +1,5 @@
 /* Einstein Math service worker — caches app shell + curriculum + panels for offline play */
-const CACHE = 'einstein-math-v2.3.0';
+const CACHE = 'einstein-math-v2.3.1';
 const PRECACHE = [
   './',
   './index.html',
@@ -7,6 +7,7 @@ const PRECACHE = [
   './css/comic.css',
   './js/storage.js',
   './js/einstein.js',
+  './js/student.js',
   './js/app.js',
   './data/curriculum.json',
   './assets/einstein.svg',
@@ -16,7 +17,8 @@ const PRECACHE = [
   './assets/panels/idle.png',
   './assets/panels/explain.png',
   './assets/panels/cheer.png',
-  './assets/panels/think.png'
+  './assets/panels/think.png',
+  './assets/student/portrait.jpg'
 ];
 
 self.addEventListener('install', (event) => {

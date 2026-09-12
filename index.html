@@ -44,13 +44,17 @@
     <!-- LANDING -->
     <section id="screen-landing" class="screen active">
       <div class="comic-panel hero">
-        <div>
-          <div class="einstein-stage" id="landing-einstein"></div>
+        <div class="cast-wrap">
+          <div class="cast-label">Einstein + student</div>
+          <div class="cast-duo">
+            <div class="einstein-stage" id="landing-einstein"></div>
+            <div class="student-stage" id="landing-student" data-student></div>
+          </div>
         </div>
         <div class="hero-copy">
           <div class="burst-badge">POW! Ages 5–10</div>
           <h1>Cosmic Adventures<br>in Numbers!</h1>
-          <p class="tagline">Learn with Einstein — an 80s comic-book teacher who makes math heroic. Pick your age track!</p>
+          <p class="tagline">Einstein teaches — your explorer learns beside him. 80s comic math adventures; pick an age track!</p>
           <div class="speech-wrap">
             <div class="speech-bubble" id="landing-speech">Loading…</div>
           </div>
@@ -99,7 +103,10 @@
       <div class="comic-panel">
         <div class="diag-progress" id="diag-progress">Warm-Up</div>
         <div class="teacher-row">
-          <div class="einstein-stage" id="diag-einstein"></div>
+          <div class="cast-duo">
+            <div class="einstein-stage" id="diag-einstein"></div>
+            <div class="student-stage" id="diag-student" data-student></div>
+          </div>
           <div class="speech-wrap"><div class="speech-bubble" id="diag-speech"></div></div>
         </div>
         <div id="diag-card"></div>
@@ -110,7 +117,10 @@
     <section id="screen-diag-result" class="screen">
       <div class="comic-panel">
         <div class="teacher-row">
-          <div class="einstein-stage" id="diag-result-einstein"></div>
+          <div class="cast-duo">
+            <div class="einstein-stage" id="diag-result-einstein"></div>
+            <div class="student-stage" id="diag-result-student" data-student></div>
+          </div>
           <div class="speech-wrap"><div class="speech-bubble" id="diag-result-speech"></div></div>
         </div>
         <div id="diag-result-body"></div>
@@ -124,7 +134,10 @@
     <section id="screen-hub" class="screen">
       <div class="comic-panel">
         <div class="teacher-row">
-          <div class="einstein-stage" id="hub-einstein" style="width:120px;height:150px;"></div>
+          <div class="cast-duo">
+            <div class="einstein-stage" id="hub-einstein" style="width:120px;height:150px;"></div>
+            <div class="student-stage" id="hub-student" data-student></div>
+          </div>
           <div class="speech-wrap"><div class="speech-bubble" id="hub-speech"></div></div>
         </div>
       </div>
@@ -138,7 +151,10 @@
     <section id="screen-progress" class="screen">
       <div class="comic-panel">
         <div class="teacher-row">
-          <div class="einstein-stage" id="progress-einstein" style="width:120px;height:150px;"></div>
+          <div class="cast-duo">
+            <div class="einstein-stage" id="progress-einstein" style="width:120px;height:150px;"></div>
+            <div class="student-stage" id="progress-student" data-student></div>
+          </div>
           <div class="speech-wrap"><div class="speech-bubble" id="progress-speech"></div></div>
         </div>
         <h2 class="panel-title">Adventure Log</h2>
@@ -201,8 +217,11 @@
         <div class="progress-pips" id="lesson-pips"></div>
       </div>
       <div class="comic-panel">
-        <div class="teacher-row">
-          <div class="einstein-stage" id="lesson-einstein"></div>
+                <div class="teacher-row">
+          <div class="cast-duo">
+            <div class="einstein-stage" id="lesson-einstein"></div>
+            <div class="student-stage" id="lesson-student" data-student></div>
+          </div>
           <div class="speech-wrap"><div class="speech-bubble" id="lesson-speech"></div></div>
         </div>
         <div id="lesson-body"></div>
@@ -221,12 +240,13 @@
     </div>
 
     <footer class="site-footer">
-      Einstein Math · Ages 5–10 · v2.3 · Progress stays on your device (no accounts) · Installable / offline after first visit
+      Einstein Math · Ages 5–10 · v2.3.1 · Progress stays on your device (no accounts) · Installable / offline after first visit
     </footer>
   </div>
 
   <script src="js/storage.js"></script>
   <script src="js/einstein.js"></script>
+  <script src="js/student.js"></script>
   <script src="js/app.js"></script>
   <script>
     // Register service worker only on http/https (never file://)

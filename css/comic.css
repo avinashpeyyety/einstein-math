@@ -984,3 +984,72 @@ h1, h2, h3, .logo, .burst-text {
     display: none !important;
   }
 }
+
+
+/* —— Student pupil (comic portrait) —— */
+.cast-duo {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+}
+.cast-duo .einstein-stage { flex: 0 0 auto; }
+.cast-duo .student-stage { flex: 0 0 auto; }
+
+.student-stage {
+  width: 150px;
+  height: auto;
+  position: relative;
+  text-align: center;
+}
+.student-stage .student-panel {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  object-position: center 18%;
+  border: 3px solid var(--ink);
+  border-radius: 6px;
+  box-shadow: 4px 4px 0 rgba(26,26,46,0.28);
+  background: #f3e9d2;
+  display: block;
+}
+.student-caption {
+  margin-top: 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.student-caption .student-role { color: var(--burst-pink, #ff6b9d); }
+
+.teacher-row {
+  grid-template-columns: auto 1fr;
+}
+.teacher-row .cast-duo {
+  max-width: 340px;
+}
+.teacher-row .einstein-stage { width: 120px; height: 160px; }
+.teacher-row .student-stage { width: 110px; }
+.teacher-row .student-stage .student-panel { height: auto; }
+
+@media (max-width: 560px) {
+  .teacher-row .cast-duo { justify-content: center; }
+  .teacher-row .einstein-stage { width: 130px; height: 173px; }
+  .teacher-row .student-stage { width: 120px; }
+}
+
+.hero .cast-duo {
+  justify-content: center;
+  margin-bottom: 0.5rem;
+}
+.hero .cast-duo .einstein-stage { width: 180px; height: 240px; }
+.hero .cast-duo .student-stage { width: 150px; }
+.cast-label {
+  width: 100%;
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 800;
+  margin-bottom: 0.25rem;
+  color: var(--ink);
+}

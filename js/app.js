@@ -22,13 +22,23 @@
     return curriculum.tracks[id] || curriculum.tracks['ages-7-8'];
   }
 
+
+  function refreshStudentCast() {
+    if (typeof Student === 'undefined') return;
+    const u = activeUser();
+    const name = (u && u.displayName) || 'Explorer';
+    Student.refreshAll(name);
+  }
+
   function syncProgressFromStore() {
     const u = activeUser();
     if (!u) {
       progress = Storage.trackDefaults();
+      refreshStudentCast();
       return;
     }
     progress = Storage.getTrackProgress(u, u.trackId);
+    refreshStudentCast();
   }
 
   function persistProgress() {
@@ -412,6 +422,7 @@
     const continuePanel = $('#landing-continue');
 
     Einstein.mount($('#landing-einstein'), 'idle');
+    refreshStudentCast();
 
     if (users.length === 0) {
       createPanel?.classList.remove('hidden');
@@ -1478,6 +1489,7 @@
     store = Storage.loadStore();
     syncProgressFromStore();
     syncSpeechFromStore();
+    refreshStudentCast();
     wireNav();
     renderLanding();
     showScreen('screen-landing');

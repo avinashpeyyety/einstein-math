@@ -104,7 +104,7 @@ Helper: `Storage.getParentSummary(store, userId, curriculum)`.
 ```json
 {
   "version": 2,
-  "appVersion": "2.3.0",
+  "appVersion": "2.3.3",
   "activeUserId": "u_…",
   "prefs": { "speechEnabled": false },
   "users": {
@@ -164,7 +164,7 @@ Localhost works for PWA install in Chromium.
 
 ## Smoke demo (2.3 trusted-home sprint)
 
-1. Load once online → DevTools → Application → Service Worker registered; Cache Storage shows `einstein-math-v2.3.4` (or the current `CACHE` in `sw.js`).
+1. Load once online → DevTools → Application → Service Worker registered; Cache Storage shows `einstein-math-v2.3.5` (or the current `CACHE` in `sw.js`).
 2. Go offline (DevTools Network → Offline) → reload → landing / Mission Map still usable.
 3. Create two explorers, earn progress → **Export all profiles** → clear site data → **Import** merge → both kids restored.
 4. Toggle **Read aloud** → Einstein bubbles speak; **Replay** repeats the last line.
@@ -179,7 +179,7 @@ Localhost works for PWA install in Chromium.
 | Multi-device handoff | Export all + import merge/replace on Progress |
 | Read-aloud | Web Speech toggle + replay; prefs in v2 root |
 | Adaptivity polish | Today's path + smarter Continue; remediation mastery nudge |
-| Version | curriculum `meta.version` **2.3.0** |
+| Version | curriculum `meta.version` **2.3.3** |
 | Non-goals | No accounts, no server, no GitHub Pages push, no real-time sync API |
 
 Curriculum generators (optional): `scripts/expand_curriculum.py` + `scripts/lessons_*.py`.

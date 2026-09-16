@@ -432,7 +432,525 @@
       'dec-zeros': `
         <div class="viz-box">0.4 = 0.40</div>`,
       'volume-box': `
-        <div class="viz-box" style="font-family:Bangers,Impact,sans-serif;font-size:1.3rem;">V = l × w × h<br>2×3×4 = 24</div>`
+        <div class="viz-box" style="font-family:Bangers,Impact,sans-serif;font-size:1.3rem;">V = l × w × h<br>2×3×4 = 24</div>`,
+      '3d-real': `
+        <div class="viz-box">
+          <div style="font-size:2rem;line-height:1.4;">⚽ sphere &nbsp; 🎲 cube &nbsp; 🍦 cone</div>
+          <div style="font-family:Comic Neue,cursive;font-size:0.95rem;">Ball · Die · Ice cream scoop!</div>
+        </div>`,
+      '3d-shapes': `
+        <div class="viz-box">
+          <svg viewBox="0 0 220 90" width="220" height="90" aria-hidden="true">
+            <rect x="10" y="30" width="40" height="40" fill="#FF6B35" stroke="#1a1a1a" stroke-width="3"/>
+            <text x="30" y="85" text-anchor="middle" font-size="10" font-family="Comic Neue,cursive">2D</text>
+            <path d="M80 55 L100 35 L140 35 L120 55 Z" fill="#4ECDC4" stroke="#1a1a1a" stroke-width="3"/>
+            <path d="M80 55 L120 55 L120 75 L80 75 Z" fill="#45B7AA" stroke="#1a1a1a" stroke-width="3"/>
+            <path d="M120 55 L140 35 L140 55 L120 75 Z" fill="#3AA89C" stroke="#1a1a1a" stroke-width="3"/>
+            <text x="110" y="85" text-anchor="middle" font-size="10" font-family="Comic Neue,cursive">3D cube</text>
+            <circle cx="180" cy="50" r="22" fill="#FFE66D" stroke="#1a1a1a" stroke-width="3"/>
+            <ellipse cx="180" cy="50" rx="22" ry="8" fill="none" stroke="#1a1a1a" stroke-width="2"/>
+            <text x="180" y="85" text-anchor="middle" font-size="10" font-family="Comic Neue,cursive">sphere</text>
+          </svg>
+          <div style="font-family:Comic Neue,cursive;font-size:0.95rem;">Flat = 2D · Solid = 3D (takes up space!)</div>
+        </div>`,
+      'ab-pattern': `
+        <div class="viz-box">
+          <div style="font-size:1.6rem;">🔴 🟦 🔴 🟦 🔴 🟦 <span style="color:#FF6B35;">?</span></div>
+          <div style="font-family:Comic Neue,cursive;margin-top:0.35rem;">Core: AB · next = 🔴</div>
+        </div>`,
+      'about-how-many': `
+        <div class="viz-box">
+          <div style="font-family:Bangers,Impact,sans-serif;font-size:1.4rem;">About how many?</div>
+          <div style="font-family:Comic Neue,cursive;">≈ 50 &nbsp;not&nbsp; 47</div>
+        </div>`,
+      'annex-zero': `
+        <div class="viz-box" style="font-family:Bangers,Impact,sans-serif;font-size:1.4rem;">
+          0.5 = 0.50
+          <div style="font-family:Comic Neue,cursive;font-size:1rem;margin-top:0.3rem;">Annex zeros to align places!</div>
+        </div>`,
+      'area-vs-perim': `
+        <div class="viz-box">
+          <svg viewBox="0 0 200 100" width="200" height="100" aria-hidden="true">
+            <rect x="20" y="20" width="70" height="50" fill="#FFE66D" stroke="#1a1a1a" stroke-width="3"/>
+            <text x="55" y="50" text-anchor="middle" font-size="12" font-family="Bangers,Impact,sans-serif">AREA</text>
+            <rect x="110" y="20" width="70" height="50" fill="none" stroke="#FF6B35" stroke-width="4" stroke-dasharray="6 3"/>
+            <text x="145" y="50" text-anchor="middle" font-size="11" font-family="Bangers,Impact,sans-serif" fill="#FF6B35">PERIM</text>
+          </svg>
+          <div style="font-family:Comic Neue,cursive;">Inside vs around!</div>
+        </div>`,
+      'bakery': `
+        <div class="viz-box">
+          <div style="font-size:1.4rem;">🧁🧁🧁🧁 &nbsp;×&nbsp; 6 &nbsp;+&nbsp; 🧁×5</div>
+          <div style="font-family:Bangers,Impact,sans-serif;font-size:1.3rem;margin-top:0.35rem;">4×6+5 = 29</div>
+        </div>`,
+      'balance-scale': `
+        <div class="viz-box">
+          <svg viewBox="0 0 200 90" width="200" height="90" aria-hidden="true">
+            <line x1="100" y1="15" x2="100" y2="45" stroke="#1a1a1a" stroke-width="3"/>
+            <line x1="40" y1="50" x2="160" y2="35" stroke="#1a1a1a" stroke-width="3"/>
+            <rect x="25" y="50" width="40" height="20" rx="3" fill="#FF6B35" stroke="#1a1a1a" stroke-width="2"/>
+            <rect x="145" y="28" width="40" height="14" rx="3" fill="#FFE66D" stroke="#1a1a1a" stroke-width="2"/>
+            <text x="45" y="85" text-anchor="middle" font-size="10" font-family="Comic Neue,cursive">heavy ↓</text>
+            <text x="165" y="85" text-anchor="middle" font-size="10" font-family="Comic Neue,cursive">light ↑</text>
+          </svg>
+        </div>`,
+      'bar-graph': `
+        <div class="viz-box">
+          <svg viewBox="0 0 180 100" width="180" height="100" aria-hidden="true">
+            <line x1="30" y1="10" x2="30" y2="85" stroke="#1a1a1a" stroke-width="2"/>
+            <line x1="30" y1="85" x2="170" y2="85" stroke="#1a1a1a" stroke-width="2"/>
+            <rect x="45" y="45" width="25" height="40" fill="#FF6B35" stroke="#1a1a1a" stroke-width="2"/>
+            <rect x="85" y="25" width="25" height="60" fill="#4ECDC4" stroke="#1a1a1a" stroke-width="2"/>
+            <rect x="125" y="55" width="25" height="30" fill="#FFE66D" stroke="#1a1a1a" stroke-width="2"/>
+            <text x="57" y="98" text-anchor="middle" font-size="10">A</text>
+            <text x="97" y="98" text-anchor="middle" font-size="10">B</text>
+            <text x="137" y="98" text-anchor="middle" font-size="10">C</text>
+          </svg>
+          <div style="font-family:Comic Neue,cursive;">Taller bar = more!</div>
+        </div>`,
+      'bar-read': `
+        <div class="viz-box">
+          <svg viewBox="0 0 160 90" width="160" height="90" aria-hidden="true">
+            <line x1="25" y1="5" x2="25" y2="75" stroke="#1a1a1a" stroke-width="2"/>
+            <line x1="25" y1="75" x2="150" y2="75" stroke="#1a1a1a" stroke-width="2"/>
+            <text x="8" y="20" font-size="9">8</text>
+            <text x="8" y="45" font-size="9">4</text>
+            <text x="8" y="75" font-size="9">0</text>
+            <rect x="50" y="35" width="30" height="40" fill="#FF6B35" stroke="#1a1a1a" stroke-width="2"/>
+            <rect x="100" y="15" width="30" height="60" fill="#4ECDC4" stroke="#1a1a1a" stroke-width="2"/>
+          </svg>
+          <div style="font-family:Comic Neue,cursive;">Check the axis numbers!</div>
+        </div>`,
+      'borrow': `
+        <div class="viz-box" style="font-family:monospace;font-size:1.3rem;">
+          Borrow: 1 ten → 10 ones
+          <div style="font-family:Comic Neue,cursive;font-size:1rem;margin-top:0.3rem;">Regrouping, not stealing!</div>
+        </div>`,
+      'carry': `
+        <div class="viz-box" style="font-family:monospace;font-size:1.3rem;">
+          <span style="color:#FF6B35;">¹</span><br>
+          &nbsp;&nbsp;27<br>+ 18<br>────
+          <div style="font-family:Comic Neue,cursive;font-size:1rem;">Carry keeps place value honest!</div>
+        </div>`,
+      'clock-230': `
+        <div class="viz-box">
+          <svg viewBox="0 0 120 120" width="110" height="110" aria-hidden="true">
+            <circle cx="60" cy="60" r="50" fill="#fff" stroke="#1a1a1a" stroke-width="3"/>
+            <text x="60" y="22" text-anchor="middle" font-size="11" font-family="Bangers,Impact,sans-serif">12</text>
+            <text x="98" y="64" text-anchor="middle" font-size="11" font-family="Bangers,Impact,sans-serif">3</text>
+            <text x="60" y="105" text-anchor="middle" font-size="11" font-family="Bangers,Impact,sans-serif">6</text>
+            <text x="22" y="64" text-anchor="middle" font-size="11" font-family="Bangers,Impact,sans-serif">9</text>
+            <line x1="60" y1="60" x2="81.3" y2="54.3" stroke="#1a1a1a" stroke-width="4" stroke-linecap="round"/>
+            <line x1="60" y1="60" x2="60.0" y2="94.0" stroke="#1a1a1a" stroke-width="3" stroke-linecap="round"/>
+            <circle cx="60" cy="60" r="4" fill="#FF6B35"/>
+          </svg>
+          <div style="font-family:Bangers,Impact,sans-serif;font-size:1.3rem;">2:30 — half past 2</div>
+        </div>`,
+      'clock-count': `
+        <div class="viz-box">
+          <div style="font-family:Bangers,Impact,sans-serif;font-size:1.2rem;">2:00 → 2:05 → 2:10 → … → 2:30</div>
+          <div style="font-family:Comic Neue,cursive;">Count forward until the end!</div>
+        </div>`,
+      'clock-half': `
+        <div class="viz-box">
+          <svg viewBox="0 0 120 120" width="110" height="110" aria-hidden="true">
+            <circle cx="60" cy="60" r="50" fill="#fff" stroke="#1a1a1a" stroke-width="3"/>
+            <text x="60" y="22" text-anchor="middle" font-size="11" font-family="Bangers,Impact,sans-serif">12</text>
+            <text x="98" y="64" text-anchor="middle" font-size="11" font-family="Bangers,Impact,sans-serif">3</text>
+            <text x="60" y="105" text-anchor="middle" font-size="11" font-family="Bangers,Impact,sans-serif">6</text>
+            <text x="22" y="64" text-anchor="middle" font-size="11" font-family="Bangers,Impact,sans-serif">9</text>
+            <line x1="60" y1="60" x2="65.7" y2="38.7" stroke="#1a1a1a" stroke-width="4" stroke-linecap="round"/>
+            <line x1="60" y1="60" x2="60.0" y2="94.0" stroke="#1a1a1a" stroke-width="3" stroke-linecap="round"/>
+            <circle cx="60" cy="60" r="4" fill="#FF6B35"/>
+          </svg>
+          <div style="font-family:Bangers,Impact,sans-serif;font-size:1.3rem;">Long hand on 6 = :30</div>
+        </div>`,
+      'coin-combo': `
+        <div class="viz-box">
+          <div>10¢+5¢ &nbsp;=&nbsp; 5¢+5¢+5¢ &nbsp;=&nbsp; 15×1¢</div>
+          <div style="font-family:Bangers,Impact,sans-serif;font-size:1.3rem;margin-top:0.3rem;">All make 15¢ ★</div>
+        </div>`,
+      'coins': `
+        <div class="viz-box">
+          <div style="display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap;font-family:Bangers,Impact,sans-serif;">
+            <span style="border:3px solid #1a1a1a;border-radius:50%;width:42px;height:42px;display:inline-flex;align-items:center;justify-content:center;background:#CD7F32;">1¢</span>
+            <span style="border:3px solid #1a1a1a;border-radius:50%;width:48px;height:48px;display:inline-flex;align-items:center;justify-content:center;background:#C0C0C0;">5¢</span>
+            <span style="border:3px solid #1a1a1a;border-radius:50%;width:42px;height:42px;display:inline-flex;align-items:center;justify-content:center;background:#FFD700;">10¢</span>
+          </div>
+          <div style="font-family:Comic Neue,cursive;margin-top:0.4rem;">Nickel=5 · Dime=10</div>
+        </div>`,
+      'compare-kids': `
+        <div class="viz-box">
+          <div>Mia ⭐⭐⭐⭐⭐⭐⭐⭐ &nbsp; Leo ⭐⭐⭐⭐⭐</div>
+          <div style="font-family:Bangers,Impact,sans-serif;font-size:1.3rem;margin-top:0.3rem;">8 − 5 = 3 more</div>
+        </div>`,
+      'compare-teens': `
+        <div class="viz-box" style="font-family:Bangers,Impact,sans-serif;font-size:1.4rem;">
+          14 vs 17
+          <div style="font-family:Comic Neue,cursive;font-size:1rem;">Same tens? 7 ones &gt; 2 ones!</div>
+        </div>`,
+      'compare-wp': `
+        <div class="viz-box" style="font-family:Bangers,Impact,sans-serif;font-size:1.3rem;">
+          How many more? → subtract the gap!
+        </div>`,
+      'coord': `
+        <div class="viz-box">
+          <svg viewBox="0 0 140 140" width="130" height="130" aria-hidden="true">
+            <line x1="20" y1="120" x2="120" y2="120" stroke="#1a1a1a" stroke-width="2"/>
+            <line x1="20" y1="120" x2="20" y2="20" stroke="#1a1a1a" stroke-width="2"/>
+            <text x="125" y="124" font-size="12" font-family="Bangers,Impact,sans-serif">x</text>
+            <text x="12" y="18" font-size="12" font-family="Bangers,Impact,sans-serif">y</text>
+            <circle cx="20" cy="120" r="4" fill="#FF6B35"/>
+            <text x="28" y="135" font-size="10">(0,0)</text>
+          </svg>
+          <div style="font-family:Comic Neue,cursive;">First = x (right), second = y (up)</div>
+        </div>`,
+      'decimal-add': `
+        <div class="viz-box" style="font-family:monospace;font-size:1.3rem;">
+          &nbsp;0.40<br>+ 0.35<br>─────<br>&nbsp;0.75
+        </div>`,
+      'decimal-align': `
+        <div class="viz-box" style="font-family:monospace;font-size:1.3rem;">
+          &nbsp;1.25<br>+ 0.40<br>─────
+          <div style="font-family:Comic Neue,cursive;font-size:1rem;">Line up the dots!</div>
+        </div>`,
+      'decimal-sub': `
+        <div class="viz-box" style="font-family:monospace;font-size:1.3rem;">
+          &nbsp;0.90<br>− 0.35<br>─────<br>&nbsp;0.55
+        </div>`,
+      'div-check': `
+        <div class="viz-box" style="font-family:Bangers,Impact,sans-serif;font-size:1.3rem;">
+          24 ÷ 6 = 4<br>
+          <span style="font-family:Comic Neue,cursive;font-size:1rem;">Check: 4 × 6 = 24 ★</span>
+        </div>`,
+      'div-types': `
+        <div class="viz-box">
+          <div><strong>Sharing:</strong> 12 ÷ 3 → 4 each</div>
+          <div><strong>Grouping:</strong> how many 3s in 12? → 4</div>
+        </div>`,
+      'divisibility': `
+        <div class="viz-box" style="font-family:Bangers,Impact,sans-serif;font-size:1.3rem;">
+          15 ÷ 5 = 3 R0 → divisible!
+          <div style="font-family:Comic Neue,cursive;font-size:1rem;">No remainder = divides evenly</div>
+        </div>`,
+      'doubles': `
+        <div class="viz-box" style="font-family:Bangers,Impact,sans-serif;font-size:1.5rem;">
+          6 + 6 = 12
+          <div style="font-family:Comic Neue,cursive;font-size:1rem;">Same + same = double!</div>
+        </div>`,
+      'doubles-chart': `
+        <div class="viz-box" style="font-family:Bangers,Impact,sans-serif;font-size:1.2rem;">
+          5+5=10 · 7+7=14 · 8+8=16
+        </div>`,
+      'elapsed': `
+        <div class="viz-box" style="font-family:Bangers,Impact,sans-serif;font-size:1.3rem;">
+          2:00 → 2:30 = 30 min
+          <div style="font-family:Comic Neue,cursive;font-size:1rem;">Elapsed time!</div>
+        </div>`,
+      'eq-groups-wp': `
+        <div class="viz-box">
+          <div style="display:flex;gap:0.5rem;justify-content:center;flex-wrap:wrap;">
+            ${[1,2,3,4].map(() => `<div class="dot-grid" style="grid-template-columns:repeat(3,1fr);border:2px dashed #1a1a1a;padding:4px;">${'<div class="dot"></div>'.repeat(6)}</div>`).join('')}
+          </div>
+          <div style="font-family:Bangers,Impact,sans-serif;font-size:1.2rem;margin-top:0.35rem;">4 × 6 = 24</div>
+        </div>`,
+      'estimate': `
+        <div class="viz-box">
+          <div style="font-family:Bangers,Impact,sans-serif;font-size:1.3rem;">48 + 31 ≈ 50 + 30 = 80</div>
+          <div style="font-family:Comic Neue,cursive;font-size:0.95rem;">Round → add → quick check!</div>
+        </div>`,
+      'fact-family': `
+        <div class="viz-box" style="font-family:Bangers,Impact,sans-serif;font-size:1.2rem;">
+          2+6=8 · 6+2=8<br>8−6=2 · 8−2=6
+        </div>`,
+      'factor-pairs': `
+        <div class="viz-box" style="font-family:Bangers,Impact,sans-serif;font-size:1.15rem;">
+          24: 1×24 · 2×12 · 3×8 · 4×6
+        </div>`,
+      'fluency-add': `
+        <div class="viz-box" style="font-family:Bangers,Impact,sans-serif;font-size:1.2rem;">
+          20+30 → easy!<br>27+18 → regroup!
+        </div>`,
+      'fluency-check': `
+        <div class="viz-box" style="font-family:Bangers,Impact,sans-serif;font-size:1.3rem;">
+          47+36 ≈ 50+40 = 90
+          <div style="font-family:Comic Neue,cursive;font-size:1rem;">Estimate to check!</div>
+        </div>`,
+      'frac-set-ex': `
+        <div class="viz-box">
+          <div class="dot-grid" style="grid-template-columns:repeat(4,1fr);">${'<div class="dot"></div>'.repeat(12)}</div>
+          <div style="font-family:Bangers,Impact,sans-serif;font-size:1.3rem;">1/4 of 12 = 3</div>
+        </div>`,
+      'frac-size': `
+        <div class="viz-box">
+          <div style="display:flex;gap:1rem;justify-content:center;align-items:center;flex-wrap:wrap;">
+            <div>
+              <div style="border:3px solid #1a1a1a;width:90px;height:28px;background:linear-gradient(90deg,#FF6B35 50%,#fff 50%);margin:0 auto;"></div>
+              <div style="font-family:Bangers,Impact,sans-serif;">1/2</div>
+            </div>
+            <div style="font-family:Bangers,Impact,sans-serif;font-size:1.4rem;">&gt;</div>
+            <div>
+              <div style="border:3px solid #1a1a1a;width:90px;height:28px;background:linear-gradient(90deg,#4ECDC4 25%,#fff 25%);margin:0 auto;"></div>
+              <div style="font-family:Bangers,Impact,sans-serif;">1/4</div>
+            </div>
+          </div>
+          <div style="font-family:Comic Neue,cursive;margin-top:0.3rem;">More splits = tinier pieces!</div>
+        </div>`,
+      'frac-sub-simp': `
+        <div class="viz-box" style="font-family:Bangers,Impact,sans-serif;font-size:1.3rem;">
+          4/6 − 1/6 = 3/6 = 1/2
+        </div>`,
+      'frac-times': `
+        <div class="viz-box" style="font-family:Bangers,Impact,sans-serif;font-size:1.3rem;">
+          a/b × n = (a×n)/b
+        </div>`,
+      'frac-times-ex': `
+        <div class="viz-box" style="font-family:Bangers,Impact,sans-serif;font-size:1.3rem;">
+          2/5 × 10 = 20/5 = 4 ★
+        </div>`,
+      'g4-wp': `
+        <div class="viz-box">
+          <div style="font-family:Comic Neue,cursive;">Hidden steps?</div>
+          <div style="font-family:Bangers,Impact,sans-serif;font-size:1.2rem;">Multiply → then subtract leftovers</div>
+        </div>`,
+      'long-div': `
+        <div class="viz-box" style="font-family:monospace;font-size:1.25rem;line-height:1.4;">
+          &nbsp;&nbsp;&nbsp;28<br>3 ) 84<br>
+          <div style="font-family:Comic Neue,cursive;font-size:0.95rem;">3s in 8? 2… bring down 4…</div>
+        </div>`,
+      'long-mult': `
+        <div class="viz-box" style="font-family:monospace;font-size:1.25rem;">
+          &nbsp;&nbsp;23<br>×&nbsp;&nbsp;4<br>────<br>&nbsp;&nbsp;92
+          <div style="font-family:Comic Neue,cursive;font-size:0.95rem;">Ones, then tens — add partials!</div>
+        </div>`,
+      'ltr': `
+        <div class="viz-box" style="font-family:Bangers,Impact,sans-serif;font-size:1.3rem;">
+          12÷3×2 = 4×2 = 8
+          <div style="font-family:Comic Neue,cursive;font-size:1rem;">Same level → left to right</div>
+        </div>`,
+      'make-10': `
+        <div class="viz-box" style="font-family:Bangers,Impact,sans-serif;font-size:1.3rem;">
+          8+5 → (8+2)+3 = 10+3 = 13
+        </div>`,
+      'mixed-add': `
+        <div class="viz-box" style="font-family:Bangers,Impact,sans-serif;font-size:1.3rem;">
+          1 2/5 + 2 1/5 = 3 3/5
+        </div>`,
+      'mixed-regroup': `
+        <div class="viz-box" style="font-family:Bangers,Impact,sans-serif;font-size:1.3rem;">
+          3 5/4 → 4 1/4
+          <div style="font-family:Comic Neue,cursive;font-size:1rem;">Fraction ≥1? Regroup!</div>
+        </div>`,
+      'mixed-sub': `
+        <div class="viz-box" style="font-family:Bangers,Impact,sans-serif;font-size:1.15rem;">
+          3 1/4 − 1 2/4 → borrow → 1 3/4
+        </div>`,
+      'mixed-sub-ex': `
+        <div class="viz-box" style="font-family:Bangers,Impact,sans-serif;font-size:1.3rem;">
+          Same denominators → smooth gears!
+        </div>`,
+      'money-ex': `
+        <div class="viz-box" style="font-family:Bangers,Impact,sans-serif;font-size:1.2rem;">
+          40¢ + 25¢ = 65¢<br>100¢ − 65¢ = 35¢ change
+        </div>`,
+      'money-wp': `
+        <div class="viz-box">
+          <div style="font-family:Comic Neue,cursive;">Cost + cost → pay → change</div>
+          <div style="font-family:Bangers,Impact,sans-serif;font-size:1.2rem;margin-top:0.3rem;">Add costs · Subtract to get change</div>
+        </div>`,
+      'mult-clues': `
+        <div class="viz-box" style="font-family:Bangers,Impact,sans-serif;font-size:1.2rem;">
+          each · every · groups of → ×
+        </div>`,
+      'multi-step': `
+        <div class="viz-box" style="font-family:Bangers,Impact,sans-serif;font-size:1.2rem;">
+          ① Underline question<br>② Step 1 · Step 2<br>③ Check!
+        </div>`,
+      'neither': `
+        <div class="viz-box" style="font-family:Bangers,Impact,sans-serif;font-size:1.5rem;">
+          1 is NEITHER
+          <div style="font-family:Comic Neue,cursive;font-size:1rem;">Not prime, not composite!</div>
+        </div>`,
+      'number-line-teens': `
+        <div class="viz-box">
+          <svg viewBox="0 0 280 50" width="280" height="50" aria-hidden="true">
+            <line x1="10" y1="25" x2="270" y2="25" stroke="#1a1a1a" stroke-width="3"/>
+            <line x1="20" y1="18" x2="20" y2="32" stroke="#1a1a1a" stroke-width="2"/><text x="20" y="46" text-anchor="middle" font-size="9" font-family="Comic Neue,cursive">10</text><line x1="46" y1="18" x2="46" y2="32" stroke="#1a1a1a" stroke-width="2"/><text x="46" y="46" text-anchor="middle" font-size="9" font-family="Comic Neue,cursive">11</text><line x1="72" y1="18" x2="72" y2="32" stroke="#1a1a1a" stroke-width="2"/><circle cx="72" cy="25" r="5" fill="#4ECDC4" stroke="#1a1a1a" stroke-width="2"/><text x="72" y="46" text-anchor="middle" font-size="9" font-family="Comic Neue,cursive">12</text><line x1="98" y1="18" x2="98" y2="32" stroke="#1a1a1a" stroke-width="2"/><text x="98" y="46" text-anchor="middle" font-size="9" font-family="Comic Neue,cursive">13</text><line x1="124" y1="18" x2="124" y2="32" stroke="#1a1a1a" stroke-width="2"/><text x="124" y="46" text-anchor="middle" font-size="9" font-family="Comic Neue,cursive">14</text><line x1="150" y1="18" x2="150" y2="32" stroke="#1a1a1a" stroke-width="2"/><text x="150" y="46" text-anchor="middle" font-size="9" font-family="Comic Neue,cursive">15</text><line x1="176" y1="18" x2="176" y2="32" stroke="#1a1a1a" stroke-width="2"/><text x="176" y="46" text-anchor="middle" font-size="9" font-family="Comic Neue,cursive">16</text><line x1="202" y1="18" x2="202" y2="32" stroke="#1a1a1a" stroke-width="2"/><text x="202" y="46" text-anchor="middle" font-size="9" font-family="Comic Neue,cursive">17</text><line x1="228" y1="18" x2="228" y2="32" stroke="#1a1a1a" stroke-width="2"/><text x="228" y="46" text-anchor="middle" font-size="9" font-family="Comic Neue,cursive">18</text><line x1="254" y1="18" x2="254" y2="32" stroke="#1a1a1a" stroke-width="2"/><circle cx="254" cy="25" r="5" fill="#FF6B35" stroke="#1a1a1a" stroke-width="2"/><text x="254" y="46" text-anchor="middle" font-size="9" font-family="Comic Neue,cursive">19</text>
+          </svg>
+          <div style="font-family:Comic Neue,cursive;">12 &lt; 19 — more ones wins!</div>
+        </div>`,
+      'partial-products': `
+        <div class="viz-box" style="font-family:Bangers,Impact,sans-serif;font-size:1.25rem;">
+          3×4=12 · 20×4=80<br>12+80=92
+        </div>`,
+      'pemdas': `
+        <div class="viz-box" style="font-family:Bangers,Impact,sans-serif;font-size:1.3rem;">
+          3+(2×4) = 3+8 = 11
+          <div style="font-family:Comic Neue,cursive;font-size:1rem;">() first — not 20!</div>
+        </div>`,
+      'perimeter': `
+        <div class="viz-box">
+          <svg viewBox="0 0 140 90" width="140" height="90" aria-hidden="true">
+            <rect x="20" y="15" width="100" height="55" fill="#4ECDC4" stroke="#1a1a1a" stroke-width="3"/>
+            <text x="70" y="10" text-anchor="middle" font-size="11" font-family="Comic Neue,cursive">5</text>
+            <text x="8" y="48" font-size="11" font-family="Comic Neue,cursive">3</text>
+          </svg>
+          <div style="font-family:Bangers,Impact,sans-serif;font-size:1.2rem;">Walk the outline!</div>
+        </div>`,
+      'pictograph': `
+        <div class="viz-box" style="text-align:left;display:inline-block;">
+          <div>Dogs: 🐶🐶🐶 = 3</div>
+          <div>Cats: 🐱🐱 = 2</div>
+          <div style="font-family:Comic Neue,cursive;margin-top:0.3rem;text-align:center;">Each picture = 1</div>
+        </div>`,
+      'plot-point': `
+        <div class="viz-box">
+          <svg viewBox="0 0 140 140" width="130" height="130" aria-hidden="true">
+            <line x1="20" y1="120" x2="120" y2="120" stroke="#1a1a1a" stroke-width="2"/>
+            <line x1="20" y1="120" x2="20" y2="20" stroke="#1a1a1a" stroke-width="2"/>
+            <line x1="20" y1="120" x2="80" y2="120" stroke="#4ECDC4" stroke-width="2" stroke-dasharray="4"/>
+            <line x1="80" y1="120" x2="80" y2="80" stroke="#4ECDC4" stroke-width="2" stroke-dasharray="4"/>
+            <circle cx="80" cy="80" r="6" fill="#FF6B35" stroke="#1a1a1a" stroke-width="2"/>
+            <text x="88" y="76" font-size="12" font-family="Bangers,Impact,sans-serif">(3,2)</text>
+          </svg>
+          <div style="font-family:Comic Neue,cursive;">Right 3, up 2!</div>
+        </div>`,
+      'primes': `
+        <div class="viz-box" style="font-family:Bangers,Impact,sans-serif;font-size:1.2rem;">
+          <span style="color:#FF6B35;">Prime:</span> 2,3,5,7,11<br>
+          <span style="color:#4ECDC4;">Composite:</span> 4,6,8,9
+        </div>`,
+      'put-together': `
+        <div class="viz-box" style="font-family:Bangers,Impact,sans-serif;font-size:1.2rem;">
+          in all · altogether · total → ADD
+        </div>`,
+      'quotative': `
+        <div class="viz-box">
+          <div class="dot-grid" style="grid-template-columns:repeat(3,1fr);">${'<div class="dot"></div>'.repeat(12)}</div>
+          <div style="font-family:Bangers,Impact,sans-serif;font-size:1.2rem;">12 ÷ 3 = 4 groups</div>
+        </div>`,
+      'rect-perim': `
+        <div class="viz-box" style="font-family:Bangers,Impact,sans-serif;font-size:1.3rem;">
+          3+5+3+5 = 16
+          <div style="font-family:Comic Neue,cursive;font-size:1rem;">Rectangle 3×5 around</div>
+        </div>`,
+      'regroup-add': `
+        <div class="viz-box" style="font-family:monospace;font-size:1.25rem;">
+          <span style="color:#FF6B35;">¹</span><br>&nbsp;&nbsp;27<br>+ 18<br>────<br>&nbsp;&nbsp;45
+          <div style="font-family:Comic Neue,cursive;font-size:0.95rem;">7+8=15 → write 5, carry 1</div>
+        </div>`,
+      'regroup-sub': `
+        <div class="viz-box" style="font-family:monospace;font-size:1.25rem;">
+          5² − 18 → 12−8=4, 4−1=3
+          <div style="font-family:Bangers,Impact,sans-serif;font-size:1.3rem;margin-top:0.3rem;">52 − 18 = 34 ★</div>
+        </div>`,
+      'rockets-sum': `
+        <div class="viz-box" style="font-size:1.4rem;">
+          🚀🚀🚀 + 🚀🚀🚀🚀 = <strong>7</strong>
+          <div style="font-family:Bangers,Impact,sans-serif;font-size:1.2rem;">3 + 4 = 7</div>
+        </div>`,
+      'round-100': `
+        <div class="viz-box" style="font-family:Bangers,Impact,sans-serif;font-size:1.3rem;">
+          Peek at tens digit<br>0–4 down · 5–9 up
+        </div>`,
+      'round-examples': `
+        <div class="viz-box" style="font-family:Bangers,Impact,sans-serif;font-size:1.3rem;">
+          350 → 400 &nbsp;·&nbsp; 340 → 300
+        </div>`,
+      'shape-ab': `
+        <div class="viz-box">
+          <div style="font-size:1.8rem;">⚪ ⬛ ⚪ ⬛ ⚪ <span style="color:#FF6B35;">?</span></div>
+          <div style="font-family:Comic Neue,cursive;">Circle, square… next is circle!</div>
+        </div>`,
+      'skip-mult': `
+        <div class="viz-box" style="font-family:Bangers,Impact,sans-serif;font-size:1.3rem;">
+          5, 10, 15, 20 → 5×4=20
+        </div>`,
+      'tally': `
+        <div class="viz-box" style="font-family:Bangers,Impact,sans-serif;font-size:1.6rem;">
+          |||| <span style="text-decoration:line-through;color:#FF6B35;">/</span> &nbsp;= 5
+          <div style="font-family:Comic Neue,cursive;font-size:1rem;">Four sticks + diagonal = bundle of 5!</div>
+        </div>`,
+      'teen-16': `
+        <div class="viz-box">
+          <div class="place-blocks">
+            <div class="place-block tens">1 ten<br>= 10</div>
+            <div class="place-block ones">6 ones<br>= 6</div>
+          </div>
+          <div style="font-family:Bangers,Impact,sans-serif;font-size:1.4rem;">16 = 10 + 6</div>
+        </div>`,
+      'teen-add': `
+        <div class="viz-box" style="font-family:Bangers,Impact,sans-serif;font-size:1.25rem;">
+          14+3 = 10+(4+3) = 17
+        </div>`,
+      'teen-blocks': `
+        <div class="viz-box">
+          <div class="place-blocks">
+            <div class="place-block tens">10</div>
+            <div class="place-block ones">· · ·</div>
+          </div>
+          <div style="font-family:Comic Neue,cursive;">Teens = ten + extras!</div>
+        </div>`,
+      'ten-friends': `
+        <div class="viz-box" style="font-family:Bangers,Impact,sans-serif;font-size:1.2rem;">
+          1+9 · 2+8 · 3+7 · 4+6 · 5+5
+        </div>`,
+      'tens-line': `
+        <div class="viz-box" style="font-family:Bangers,Impact,sans-serif;font-size:1.15rem;letter-spacing:0.04em;">
+          10 20 30 40 50 60 70 80 90 100
+        </div>`,
+      'tens-rocket': `
+        <div class="viz-box" style="font-size:1.3rem;">
+          🚀10 🚀20 🚀30 🚀40…
+          <div style="font-family:Comic Neue,cursive;">Skip by 10s — fly!</div>
+        </div>`,
+      'times-10': `
+        <div class="viz-box" style="font-family:Bangers,Impact,sans-serif;font-size:1.4rem;">
+          7 × 10 = 70
+          <div style="font-family:Comic Neue,cursive;font-size:1rem;">×10 tacks on a zero!</div>
+        </div>`,
+      'triangle-facts': `
+        <div class="viz-box">
+          <svg viewBox="0 0 160 110" width="160" height="110" aria-hidden="true">
+            <polygon points="80,15 20,95 140,95" fill="#FFE66D" stroke="#1a1a1a" stroke-width="3"/>
+            <text x="80" y="55" text-anchor="middle" font-size="16" font-family="Bangers,Impact,sans-serif">8</text>
+            <text x="40" y="90" text-anchor="middle" font-size="14" font-family="Bangers,Impact,sans-serif">2</text>
+            <text x="120" y="90" text-anchor="middle" font-size="14" font-family="Bangers,Impact,sans-serif">6</text>
+          </svg>
+          <div style="font-family:Comic Neue,cursive;">Fact-family triangle!</div>
+        </div>`,
+      'two-step-ex': `
+        <div class="viz-box" style="font-family:Bangers,Impact,sans-serif;font-size:1.3rem;">
+          10+4=14 → 14−3=11 ★
+        </div>`,
+      'unit-frac': `
+        <div class="viz-box">
+          <div style="display:flex;gap:4px;justify-content:center;">
+            <div style="width:36px;height:36px;background:#FF6B35;border:3px solid #1a1a1a;"></div>
+            <div style="width:36px;height:36px;background:#fff;border:3px solid #1a1a1a;"></div>
+            <div style="width:36px;height:36px;background:#fff;border:3px solid #1a1a1a;"></div>
+            <div style="width:36px;height:36px;background:#fff;border:3px solid #1a1a1a;"></div>
+          </div>
+          <div style="font-family:Bangers,Impact,sans-serif;font-size:1.3rem;margin-top:0.35rem;">1/4 — one piece of four</div>
+        </div>`,
+      'volume': `
+        <div class="viz-box">
+          <svg viewBox="0 0 140 110" width="140" height="110" aria-hidden="true">
+            <path d="M40 30 L100 30 L120 50 L120 90 L60 90 L40 70 Z" fill="#4ECDC4" stroke="#1a1a1a" stroke-width="3"/>
+            <path d="M40 30 L60 50 L120 50 L100 30 Z" fill="#7EDDD6" stroke="#1a1a1a" stroke-width="2"/>
+            <path d="M40 30 L40 70 L60 90 L60 50 Z" fill="#3AA89C" stroke="#1a1a1a" stroke-width="2"/>
+          </svg>
+          <div style="font-family:Bangers,Impact,sans-serif;font-size:1.25rem;">V = 3×2×4 = 24</div>
+        </div>`,
+      'volume-layers': `
+        <div class="viz-box" style="font-family:Bangers,Impact,sans-serif;font-size:1.2rem;">
+          Layer = l×w cubes<br>× height layers = V
+        </div>`,
+      'weight-compare': `
+        <div class="viz-box" style="font-size:1.5rem;">
+          🍉 &gt; 🍎
+          <div style="font-family:Comic Neue,cursive;font-size:1rem;">Watermelon heavier than apple!</div>
+        </div>`,
     };
     return map[key] || `<div class="viz-box">${escapeHtml(String(key))}</div>`;
   }

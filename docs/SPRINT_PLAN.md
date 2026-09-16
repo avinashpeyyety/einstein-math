@@ -34,7 +34,7 @@ Keep forever (math or not):
 ### Shared (once)
 
 - Profiles, progress store, Today’s path, parent summary, visuals renderer, speech, SW shell
-- Age-track picker and explorer identity
+- Age-track picker and explorer identity (optional **comicified photo avatar** from profile upload)
 
 ### Per subject (module)
 
@@ -74,6 +74,7 @@ Progress keys **namespaced** by `subject + track` so multi-subject explorers sta
 - Curriculum schema v3: `subjects: { math, science, geography, … }` each with tracks
 - Progress namespaced by subject + track
 - SW cache / versioning discipline for multi-pack assets
+- **Personalized comic profile:** upload a photo in the profile → comicify it (local/on-device or approved Imagine path) → use as the explorer avatar across lessons and parent summary; store with device-local profile + export/import; privacy: photo never leaves device unless user explicitly chooses a cloud comicify step
 
 ### Track S — Science (first expansion)
 
@@ -102,6 +103,7 @@ Progress keys **namespaced** by `subject + track` so multi-subject explorers sta
 | Week | Focus (example) |
 |------|-----------------|
 | W1 | Track P: schema v3 stub + subject switcher (Math-only still works) |
+| W1b | Track P: profile photo upload → comicify → personalized explorer avatar |
 | W2 | Track S: science pilot unit for ages 5–6 |
 | W3 | Track S: science pilots for 7–8 and/or 9–10 |
 | W4 | Track M: math depth / visuals OR Track G kickoff |
@@ -134,3 +136,11 @@ Start EM continuous work **after Mahabharata clears**, or when Avinash explicitl
 ## Vision (Avinash)
 
 Continuous development. Not math-only forever. Expand into **science, geography, and other subjects** as a **comprehensive one-stop gamified education** product, **graded by age groups**, keeping the existing 5–6 / 7–8 / 9–10 tracks as the age spine.
+
+---
+
+## 7. Product backlog (Avinash asks)
+
+| Ask | Track | Note |
+|-----|-------|------|
+| Profile photo upload → comicify for personalized explorer avatar | P | Device-local by default; comic style should match Einstein comic voice; Studio defines style guide; Forge wires upload + storage + UI |

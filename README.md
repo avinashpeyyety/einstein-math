@@ -2,6 +2,8 @@
 
 Public interactive math program for **ages 5–10** (US K–5), delivered by **Einstein** as an 80s comic-book teacher — big hair, mustache, sweater/lab coat, speech bubbles, bold ink outlines, warm primary colors.
 
+**Continuous sprint plan:** see [`docs/SPRINT_PLAN.md`](docs/SPRINT_PLAN.md) — math continuous + platform for multi-subject (science → geography → more), age tracks 5–6 / 7–8 / 9–10.
+
 ## Features
 
 - **Age tracks** (distinct curricula, **~28–30 playable lessons** each):

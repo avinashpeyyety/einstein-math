@@ -74,7 +74,7 @@ Progress keys **namespaced** by `subject + track` so multi-subject explorers sta
 - Curriculum schema v3: `subjects: { math, science, geography, … }` each with tracks
 - Progress namespaced by subject + track
 - SW cache / versioning discipline for multi-pack assets
-- **Personalized comic profile:** upload a photo in the profile → comicify it (local/on-device or approved Imagine path) → use as the explorer avatar across lessons and parent summary; store with device-local profile + export/import; privacy: photo never leaves device unless user explicitly chooses a cloud comicify step
+- **Personalized comic profile:** ✅ **Shipped (v2.4.0)** — upload a photo on Progress → comicify entirely in-browser (canvas; no external APIs) → explorer avatar on chip / Home cards / Progress / student portrait; stored as `avatarDataUrl` with device-local profile + export/import; photo never leaves the device
 
 ### Track S — Science (first expansion)
 
@@ -103,7 +103,7 @@ Progress keys **namespaced** by `subject + track` so multi-subject explorers sta
 | Week | Focus (example) |
 |------|-----------------|
 | W1 | Track P: schema v3 stub + subject switcher (Math-only still works) |
-| W1b | Track P: profile photo upload → comicify → personalized explorer avatar |
+| W1b | Track P: profile photo upload → comicify → personalized explorer avatar ✅ shipped v2.4.0 |
 | W2 | Track S: science pilot unit for ages 5–6 |
 | W3 | Track S: science pilots for 7–8 and/or 9–10 |
 | W4 | Track M: math depth / visuals OR Track G kickoff |
@@ -143,4 +143,4 @@ Continuous development. Not math-only forever. Expand into **science, geography,
 
 | Ask | Track | Note |
 |-----|-------|------|
-| Profile photo upload → comicify for personalized explorer avatar | P | Device-local by default; comic style should match Einstein comic voice; Studio defines style guide; Forge wires upload + storage + UI |
+| Profile photo upload → comicify for personalized explorer avatar | P | ✅ **Shipped (v2.4.0)** — in-browser canvas comicify; `avatarDataUrl` on user; chip / Home / Progress / student portrait; export/import; no external APIs |

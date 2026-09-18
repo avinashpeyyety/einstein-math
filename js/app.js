@@ -46,7 +46,8 @@
     if (typeof Student === 'undefined') return;
     const u = activeUser();
     const name = (u && u.displayName) || 'Explorer';
-    Student.refreshAll(name, state);
+    const avatar = (u && u.avatarDataUrl) || null;
+    Student.refreshAll(name, state, avatar);
   }
 
   function syncProgressFromStore() {
@@ -185,19 +186,215 @@
       return;
     }
     chip.classList.remove('hidden');
-    const letter = (u.displayName || 'E').trim().charAt(0).toUpperCase();
     const av = $('#user-avatar');
     const nameEl = $('#user-name');
-    if (av) {
-      av.textContent = letter;
-      av.style.background = u.avatarColor || '#FF6B35';
-    }
+    if (av) paintAvatarEl(av, u);
     if (nameEl) nameEl.textContent = u.displayName;
     const trackMeta = $('#user-track-label');
     if (trackMeta && curriculum) {
       const t = activeTrack();
       trackMeta.textContent = t ? t.label : '';
     }
+  }
+
+  /** Letter or comic photo into a .user-avatar element */
+  function paintAvatarEl(el, u) {
+    if (!el || !u) return;
+    const letter = (u.displayName || 'E').trim().charAt(0).toUpperCase();
+    el.style.background = u.avatarColor || '#FF6B35';
+    if (u.avatarDataUrl) {
+      el.classList.add('has-photo');
+      el.style.backgroundImage = `url("${u.avatarDataUrl.replace(/"/g, '')}")`;
+      el.textContent = '';
+    } else {
+      el.classList.remove('has-photo');
+      el.style.backgroundImage = '';
+      el.textContent = letter;
+    }
+  }
+
+  function avatarSpanHtml(u, extraClass = '') {
+    const letter = (u.displayName || 'E').charAt(0).toUpperCase();
+    const color = escapeAttr(u.avatarColor || '#FF6B35');
+    const cls = 'user-avatar' + (u.avatarDataUrl ? ' has-photo' : '') + (extraClass ? ' ' + extraClass : '');
+    if (u.avatarDataUrl) {
+      const url = escapeAttr(u.avatarDataUrl);
+      return `<span class="${cls}" style="background:${color};background-image:url('${url}')"></span>`;
+    }
+    return `<span class="${cls}" style="background:${color}">${escapeHtml(letter)}</span>`;
+  }
+
+  /**
+   * In-browser comicify: resize ~320px, posterize, ink outline, warm comic look.
+   * Pure canvas — never calls external APIs. Returns JPEG data URL.
+   */
+  function comicifyImageFile(file) {
+    return new Promise((resolve, reject) => {
+      if (!file || !String(file.type || '').startsWith('image/')) {
+        reject(new Error('Please choose an image file.'));
+        return;
+      }
+      const objUrl = URL.createObjectURL(file);
+      const img = new Image();
+      img.onload = () => {
+        URL.revokeObjectURL(objUrl);
+        try {
+          const maxSide = 320;
+          let w = img.naturalWidth || img.width;
+          let h = img.naturalHeight || img.height;
+          if (!w || !h) throw new Error('Could not read image size.');
+          const scale = Math.min(1, maxSide / Math.max(w, h));
+          w = Math.max(1, Math.round(w * scale));
+          h = Math.max(1, Math.round(h * scale));
+          const canvas = document.createElement('canvas');
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext('2d', { willReadFrequently: true });
+          ctx.imageSmoothingEnabled = true;
+          ctx.drawImage(img, 0, 0, w, h);
+          const imageData = ctx.getImageData(0, 0, w, h);
+          const data = imageData.data;
+          const levels = 5;
+          const step = 255 / (levels - 1);
+          // Posterize + warm comic tint
+          for (let i = 0; i < data.length; i += 4) {
+            let r = data[i], g = data[i + 1], b = data[i + 2];
+            r = Math.round(r / step) * step;
+            g = Math.round(g / step) * step;
+            b = Math.round(b / step) * step;
+            // Warm: lift red/yellow, slight contrast
+            r = Math.min(255, r * 1.08 + 12);
+            g = Math.min(255, g * 1.02 + 6);
+            b = Math.min(255, b * 0.92);
+            data[i] = r; data[i + 1] = g; data[i + 2] = b;
+          }
+          // Ink outline via simple edge luminance
+          const copy = new Uint8ClampedArray(data);
+          const lum = (i) => 0.299 * copy[i] + 0.587 * copy[i + 1] + 0.114 * copy[i + 2];
+          const thr = 38;
+          for (let y = 1; y < h - 1; y++) {
+            for (let x = 1; x < w - 1; x++) {
+              const i = (y * w + x) * 4;
+              const c = lum(i);
+              const gx = Math.abs(c - lum(i + 4)) + Math.abs(c - lum(i - 4));
+              const gy = Math.abs(c - lum(i + w * 4)) + Math.abs(c - lum(i - w * 4));
+              if (gx + gy > thr) {
+                data[i] = Math.min(data[i], 36);
+                data[i + 1] = Math.min(data[i + 1], 28);
+                data[i + 2] = Math.min(data[i + 2], 40);
+              }
+            }
+          }
+          ctx.putImageData(imageData, 0, 0);
+          // Soft warm paper wash overlay
+          ctx.globalCompositeOperation = 'soft-light';
+          ctx.fillStyle = 'rgba(255, 214, 120, 0.28)';
+          ctx.fillRect(0, 0, w, h);
+          ctx.globalCompositeOperation = 'source-over';
+          // Bold ink frame
+          ctx.strokeStyle = '#1a1a2e';
+          ctx.lineWidth = Math.max(3, Math.round(Math.min(w, h) * 0.02));
+          ctx.strokeRect(1, 1, w - 2, h - 2);
+          resolve(canvas.toDataURL('image/jpeg', 0.82));
+        } catch (err) {
+          reject(err);
+        }
+      };
+      img.onerror = () => {
+        URL.revokeObjectURL(objUrl);
+        reject(new Error('Could not load that image.'));
+      };
+      img.src = objUrl;
+    });
+  }
+
+  async function applyExplorerPhoto(file) {
+    const u = activeUser();
+    if (!u || !file) return;
+    try {
+      const dataUrl = await comicifyImageFile(file);
+      Storage.setUserAvatar(store, u.id, dataUrl);
+      store = Storage.loadStore();
+      syncProgressFromStore();
+      updateHeaderUser();
+      renderProgress();
+      refreshStudentCast();
+    } catch (err) {
+      alert(err && err.message ? err.message : 'Photo comicify failed.');
+    }
+  }
+
+  function clearExplorerPhoto() {
+    const u = activeUser();
+    if (!u) return;
+    if (!u.avatarDataUrl) return;
+    if (!confirm('Clear comic photo avatar for ' + u.displayName + '?')) return;
+    Storage.clearUserAvatar(store, u.id);
+    store = Storage.loadStore();
+    syncProgressFromStore();
+    updateHeaderUser();
+    renderProgress();
+    refreshStudentCast();
+  }
+
+  function renameActiveExplorer() {
+    const u = activeUser();
+    if (!u) return;
+    const next = prompt('Explorer name:', u.displayName);
+    if (next == null) return;
+    Storage.renameUser(store, u.id, next);
+    store = Storage.loadStore();
+    syncProgressFromStore();
+    updateHeaderUser();
+    refreshStudentCast();
+    const onProgress = $('#screen-progress')?.classList.contains('active');
+    if (onProgress) renderProgress();
+    else renderLanding();
+  }
+
+  function renameExplorerById(userId) {
+    const u = store.users[userId];
+    if (!u) return;
+    const next = prompt('Explorer name:', u.displayName);
+    if (next == null) return;
+    Storage.renameUser(store, userId, next);
+    store = Storage.loadStore();
+    syncProgressFromStore();
+    updateHeaderUser();
+    refreshStudentCast();
+    renderLanding();
+  }
+
+  function deleteExplorerById(userId) {
+    const u = store.users[userId];
+    if (!u) return;
+    if (!confirm(`Delete explorer "${u.displayName}" and all their progress on this device?`)) return;
+    Storage.deleteUser(store, userId);
+    store = Storage.loadStore();
+    syncProgressFromStore();
+    updateHeaderUser();
+    showScreen('screen-landing');
+    renderLanding();
+  }
+
+  function resetAllExplorers() {
+    const n = Object.keys(store.users || {}).length;
+    if (!n) {
+      alert('No explorers to remove.');
+      return;
+    }
+    if (!confirm(
+      `Remove ALL ${n} explorer(s) on this device?\n\n` +
+      'This clears every profile and progress under Einstein Math on this browser. Prefs (like read-aloud) stay.\n\n' +
+      'This is NOT an import replace — it just wipes local explorers.\n\nOK to continue…'
+    )) return;
+    if (!confirm('Final confirm: permanently delete all explorers on this device?')) return;
+    Storage.resetAllUsers(store);
+    store = Storage.loadStore();
+    syncProgressFromStore();
+    updateHeaderUser();
+    showScreen('screen-landing');
+    renderLanding();
   }
 
   function trackButtonsHtml(selectedId, namePrefix) {
@@ -1063,15 +1260,20 @@
     const activeId = store.activeUserId;
     list.innerHTML = users.map(u => {
       const t = curriculum.tracks[u.trackId];
-      const letter = (u.displayName || 'E').charAt(0).toUpperCase();
       const active = u.id === activeId ? ' active' : '';
-      return `<button type="button" class="user-card${active}" data-user-id="${u.id}">
-        <span class="user-avatar" style="background:${escapeAttr(u.avatarColor || '#FF6B35')}">${escapeHtml(letter)}</span>
-        <span class="user-card-text">
-          <strong>${escapeHtml(u.displayName)}</strong>
-          <span class="muted">${escapeHtml(t ? t.label : u.trackId)}</span>
-        </span>
-      </button>`;
+      return `<div class="user-card-row${active}" data-user-id="${escapeAttr(u.id)}">
+        <button type="button" class="user-card${active}" data-user-id="${escapeAttr(u.id)}">
+          ${avatarSpanHtml(u)}
+          <span class="user-card-text">
+            <strong>${escapeHtml(u.displayName)}</strong>
+            <span class="muted">${escapeHtml(t ? t.label : u.trackId)}</span>
+          </span>
+        </button>
+        <div class="user-card-actions">
+          <button type="button" class="btn btn-ghost btn-sm btn-rename-card" data-rename-id="${escapeAttr(u.id)}" title="Rename">✎ Rename</button>
+          <button type="button" class="btn btn-ghost btn-sm btn-delete-card" data-delete-id="${escapeAttr(u.id)}" title="Delete">Delete</button>
+        </div>
+      </div>`;
     }).join('');
 
     $$('.user-card', list).forEach(btn => {
@@ -1080,6 +1282,18 @@
         store = Storage.loadStore();
         syncProgressFromStore();
         renderLanding();
+      });
+    });
+    $$('.btn-rename-card', list).forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        renameExplorerById(btn.dataset.renameId);
+      });
+    });
+    $$('.btn-delete-card', list).forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        deleteExplorerById(btn.dataset.deleteId);
       });
     });
 
@@ -1333,7 +1547,7 @@
     host.innerHTML = `
       <div class="parent-card">
         <div class="parent-identity">
-          <span class="user-avatar" style="background:${escapeHtml(summary.avatarColor || '#4ECDC4')}">${escapeHtml((summary.displayName || '?')[0].toUpperCase())}</span>
+          ${avatarSpanHtml({ displayName: summary.displayName, avatarColor: summary.avatarColor || '#4ECDC4', avatarDataUrl: summary.avatarDataUrl })}
           <div>
             <strong>${escapeHtml(summary.displayName)}</strong>
             <div class="muted">${escapeHtml(summary.trackLabel)}${summary.ageRange ? ' · ' + escapeHtml(summary.ageRange) : ''}</div>
@@ -1399,8 +1613,34 @@
     $('#progress-pct').textContent = pct + '%';
     const profileLine = $('#progress-profile-line');
     if (profileLine) {
-      profileLine.innerHTML = `<strong>${escapeHtml(u.displayName)}</strong> · ${escapeHtml(track.label)}
-        <span class="muted">(progress for this age track)</span>`;
+      profileLine.innerHTML = `
+        <div class="profile-identity-row">
+          ${avatarSpanHtml(u, 'avatar-lg')}
+          <div class="profile-identity-text">
+            <strong>${escapeHtml(u.displayName)}</strong> · ${escapeHtml(track.label)}
+            <span class="muted">(progress for this age track)</span>
+          </div>
+        </div>
+        <div class="profile-photo-tools no-print">
+          <p class="field-label" style="margin-top:0.75rem;">Comic photo avatar</p>
+          <p class="muted" style="margin-bottom:0.35rem;">Upload a photo — we comicify it on this device (no cloud). Shows on your chip, Home cards, and student portrait.</p>
+          <div class="profile-photo-actions">
+            <label class="btn btn-cyan btn-sm" for="input-explorer-photo">Upload photo</label>
+            <button type="button" class="btn btn-ghost btn-sm" id="btn-clear-photo"${u.avatarDataUrl ? '' : ' disabled'}>Clear photo</button>
+            <button type="button" class="btn btn-ghost btn-sm" id="btn-rename-inline">Rename</button>
+          </div>
+          <input type="file" id="input-explorer-photo" accept="image/*" class="hidden" />
+        </div>`;
+      $('#btn-clear-photo')?.addEventListener('click', () => clearExplorerPhoto());
+      $('#btn-rename-inline')?.addEventListener('click', () => renameActiveExplorer());
+      const photoInput = $('#input-explorer-photo');
+      if (photoInput) {
+        photoInput.value = '';
+        photoInput.onchange = (e) => {
+          const f = e.target.files && e.target.files[0];
+          if (f) applyExplorerPhoto(f);
+        };
+      }
     }
 
     const dueCount = Storage.getDueReviews(progress).length;
@@ -1845,9 +2085,8 @@
     const users = Storage.listUsers(store);
     list.innerHTML = users.map(u => {
       const t = curriculum.tracks[u.trackId];
-      const letter = (u.displayName || 'E').charAt(0).toUpperCase();
-      return `<button type="button" class="user-card" data-switch-id="${u.id}">
-        <span class="user-avatar" style="background:${escapeAttr(u.avatarColor || '#FF6B35')}">${escapeHtml(letter)}</span>
+      return `<button type="button" class="user-card" data-switch-id="${escapeAttr(u.id)}">
+        ${avatarSpanHtml(u)}
         <span class="user-card-text">
           <strong>${escapeHtml(u.displayName)}</strong>
           <span class="muted">${escapeHtml(t ? t.label : '')}</span>
@@ -1902,26 +2141,13 @@
         renderProgress();
       }
     });
-    $('#btn-rename')?.addEventListener('click', () => {
-      const u = activeUser();
-      if (!u) return;
-      const next = prompt('New explorer name:', u.displayName);
-      if (next == null) return;
-      Storage.renameUser(store, u.id, next);
-      store = Storage.loadStore();
-      renderProgress();
-      updateHeaderUser();
-    });
+    $('#btn-rename')?.addEventListener('click', () => renameActiveExplorer());
     $('#btn-delete-user')?.addEventListener('click', () => {
       const u = activeUser();
       if (!u) return;
-      if (!confirm(`Delete explorer "${u.displayName}" and all their progress on this device?`)) return;
-      Storage.deleteUser(store, u.id);
-      store = Storage.loadStore();
-      syncProgressFromStore();
-      showScreen('screen-landing');
-      renderLanding();
+      deleteExplorerById(u.id);
     });
+    $('#btn-reset-all-explorers')?.addEventListener('click', () => resetAllExplorers());
     $('#user-chip')?.addEventListener('click', openSwitcher);
     $('#btn-close-switcher')?.addEventListener('click', () => {
       $('#switcher-modal')?.classList.add('hidden');

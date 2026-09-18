@@ -16,7 +16,9 @@ Public interactive math program for **ages 5–10** (US K–5), delivered by **E
 - **Multi-device handoff** — **Export all profiles** / **Import profiles** (merge by id or replace-all) until real sync exists
 - **PWA / offline** — installable app shell; service worker caches curriculum + panels after first online visit
 - **Einstein read-aloud** — optional Web Speech API narration of speech bubbles (toggle in header)
-- **Local multi-user profiles** — named explorers on one device; progress nested per age track
+- **Local multi-user profiles** — named explorers on one device; progress nested per age track; **rename** anytime (Home cards + Progress)
+- **Comic photo avatar** — upload a photo on Progress → comicify entirely in-browser (canvas; no external APIs) → store as `avatarDataUrl` on the user; shows on chip, Home cards, Progress, and student portrait; replace/clear supported; included in export/import
+- **Remove all explorers** — Progress double-confirm wipe of every profile + `activeUserId` (keeps prefs); distinct from Import → Replace
 - Landing: create profile (name + track) or pick an existing explorer
 - Richer diagnostic (10 items) → suggested unit path (per track)
 - Full playable lessons with Einstein UI (explain → worked example → practice → quick check)
@@ -106,7 +108,7 @@ Helper: `Storage.getParentSummary(store, userId, curriculum)`.
 ```json
 {
   "version": 2,
-  "appVersion": "2.3.3",
+  "appVersion": "2.4.0",
   "activeUserId": "u_…",
   "prefs": { "speechEnabled": false },
   "users": {
@@ -117,6 +119,7 @@ Helper: `Storage.getParentSummary(store, userId, curriculum)`.
       "updatedAt": "…",
       "trackId": "ages-7-8",
       "avatarColor": "#FF6B35",
+      "avatarDataUrl": null,
       "tracks": {
         "ages-7-8": {
           "started": true,
@@ -166,12 +169,23 @@ Localhost works for PWA install in Chromium.
 
 ## Smoke demo (2.3 trusted-home sprint)
 
-1. Load once online → DevTools → Application → Service Worker registered; Cache Storage shows `einstein-math-v2.3.5` (or the current `CACHE` in `sw.js`).
+1. Load once online → DevTools → Application → Service Worker registered; Cache Storage shows `einstein-math-v2.4.0` (or the current `CACHE` in `sw.js`).
 2. Go offline (DevTools Network → Offline) → reload → landing / Mission Map still usable.
 3. Create two explorers, earn progress → **Export all profiles** → clear site data → **Import** merge → both kids restored.
 4. Toggle **Read aloud** → Einstein bubbles speak; **Replay** repeats the last line.
 5. Seed a due review (`nextReviewAt` in the past) → Home/Map **Today's path** + **Continue** open that review first.
 6. Fail a check (&lt;60%) → Retry Weak Spots → success nudges mastery / can clear needs_review.
+7. **Rename** from a Home explorer card or Progress → name updates on chip + cards.
+8. Progress → **Upload photo** → comic avatar appears on chip / Home / student portrait; **Clear photo** restores letter + stock panels.
+9. Progress → **Remove All Explorers** (two confirms) → empty landing create form (prefs kept).
+
+## Sprint notes (2.4.0)
+
+| Goal | Result |
+|------|--------|
+| Rename explorer after create | Home card ✎ + Progress Rename; `Storage.renameUser` bumps `updatedAt` |
+| Photo → local comicify → avatar | Canvas comicify (~320px, posterize, ink, warm wash); `avatarDataUrl` on user; export/import via merge |
+| Reset/remove all explorers | Progress **Remove All Explorers** double-confirm; `Storage.resetAllUsers`; single delete confirm kept |
 
 ## Sprint notes (2.3.0)
 

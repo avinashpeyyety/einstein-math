@@ -27,7 +27,7 @@ const Storage = {
   emptyStore() {
     return {
       version: 2,
-      appVersion: '2.3.0',
+      appVersion: '2.4.0',
       activeUserId: null,
       users: {},
       prefs: {
@@ -147,6 +147,7 @@ const Storage = {
         updatedAt: new Date().toISOString(),
         trackId,
         avatarColor: this.avatarColorFor(v1.name || 'Explorer'),
+        avatarDataUrl: null,
         tracks: { [trackId]: trackProg }
       };
       store.activeUserId = id;
@@ -167,6 +168,7 @@ const Storage = {
       // Normalize all lesson blobs on load
       Object.values(store.users || {}).forEach(user => {
         if (!user.tracks) user.tracks = {};
+        if (user.avatarDataUrl === undefined) user.avatarDataUrl = null;
         Object.keys(user.tracks).forEach(tid => {
           user.tracks[tid] = this.normalizeTrackProgress(user.tracks[tid]);
         });
@@ -180,7 +182,7 @@ const Storage = {
 
   saveStore(store) {
     store.version = 2;
-    store.appVersion = store.appVersion || '2.3.0';
+    store.appVersion = store.appVersion || '2.4.0';
     if (!store.prefs || typeof store.prefs !== 'object') store.prefs = { speechEnabled: false };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
   },
@@ -230,6 +232,7 @@ const Storage = {
       updatedAt: new Date().toISOString(),
       trackId: tid,
       avatarColor: this.avatarColorFor(name),
+      avatarDataUrl: null,
       tracks: { [tid]: this.trackDefaults() }
     };
     store.users[id] = user;
@@ -263,6 +266,34 @@ const Storage = {
       const rest = Object.keys(store.users);
       store.activeUserId = rest[0] || null;
     }
+    this.saveStore(store);
+    return store;
+  },
+
+  /** Comic avatar data URL (device-local; included in export/import). */
+  setUserAvatar(store, userId, dataUrl) {
+    const user = store.users[userId];
+    if (!user) return null;
+    const url = dataUrl && String(dataUrl).startsWith('data:image/') ? String(dataUrl) : null;
+    user.avatarDataUrl = url;
+    this.touchUser(user);
+    this.saveStore(store);
+    return user;
+  },
+
+  clearUserAvatar(store, userId) {
+    const user = store.users[userId];
+    if (!user) return null;
+    user.avatarDataUrl = null;
+    this.touchUser(user);
+    this.saveStore(store);
+    return user;
+  },
+
+  /** Wipe all explorers on this device (keeps prefs). Distinct from import replace. */
+  resetAllUsers(store) {
+    store.users = {};
+    store.activeUserId = null;
     this.saveStore(store);
     return store;
   },
@@ -521,6 +552,7 @@ const Storage = {
       userId: user.id,
       displayName: user.displayName,
       avatarColor: user.avatarColor,
+      avatarDataUrl: user.avatarDataUrl || null,
       trackId,
       trackLabel: track?.label || trackId,
       ageRange: track?.ageRange || '',
@@ -548,7 +580,7 @@ const Storage = {
   normalizeStoreMeta(store) {
     if (!store || typeof store !== 'object') return this.emptyStore();
     store.version = 2;
-    store.appVersion = store.appVersion || '2.3.0';
+    store.appVersion = store.appVersion || '2.4.0';
     if (!store.prefs || typeof store.prefs !== 'object') {
       store.prefs = { speechEnabled: false };
     } else if (typeof store.prefs.speechEnabled !== 'boolean') {
@@ -578,7 +610,7 @@ const Storage = {
       exportedAt: new Date().toISOString(),
       note: 'Multi-device handoff snapshot (not cloud sync). Import on another device to merge or replace.',
       version: 2,
-      appVersion: s.appVersion || '2.3.0',
+      appVersion: s.appVersion || '2.4.0',
       activeUserId: s.activeUserId || null,
       prefs: s.prefs || { speechEnabled: false },
       users: s.users || {}
@@ -647,6 +679,10 @@ const Storage = {
     if (!localU) {
       const u = JSON.parse(JSON.stringify(incomingU));
       if (!u.tracks) u.tracks = {};
+      if (u.avatarDataUrl !== null && u.avatarDataUrl !== undefined && !String(u.avatarDataUrl).startsWith('data:image/')) {
+        u.avatarDataUrl = null;
+      }
+      if (u.avatarDataUrl === undefined) u.avatarDataUrl = null;
       Object.keys(u.tracks).forEach(tid => { u.tracks[tid] = this.normalizeTrackProgress(u.tracks[tid]); });
       return u;
     }
@@ -660,6 +696,9 @@ const Storage = {
       updatedAt: preferIncoming ? (incomingU.updatedAt || localU.updatedAt) : (localU.updatedAt || incomingU.updatedAt),
       trackId: preferIncoming ? (incomingU.trackId || localU.trackId) : (localU.trackId || incomingU.trackId),
       avatarColor: preferIncoming ? (incomingU.avatarColor || localU.avatarColor) : (localU.avatarColor || incomingU.avatarColor),
+      avatarDataUrl: preferIncoming
+        ? (incomingU.avatarDataUrl !== undefined ? incomingU.avatarDataUrl : localU.avatarDataUrl)
+        : (localU.avatarDataUrl !== undefined ? localU.avatarDataUrl : incomingU.avatarDataUrl),
       tracks: {}
     };
     const tids = new Set([
@@ -724,7 +763,7 @@ const Storage = {
     }
     const store = this.normalizeStoreMeta({
       version: 2,
-      appVersion: incoming.appVersion || '2.3.0',
+      appVersion: incoming.appVersion || '2.4.0',
       activeUserId: incoming.activeUserId || null,
       prefs: incoming.prefs && typeof incoming.prefs === 'object'
         ? { speechEnabled: !!incoming.prefs.speechEnabled }

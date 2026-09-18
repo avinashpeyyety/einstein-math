@@ -80,7 +80,7 @@
           <button type="button" class="btn btn-pink" id="btn-show-new">+ New Explorer</button>
         </div>
         <div id="new-explorer-form" class="hidden" style="margin-top:1rem;"></div>
-        <p class="privacy-note">Profiles &amp; progress stay on this device only (localStorage) — no accounts, no passwords, no cloud sync. Use Parent / Progress export &amp; import to hand off between devices.</p>
+        <p class="privacy-note">Profiles &amp; progress stay on this device only (localStorage) — no accounts, no passwords, no cloud sync. Rename or delete from each card; upload a comic photo on Progress. Use Parent / Progress export &amp; import to hand off between devices. Progress also has <strong>Remove All Explorers</strong> (double confirm).</p>
       </div>
 
       <div class="comic-panel">
@@ -91,7 +91,7 @@
           <li>Mission Map: explain → example → practice → check across ~28–30 lessons per track</li>
           <li><strong>Mastery &amp; spaced review</strong> — hit ~80% on the check to master; reviews pop up later so skills stick</li>
           <li>Missed the check? Retry weak spots before a full redo — Einstein coaches gently</li>
-          <li>Multiple kids on one device — each keeps separate stars (device-local only)</li>
+          <li>Multiple kids on one device — each keeps separate stars (device-local only); rename anytime; optional comic photo avatar (comicified on-device)</li>
           <li><strong>Install / offline</strong> — after one online visit, Chromium can install this PWA; play offline from the cache</li>
           <li><strong>Multi-device</strong> — export all profiles on Progress, import on another device (merge or replace) until real sync exists</li>
         </ul>
@@ -202,8 +202,9 @@
           <button type="button" class="btn btn-ghost btn-sm" id="btn-rename">Rename</button>
           <button type="button" class="btn btn-ghost btn-sm" id="btn-reset">Reset This Track</button>
           <button type="button" class="btn btn-ghost btn-sm" id="btn-delete-user">Delete Explorer</button>
+          <button type="button" class="btn btn-ghost btn-sm" id="btn-reset-all-explorers" title="Wipe all explorers on this device">Remove All Explorers</button>
         </div>
-        <p class="privacy-note">Device-local only. Clearing browser data erases progress (export first if you need a backup).</p>
+        <p class="privacy-note">Device-local only. Clearing browser data erases progress (export first if you need a backup). <strong>Remove All Explorers</strong> double-confirms a full local wipe (keeps read-aloud prefs) — distinct from Import → Replace.</p>
       </div>
     </section>
 
@@ -240,7 +241,7 @@
     </div>
 
     <footer class="site-footer">
-      Einstein Math · Ages 5–10 · v2.3.3 · Progress stays on your device (no accounts) · Installable / offline after first visit
+      Einstein Math · Ages 5–10 · v2.4.0 · Progress stays on your device (no accounts) · Installable / offline after first visit
     </footer>
   </div>
 

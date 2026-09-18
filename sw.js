@@ -1,5 +1,5 @@
 /* Einstein Math service worker — caches app shell + curriculum + panels for offline play */
-const CACHE = 'einstein-math-v2.3.5';
+const CACHE = 'einstein-math-v2.4.0';
 const PRECACHE = [
   './',
   './index.html',

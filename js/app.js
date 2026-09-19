@@ -225,8 +225,8 @@
   }
 
   /**
-   * In-browser comicify: resize ~320px, posterize, ink outline, warm comic look.
-   * Pure canvas — never calls external APIs. Returns JPEG data URL.
+   * In-browser comicify: ~640px, soft contrast, mild posterize, clean ink edges.
+   * Pure canvas — never calls external APIs. Returns PNG data URL for sharper avatars.
    */
   function comicifyImageFile(file) {
     return new Promise((resolve, reject) => {
@@ -239,7 +239,7 @@
       img.onload = () => {
         URL.revokeObjectURL(objUrl);
         try {
-          const maxSide = 320;
+          const maxSide = 640;
           let w = img.naturalWidth || img.width;
           let h = img.naturalHeight || img.height;
           if (!w || !h) throw new Error('Could not read image size.');
@@ -251,27 +251,32 @@
           canvas.height = h;
           const ctx = canvas.getContext('2d', { willReadFrequently: true });
           ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = 'high';
           ctx.drawImage(img, 0, 0, w, h);
           const imageData = ctx.getImageData(0, 0, w, h);
           const data = imageData.data;
-          const levels = 5;
+          // Milder posterize (8 levels) + gentle contrast/warmth (less muddy than 5-level)
+          const levels = 8;
           const step = 255 / (levels - 1);
-          // Posterize + warm comic tint
           for (let i = 0; i < data.length; i += 4) {
             let r = data[i], g = data[i + 1], b = data[i + 2];
-            r = Math.round(r / step) * step;
-            g = Math.round(g / step) * step;
-            b = Math.round(b / step) * step;
-            // Warm: lift red/yellow, slight contrast
-            r = Math.min(255, r * 1.08 + 12);
-            g = Math.min(255, g * 1.02 + 6);
-            b = Math.min(255, b * 0.92);
+            // Contrast midtones slightly before quantize
+            const contrast = 1.12;
+            r = (r - 128) * contrast + 128;
+            g = (g - 128) * contrast + 128;
+            b = (b - 128) * contrast + 128;
+            r = Math.round(Math.min(255, Math.max(0, r)) / step) * step;
+            g = Math.round(Math.min(255, Math.max(0, g)) / step) * step;
+            b = Math.round(Math.min(255, Math.max(0, b)) / step) * step;
+            r = Math.min(255, r * 1.04 + 8);
+            g = Math.min(255, g * 1.01 + 4);
+            b = Math.min(255, b * 0.96);
             data[i] = r; data[i + 1] = g; data[i + 2] = b;
           }
-          // Ink outline via simple edge luminance
+          // Sobel-ish edge ink (thinner, higher threshold → less blotchy)
           const copy = new Uint8ClampedArray(data);
           const lum = (i) => 0.299 * copy[i] + 0.587 * copy[i + 1] + 0.114 * copy[i + 2];
-          const thr = 38;
+          const thr = 52;
           for (let y = 1; y < h - 1; y++) {
             for (let x = 1; x < w - 1; x++) {
               const i = (y * w + x) * 4;
@@ -279,23 +284,24 @@
               const gx = Math.abs(c - lum(i + 4)) + Math.abs(c - lum(i - 4));
               const gy = Math.abs(c - lum(i + w * 4)) + Math.abs(c - lum(i - w * 4));
               if (gx + gy > thr) {
-                data[i] = Math.min(data[i], 36);
-                data[i + 1] = Math.min(data[i + 1], 28);
-                data[i + 2] = Math.min(data[i + 2], 40);
+                const ink = 0.55;
+                data[i] = Math.round(data[i] * (1 - ink) + 22 * ink);
+                data[i + 1] = Math.round(data[i + 1] * (1 - ink) + 18 * ink);
+                data[i + 2] = Math.round(data[i + 2] * (1 - ink) + 28 * ink);
               }
             }
           }
           ctx.putImageData(imageData, 0, 0);
-          // Soft warm paper wash overlay
+          // Lighter paper wash (was heavy yellow mud)
           ctx.globalCompositeOperation = 'soft-light';
-          ctx.fillStyle = 'rgba(255, 214, 120, 0.28)';
+          ctx.fillStyle = 'rgba(255, 228, 170, 0.14)';
           ctx.fillRect(0, 0, w, h);
           ctx.globalCompositeOperation = 'source-over';
-          // Bold ink frame
+          // Slimmer ink frame
           ctx.strokeStyle = '#1a1a2e';
-          ctx.lineWidth = Math.max(3, Math.round(Math.min(w, h) * 0.02));
+          ctx.lineWidth = Math.max(2, Math.round(Math.min(w, h) * 0.012));
           ctx.strokeRect(1, 1, w - 2, h - 2);
-          resolve(canvas.toDataURL('image/jpeg', 0.82));
+          resolve(canvas.toDataURL('image/png'));
         } catch (err) {
           reject(err);
         }
@@ -308,33 +314,40 @@
     });
   }
 
-  async function applyExplorerPhoto(file) {
-    const u = activeUser();
-    if (!u || !file) return;
+  function refreshAfterProfileChange() {
+    updateHeaderUser();
+    refreshStudentCast();
+    const onLanding = $('#screen-landing')?.classList.contains('active');
+    const onProgress = $('#screen-progress')?.classList.contains('active');
+    if (onLanding) renderLanding();
+    else if (onProgress) renderProgress();
+  }
+
+  async function applyExplorerPhoto(file, userId) {
+    const id = userId || activeUser()?.id;
+    if (!id || !file) return;
+    if (!store.users[id]) return;
     try {
       const dataUrl = await comicifyImageFile(file);
-      Storage.setUserAvatar(store, u.id, dataUrl);
+      Storage.setUserAvatar(store, id, dataUrl);
       store = Storage.loadStore();
       syncProgressFromStore();
-      updateHeaderUser();
-      renderProgress();
-      refreshStudentCast();
+      refreshAfterProfileChange();
     } catch (err) {
       alert(err && err.message ? err.message : 'Photo comicify failed.');
     }
   }
 
-  function clearExplorerPhoto() {
-    const u = activeUser();
-    if (!u) return;
-    if (!u.avatarDataUrl) return;
+  function clearExplorerPhoto(userId) {
+    const id = userId || activeUser()?.id;
+    if (!id) return;
+    const u = store.users[id];
+    if (!u || !u.avatarDataUrl) return;
     if (!confirm('Clear comic photo avatar for ' + u.displayName + '?')) return;
-    Storage.clearUserAvatar(store, u.id);
+    Storage.clearUserAvatar(store, id);
     store = Storage.loadStore();
     syncProgressFromStore();
-    updateHeaderUser();
-    renderProgress();
-    refreshStudentCast();
+    refreshAfterProfileChange();
   }
 
   function renameActiveExplorer() {
@@ -1215,6 +1228,9 @@
       <input type="text" id="input-name-${mode}" class="text-input" maxlength="24" placeholder="e.g. Sam" autocomplete="nickname" />
       <p class="field-label" style="margin-top:0.75rem;">Age track</p>
       <div class="track-grid" id="track-grid-${mode}">${trackButtonsHtml(defaultTrack, mode)}</div>
+      <p class="field-label" style="margin-top:0.75rem;">Upload comic photo <span class="muted">(optional)</span></p>
+      <input type="file" id="input-photo-${mode}" accept="image/*" />
+      <p class="muted" style="margin-top:0.35rem;margin-bottom:0;">We comicify it on this device — no cloud upload.</p>
       <div style="margin-top:1rem;display:flex;gap:0.5rem;flex-wrap:wrap;">
         <button type="button" class="btn btn-primary" id="btn-save-profile-${mode}">${mode === 'create' ? 'Start Adventure!' : 'Create Explorer'}</button>
         ${mode === 'new' ? `<button type="button" class="btn btn-ghost" id="btn-cancel-new">Cancel</button>` : ''}
@@ -1230,19 +1246,32 @@
       });
     });
 
-    $('#btn-save-profile-' + mode)?.addEventListener('click', () => {
+    $('#btn-save-profile-' + mode)?.addEventListener('click', async () => {
       const name = ($('#input-name-' + mode)?.value || '').trim();
       if (!name) {
         $('#input-name-' + mode)?.focus();
         return;
       }
-      Storage.createUser(store, { displayName: name, trackId: selected });
+      const created = Storage.createUser(store, { displayName: name, trackId: selected });
       store = Storage.loadStore();
       syncProgressFromStore();
+      const photoFile = $('#input-photo-' + mode)?.files?.[0];
+      if (photoFile && created?.id) {
+        try {
+          const dataUrl = await comicifyImageFile(photoFile);
+          Storage.setUserAvatar(store, created.id, dataUrl);
+          store = Storage.loadStore();
+          syncProgressFromStore();
+        } catch (err) {
+          alert(err && err.message ? err.message : 'Photo comicify failed.');
+        }
+      }
       if (mode === 'new') {
         $('#new-explorer-form')?.classList.add('hidden');
         renderLanding();
       }
+      updateHeaderUser();
+      refreshStudentCast();
       // New users go to diagnostic for their track
       startDiagnostic();
     });
@@ -1261,6 +1290,7 @@
     list.innerHTML = users.map(u => {
       const t = curriculum.tracks[u.trackId];
       const active = u.id === activeId ? ' active' : '';
+      const photoId = 'input-photo-card-' + u.id;
       return `<div class="user-card-row${active}" data-user-id="${escapeAttr(u.id)}">
         <button type="button" class="user-card${active}" data-user-id="${escapeAttr(u.id)}">
           ${avatarSpanHtml(u)}
@@ -1271,6 +1301,9 @@
         </button>
         <div class="user-card-actions">
           <button type="button" class="btn btn-ghost btn-sm btn-rename-card" data-rename-id="${escapeAttr(u.id)}" title="Rename">✎ Rename</button>
+          <label class="btn btn-cyan btn-sm btn-photo-card" for="${escapeAttr(photoId)}" data-photo-id="${escapeAttr(u.id)}" title="Upload comic photo">Upload photo</label>
+          <input type="file" id="${escapeAttr(photoId)}" class="hidden input-photo-card" accept="image/*" data-photo-user="${escapeAttr(u.id)}" />
+          ${u.avatarDataUrl ? `<button type="button" class="btn btn-ghost btn-sm btn-clear-photo-card" data-clear-photo-id="${escapeAttr(u.id)}" title="Clear photo">Clear photo</button>` : ''}
           <button type="button" class="btn btn-ghost btn-sm btn-delete-card" data-delete-id="${escapeAttr(u.id)}" title="Delete">Delete</button>
         </div>
       </div>`;
@@ -1288,6 +1321,25 @@
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
         renameExplorerById(btn.dataset.renameId);
+      });
+    });
+    $$('.btn-photo-card', list).forEach(label => {
+      label.addEventListener('click', (e) => e.stopPropagation());
+    });
+    $$('.input-photo-card', list).forEach(input => {
+      input.addEventListener('click', (e) => e.stopPropagation());
+      input.addEventListener('change', (e) => {
+        e.stopPropagation();
+        const f = e.target.files && e.target.files[0];
+        const uid = e.target.dataset.photoUser;
+        if (f && uid) applyExplorerPhoto(f, uid);
+        e.target.value = '';
+      });
+    });
+    $$('.btn-clear-photo-card', list).forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        clearExplorerPhoto(btn.dataset.clearPhotoId);
       });
     });
     $$('.btn-delete-card', list).forEach(btn => {
@@ -1620,27 +1672,7 @@
             <strong>${escapeHtml(u.displayName)}</strong> · ${escapeHtml(track.label)}
             <span class="muted">(progress for this age track)</span>
           </div>
-        </div>
-        <div class="profile-photo-tools no-print">
-          <p class="field-label" style="margin-top:0.75rem;">Comic photo avatar</p>
-          <p class="muted" style="margin-bottom:0.35rem;">Upload a photo — we comicify it on this device (no cloud). Shows on your chip, Home cards, and student portrait.</p>
-          <div class="profile-photo-actions">
-            <label class="btn btn-cyan btn-sm" for="input-explorer-photo">Upload photo</label>
-            <button type="button" class="btn btn-ghost btn-sm" id="btn-clear-photo"${u.avatarDataUrl ? '' : ' disabled'}>Clear photo</button>
-            <button type="button" class="btn btn-ghost btn-sm" id="btn-rename-inline">Rename</button>
-          </div>
-          <input type="file" id="input-explorer-photo" accept="image/*" class="hidden" />
         </div>`;
-      $('#btn-clear-photo')?.addEventListener('click', () => clearExplorerPhoto());
-      $('#btn-rename-inline')?.addEventListener('click', () => renameActiveExplorer());
-      const photoInput = $('#input-explorer-photo');
-      if (photoInput) {
-        photoInput.value = '';
-        photoInput.onchange = (e) => {
-          const f = e.target.files && e.target.files[0];
-          if (f) applyExplorerPhoto(f);
-        };
-      }
     }
 
     const dueCount = Storage.getDueReviews(progress).length;
@@ -2141,7 +2173,6 @@
         renderProgress();
       }
     });
-    $('#btn-rename')?.addEventListener('click', () => renameActiveExplorer());
     $('#btn-delete-user')?.addEventListener('click', () => {
       const u = activeUser();
       if (!u) return;

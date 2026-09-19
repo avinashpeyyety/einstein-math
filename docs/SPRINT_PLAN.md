@@ -74,7 +74,8 @@ Progress keys **namespaced** by `subject + track` so multi-subject explorers sta
 - Curriculum schema v3: `subjects: { math, science, geography, … }` each with tracks
 - Progress namespaced by subject + track
 - SW cache / versioning discipline for multi-pack assets
-- **Personalized comic profile:** ✅ **Shipped (v2.4.0)** — upload a photo on Progress → comicify entirely in-browser (canvas; no external APIs) → explorer avatar on chip / Home cards / Progress / student portrait; stored as `avatarDataUrl` with device-local profile + export/import; photo never leaves the device
+- **Personalized comic profile:** ✅ **Shipped (v2.4.0)** · UI on Home (v2.4.1) · comicify quality pass (v2.4.2, ~640px PNG) — in-browser comicify (canvas; no external APIs) → explorer avatar on chip / Home cards / Progress / student portrait; stored as `avatarDataUrl` with device-local profile + export/import; photo never leaves the device
+- **Home profile controls (v2.4.2):** rename + comic photo upload/clear moved to Home Who’s Playing cards and Create / + New Explorer form; Progress keeps identity row only (no upload/rename tools)
 
 ### Track S — Science (first expansion)
 
@@ -103,7 +104,7 @@ Progress keys **namespaced** by `subject + track` so multi-subject explorers sta
 | Week | Focus (example) |
 |------|-----------------|
 | W1 | Track P: schema v3 stub + subject switcher (Math-only still works) |
-| W1b | Track P: profile photo upload → comicify → personalized explorer avatar ✅ shipped v2.4.0 |
+| W1b | Track P: profile photo upload → comicify → personalized explorer avatar ✅ shipped v2.4.0; photo/rename UI on Home (not Progress) ✅ v2.4.2 |
 | W2 | Track S: science pilot unit for ages 5–6 |
 | W3 | Track S: science pilots for 7–8 and/or 9–10 |
 | W4 | Track M: math depth / visuals OR Track G kickoff |
@@ -143,4 +144,4 @@ Continuous development. Not math-only forever. Expand into **science, geography,
 
 | Ask | Track | Note |
 |-----|-------|------|
-| Profile photo upload → comicify for personalized explorer avatar | P | ✅ **Shipped (v2.4.0)** — in-browser canvas comicify; `avatarDataUrl` on user; chip / Home / Progress / student portrait; export/import; no external APIs |
+| Profile photo upload → comicify for personalized explorer avatar | P | ✅ **Shipped (v2.4.0)**; **UI on Home (v2.4.2)** — create form + Who’s Playing cards host upload/clear/rename; Progress identity only; in-browser comicify; `avatarDataUrl`; export/import; no external APIs |

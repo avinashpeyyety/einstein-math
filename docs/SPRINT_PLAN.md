@@ -102,7 +102,7 @@ Progress keys **namespaced** by `subject + track` so multi-subject explorers sta
 
 | Week | Focus (example) |
 |------|-----------------|
-| W1 | Track P: schema v3 stub + subject switcher (Math-only still works) |
+| W1 | ✅ Track P: schema v3 stub + subject switcher (Math-only still works) |
 | W1b | Track P: profile photo upload → comicify → personalized explorer avatar |
 | W2 | Track S: science pilot unit for ages 5–6 |
 | W3 | Track S: science pilots for 7–8 and/or 9–10 |

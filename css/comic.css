@@ -1074,3 +1074,37 @@ h1, h2, h3, .logo, .burst-text {
   margin-bottom: 0.25rem;
   color: var(--ink);
 }
+
+
+/* Track P — subject switcher chip */
+.subject-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.75rem;
+  border: 3px solid var(--ink);
+  border-radius: 999px;
+  background: var(--cyan, #4ECDC4);
+  box-shadow: 2px 2px 0 var(--ink);
+  cursor: pointer;
+  font-family: 'Comic Neue', cursive, sans-serif;
+  font-weight: 700;
+}
+.subject-chip:hover { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink); }
+.subject-chip-label {
+  font-family: 'Bangers', Impact, sans-serif;
+  font-size: 1rem;
+  letter-spacing: 0.02em;
+}
+.subject-chip-hint { font-size: 0.7rem; }
+.subject-card.soon { opacity: 0.72; }
+.subject-card .soon-badge {
+  display: inline-block;
+  margin-left: 0.35rem;
+  padding: 0.1rem 0.4rem;
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  background: var(--yellow, #FFE66D);
+  font-size: 0.7rem;
+  font-weight: 700;
+}

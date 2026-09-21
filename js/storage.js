@@ -31,7 +31,8 @@ const Storage = {
       activeUserId: null,
       users: {},
       prefs: {
-        speechEnabled: false
+        speechEnabled: false,
+        activeSubject: 'math'
       }
     };
   },
@@ -181,7 +182,8 @@ const Storage = {
   saveStore(store) {
     store.version = 2;
     store.appVersion = store.appVersion || '2.3.0';
-    if (!store.prefs || typeof store.prefs !== 'object') store.prefs = { speechEnabled: false };
+    if (!store.prefs || typeof store.prefs !== 'object') store.prefs = { speechEnabled: false, activeSubject: 'math' };
+    if (!store.prefs.activeSubject) store.prefs.activeSubject = 'math';
     localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
   },
 
@@ -550,9 +552,12 @@ const Storage = {
     store.version = 2;
     store.appVersion = store.appVersion || '2.3.0';
     if (!store.prefs || typeof store.prefs !== 'object') {
-      store.prefs = { speechEnabled: false };
-    } else if (typeof store.prefs.speechEnabled !== 'boolean') {
-      store.prefs.speechEnabled = !!store.prefs.speechEnabled;
+      store.prefs = { speechEnabled: false, activeSubject: 'math' };
+    } else {
+      if (typeof store.prefs.speechEnabled !== 'boolean') {
+        store.prefs.speechEnabled = !!store.prefs.speechEnabled;
+      }
+      if (!store.prefs.activeSubject) store.prefs.activeSubject = 'math';
     }
     if (!store.users) store.users = {};
     return store;
@@ -561,6 +566,18 @@ const Storage = {
   getSpeechEnabled(store) {
     store = this.normalizeStoreMeta(store || this.loadStore());
     return !!store.prefs.speechEnabled;
+  },
+
+  getActiveSubject(store) {
+    store = this.normalizeStoreMeta(store || this.loadStore());
+    return store.prefs.activeSubject || 'math';
+  },
+
+  setActiveSubject(store, subjectId) {
+    if (!store.prefs) store.prefs = { speechEnabled: false, activeSubject: 'math' };
+    store.prefs.activeSubject = subjectId || 'math';
+    this.saveStore(store);
+    return store;
   },
 
   setSpeechEnabled(store, enabled) {

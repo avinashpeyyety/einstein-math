@@ -174,6 +174,7 @@
     if (el) el.classList.add('active');
     window.scrollTo({ top: 0, behavior: 'smooth' });
     updateHeaderUser();
+    updateSubjectChip();
   }
 
   function updateHeaderUser() {
@@ -198,6 +199,15 @@
       const t = activeTrack();
       trackMeta.textContent = t ? t.label : '';
     }
+    updateSubjectChip();
+  }
+
+  function updateSubjectChip() {
+    const label = $('#subject-chip-label');
+    if (!label || typeof Subjects === 'undefined') return;
+    const id = Storage.getActiveSubject(store);
+    const sub = Subjects.get(id);
+    label.textContent = sub ? sub.label : 'Math';
   }
 
   function trackButtonsHtml(selectedId, namePrefix) {
@@ -1838,6 +1848,41 @@
     fn();
   }
 
+
+  function openSubjectModal() {
+    const modal = $('#subject-modal');
+    if (!modal || typeof Subjects === 'undefined') return;
+    const list = $('#subject-list');
+    const activeId = Storage.getActiveSubject(store);
+    list.innerHTML = Subjects.CATALOG.map((sub) => {
+      const soon = sub.status !== 'live';
+      const sel = sub.id === activeId ? ' selected' : '';
+      const badge = soon ? '<span class="soon-badge">soon</span>' : '';
+      return `<button type="button" class="user-card subject-card${soon ? ' soon' : ''}${sel}" data-subject-id="${escapeAttr(sub.id)}" ${soon ? 'aria-disabled="true"' : ''}>
+        <span class="user-card-text">
+          <strong>${escapeHtml(sub.label)}${badge}</strong>
+          <span class="muted">${escapeHtml(sub.blurb || '')}</span>
+        </span>
+      </button>`;
+    }).join('');
+    $$('[data-subject-id]', list).forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const id = btn.dataset.subjectId;
+        if (!Subjects.isLive(id)) {
+          alert((Subjects.get(id).label || 'That subject') + ' is coming soon — Math stays active for now.');
+          return;
+        }
+        store = Storage.setActiveSubject(store, id);
+        curriculum = Subjects.normalizeCurriculum(curriculum, id);
+        modal.classList.add('hidden');
+        updateSubjectChip();
+        showScreen('screen-landing');
+        renderLanding();
+      });
+    });
+    modal.classList.remove('hidden');
+  }
+
   function openSwitcher() {
     const modal = $('#switcher-modal');
     if (!modal) return;
@@ -1929,6 +1974,13 @@
     $('#switcher-modal')?.addEventListener('click', (e) => {
       if (e.target.id === 'switcher-modal') e.target.classList.add('hidden');
     });
+    $('#btn-subject-chip')?.addEventListener('click', openSubjectModal);
+    $('#btn-close-subject')?.addEventListener('click', () => {
+      $('#subject-modal')?.classList.add('hidden');
+    });
+    $('#subject-modal')?.addEventListener('click', (e) => {
+      if (e.target.id === 'subject-modal') e.target.classList.add('hidden');
+    });
     $('.logo')?.addEventListener('click', () => {
       showScreen('screen-landing');
       renderLanding();
@@ -2017,6 +2069,11 @@
       const res = await fetch('data/curriculum.json');
       if (!res.ok) throw new Error('Failed to load curriculum');
       curriculum = await res.json();
+      store = Storage.loadStore();
+      const sid = Storage.getActiveSubject(store);
+      curriculum = (typeof Subjects !== 'undefined')
+        ? Subjects.normalizeCurriculum(curriculum, sid)
+        : curriculum;
       if (!curriculum.tracks) throw new Error('Curriculum missing tracks');
     } catch (err) {
       document.body.innerHTML = `

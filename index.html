@@ -20,6 +20,10 @@
     <header class="top-bar">
       <div class="logo" title="Home">Einstein <span>Math</span></div>
       <div class="top-bar-right">
+        <button type="button" class="subject-chip" id="btn-subject-chip" title="Switch subject">
+          <span class="subject-chip-label" id="subject-chip-label">Math</span>
+          <span class="muted subject-chip-hint">subject</span>
+        </button>
         <button type="button" class="btn btn-ghost btn-sm speech-toggle" id="btn-speech-toggle" title="Read Einstein aloud">
           🔇 Read aloud
         </button>
@@ -230,6 +234,16 @@
       <button type="button" class="btn btn-ghost btn-sm" data-nav="hub" style="margin-top:0.5rem;">← Exit to Map</button>
     </section>
 
+    <!-- Subject modal (Track P) -->
+    <div id="subject-modal" class="modal-backdrop hidden">
+      <div class="comic-panel modal-panel">
+        <h2 class="panel-title">Subjects</h2>
+        <p class="muted" style="margin:0 0 0.75rem;">Math is live. Science &amp; Geography are coming soon.</p>
+        <div id="subject-list" class="user-picker-list"></div>
+        <button type="button" class="btn btn-ghost btn-sm" id="btn-close-subject" style="margin-top:1rem;">Close</button>
+      </div>
+    </div>
+
     <!-- Switcher modal -->
     <div id="switcher-modal" class="modal-backdrop hidden">
       <div class="comic-panel modal-panel">
@@ -240,11 +254,12 @@
     </div>
 
     <footer class="site-footer">
-      Einstein Math · Ages 5–10 · v2.3.3 · Progress stays on your device (no accounts) · Installable / offline after first visit
+      Einstein Math · Ages 5–10 · v2.3.6 · Progress stays on your device (no accounts) · Installable / offline after first visit
     </footer>
   </div>
 
   <script src="js/storage.js"></script>
+  <script src="js/subjects.js"></script>
   <script src="js/einstein.js"></script>
   <script src="js/student.js"></script>
   <script src="js/app.js"></script>

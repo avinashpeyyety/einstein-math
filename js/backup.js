@@ -52,9 +52,10 @@
 
   // ---------- 2. auto-restore when localStorage was wiped ----------
   // Only when the key is entirely missing (cleared), never when the user deleted explorers on purpose.
+  // app.js writes an empty store on boot, so remember "was missing" now and accept an empty store later.
   if (localStorage.getItem(KEY) === null && !sessionStorage.getItem(RESTORED_FLAG)) {
     idbGet('latest').then(snap => {
-      if (snap && hasUsers(snap.data) && localStorage.getItem(KEY) === null) {
+      if (snap && hasUsers(snap.data) && !hasUsers(localStorage.getItem(KEY))) {
         localStorage.setItem(KEY, snap.data);
         sessionStorage.setItem(RESTORED_FLAG, String(snap.at || Date.now()));
         location.reload();
@@ -82,7 +83,7 @@
     payload.report = {
       title: 'Einstein Math progress report',
       savedAt: new Date().toISOString(),
-      howToRestore: 'Open Einstein Math → 💾 Progress → "Restore from a progress file" and pick this file.',
+      howToRestore: 'Open Einstein Math → 💾 Backup → "Restore from a progress file" and pick this file.',
       explorers
     };
     return payload;
@@ -117,6 +118,7 @@
   async function mirror() {
     const data = localStorage.getItem(KEY);
     if (data === null) return;
+    if (!hasUsers(data)) { const prev = await idbGet('latest').catch(() => null); if (prev && hasUsers(prev.data)) return; }
     const at = Date.now();
     try {
       await idbPut('latest', { data, at });
@@ -216,7 +218,7 @@
   function buildUi() {
     const right = document.querySelector('.top-bar-right');
     if (right && !document.getElementById('btn-backup')) {
-      const b = el('<button type="button" class="btn btn-ghost btn-sm" id="btn-backup" title="Save or restore progress">💾 Progress</button>');
+      const b = el('<button type="button" class="btn btn-ghost btn-sm" id="btn-backup" title="Save or restore progress">💾 Backup</button>');
       right.insertBefore(b, right.firstChild);
       b.addEventListener('click', openModal);
     }

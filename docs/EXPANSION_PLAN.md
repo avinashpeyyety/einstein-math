@@ -1,4 +1,4 @@
-# Einstein Math — Expansion Plan: Math depth · Physics · SQL
+# Einstein Math — Expansion Plan: Math depth · Physics
 
 **Owner:** Chief (autonomous paced sprints; no go-ahead needed) · **Implementers:** Forge (engine/UI/content), Studio (comic panels)
 **Cadence:** one ticket per sprint cycle, weekday cycles (see §6). Each cycle: take the top unchecked ticket in §5 → ship → smoke → commit → tick it here → pulse.
@@ -32,21 +32,13 @@ Physics is taught by Einstein in his own voice — the most on-brand subject. In
 
 Engine: `js/sims/` — tiny canvas sims (ramp, pendulum, circuit, lens, buoyancy) driven by lesson JSON params; checks read sim state. Mastery and review reuse the math engine.
 
-## 3. SQL ("Data Detectives")
+## 3. SQL — on hold (moved out)
 
-Kids learn SQL as asking questions of a table. Runs fully offline.
-
-| Track | Units |
-|-------|-------|
-| Ages 9–10 | Tables, rows & columns (pets, planets, snacks) · sort & filter with blocks → reveals `SELECT … WHERE … ORDER BY` · counting (`COUNT`) |
-| Ages 11–12 | Typed `SELECT` / `WHERE` / `AND/OR` / `ORDER BY` / `LIMIT` · `COUNT/SUM/AVG/MIN/MAX` · `GROUP BY` |
-| Ages 13–14 | `JOIN` (students ↔ classes) · `HAVING` · subqueries · `INSERT/UPDATE` in a sandbox · mystery cases ("Who ate the cookies?") |
-
-Engine: in-browser SQLite via vendored **sql.js** wasm (MIT, ~1 MB, lazy-loaded only on the SQL module, SW-cached) — same vendoring rules as MediaPipe. Checks compare the learner's result set to the expected set (order-insensitive unless `ORDER BY` is the skill). Block mode for 9–10 generates SQL text so kids see the bridge.
+Per Avinash (2026-10-01): SQL is for adults and will be a **separate portal**, not part of Einstein Math. No SQL tickets here.
 
 ## 4. Platform work needed first
 
-1. Schema v3 real: `subjects.{math,physics,sql}.tracks.*`; progress keyed `subject:track` with migration from v2 keys.
+1. Schema v3 real: `subjects.{math,physics}.tracks.*`; progress keyed `subject:track` with migration from v2 keys.
 2. Subject switcher live (W1 stub) + subject-aware Today's path and parent summary.
 3. Age tracks 11–12 and 13–14 added to the picker (optional per subject).
 4. Lazy subject packs: `data/subjects/<subject>.json` loaded on demand; SW caches on first use.
@@ -61,17 +53,13 @@ Effort: S ≤ 1 cycle, M = 2 cycles. Each ticket ends with smoke (0 JS errors, e
 - [ ] **X4 (M)** Physics engine `js/sims/` + first sim (ramp & friction) + lesson type `sim`
 - [ ] **X5 (M)** Physics pilot: ages 7–8 unit "Forces & friction" (4 lessons + check) — Studio: 2 Einstein physics panels
 - [ ] **X6 (S)** Physics ages 5–6 unit "Push & pull / sink or float" (3 lessons)
-- [ ] **X7 (M)** SQL engine: vendored sql.js lazy-load + result-set checker + lesson type `sql`
-- [ ] **X8 (M)** SQL pilot: ages 9–10 "Data Detectives" block mode (4 lessons, pets table)
 - [ ] **X9 (M)** Math: procedural generators for top 10 practiced skills (seeded, difficulty dial)
 - [ ] **X10 (M)** Math ages 11–12 track v1: ratios, percents, negatives, one-step equations (8 lessons)
 - [ ] **X11 (S)** Fact-fluency arcade (timed sprints, streaks, bests)
 - [ ] **X12 (M)** Physics ages 9–10: speed, gravity, circuits sim (5 lessons)
-- [ ] **X13 (M)** SQL ages 11–12 typed SQL: SELECT/WHERE/ORDER/aggregates/GROUP BY (6 lessons)
-- [ ] **X14 (S)** Puzzle of the day (math + physics + SQL rotation)
+- [ ] **X14 (S)** Puzzle of the day (math + physics rotation)
 - [ ] **X15 (M)** Math ages 13–14 pre-algebra v1 (8 lessons)
 - [ ] **X16 (M)** Physics ages 11–14: Newton's laws + Ohm's law sims (6 lessons)
-- [ ] **X17 (M)** SQL ages 13–14: JOIN + mystery cases (5 lessons)
 - [ ] **X18 (S)** Parent skill heat-grid + printable generated worksheets
 - [ ] **X19 (S)** Rename/branding pass: "Einstein Academy" umbrella (math stays the flagship) — only if Avinash approves the name
 
@@ -83,3 +71,7 @@ Blocked on Avinash (do not stall the queue): public GitHub/Pages create for eins
 - **Week shape:** Mon–Thu ship tickets; Fri cycle = polish/regressions + docs.
 - **Pulse:** included in the twice-daily sprint pulse (11:03, 4:03) — tickets shipped, next ticket, blockers.
 - **Stop rules:** two failed smokes on the same ticket → mark ⚠ with reason, skip to next; Air offline → stage on box, apply when back; never push to public; never ship third-party code without vendoring + license note.
+
+## 7. Progress log
+
+- 2026-10-01 · (side ask) progress safety net: IndexedDB mirror + auto-restore + progress report download / auto-save file / restore from file

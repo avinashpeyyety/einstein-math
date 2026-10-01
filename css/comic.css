@@ -1122,3 +1122,10 @@ h1, h2, h3, .logo, .burst-text {
 .avatar-preview-row { display: flex; align-items: center; gap: 1rem; justify-content: center; }
 .avatar-preview-big { width: 220px; height: 220px; border-radius: 50%; border: 4px solid var(--ink); object-fit: cover; }
 .avatar-preview-small { width: 48px; height: 48px; }
+/* Progress backup (js/backup.js) */
+.backup-panel { max-width: 520px; }
+.backup-line { margin: 0.35rem 0; }
+.backup-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.75rem 0; }
+.backup-status { min-height: 1.2em; font-weight: 600; }
+.backup-landing { margin-top: 0.9rem; font-size: 0.95rem; }
+.backup-toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); background: #FFE66D; color: #1a1a1a; border: 3px solid #1a1a1a; border-radius: 10px; padding: 0.55rem 1rem; font-weight: 700; box-shadow: 4px 4px 0 #1a1a1a; z-index: 9999; }

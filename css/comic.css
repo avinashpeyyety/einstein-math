@@ -1108,3 +1108,17 @@ h1, h2, h3, .logo, .burst-text {
   font-size: 0.7rem;
   font-weight: 700;
 }
+
+
+/* W1b — comic avatar */
+.user-avatar.has-img { padding: 0; overflow: hidden; background: var(--paper, #FFF8E7) !important; }
+.user-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block; }
+.avatar-modal-panel { max-width: 420px; }
+.avatar-tip { margin: 0 0 0.5rem; font-size: 0.9rem; }
+.avatar-crop { width: 100%; max-width: 320px; aspect-ratio: 1; display: block; margin: 0 auto; border: 4px solid var(--ink); border-radius: 8px; touch-action: none; cursor: grab; background: var(--paper, #FFF8E7); }
+.avatar-zoom { display: flex; align-items: center; gap: 0.5rem; margin: 0.6rem 0; font-weight: 700; }
+.avatar-zoom input { flex: 1; }
+.avatar-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.6rem; }
+.avatar-preview-row { display: flex; align-items: center; gap: 1rem; justify-content: center; }
+.avatar-preview-big { width: 220px; height: 220px; border-radius: 50%; border: 4px solid var(--ink); object-fit: cover; }
+.avatar-preview-small { width: 48px; height: 48px; }

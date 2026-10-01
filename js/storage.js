@@ -258,6 +258,33 @@ const Storage = {
     return user;
   },
 
+  /** W1b: comic avatar (device-local). Only generated PNGs are kept; the source photo never is. */
+  setComicAvatar(store, userId, png128, png512) {
+    const user = store.users[userId];
+    if (!user || !png128) return null;
+    user.avatarImage = png128;
+    user.avatarImage512 = png512 || null;
+    this.touchUser(user);
+    try {
+      this.saveStore(store);
+    } catch (err) {
+      // localStorage full: keep only the small list-size image
+      user.avatarImage512 = null;
+      this.saveStore(store);
+    }
+    return user;
+  },
+
+  clearComicAvatar(store, userId) {
+    const user = store.users[userId];
+    if (!user) return null;
+    delete user.avatarImage;
+    delete user.avatarImage512;
+    this.touchUser(user);
+    this.saveStore(store);
+    return user;
+  },
+
   deleteUser(store, userId) {
     if (!store.users[userId]) return store;
     delete store.users[userId];
@@ -679,6 +706,11 @@ const Storage = {
       avatarColor: preferIncoming ? (incomingU.avatarColor || localU.avatarColor) : (localU.avatarColor || incomingU.avatarColor),
       tracks: {}
     };
+    const avSrc = preferIncoming ? (incomingU.avatarImage ? incomingU : localU) : (localU.avatarImage ? localU : incomingU);
+    if (avSrc && avSrc.avatarImage) {
+      out.avatarImage = avSrc.avatarImage;
+      if (avSrc.avatarImage512) out.avatarImage512 = avSrc.avatarImage512;
+    }
     const tids = new Set([
       ...Object.keys(localU.tracks || {}),
       ...Object.keys(incomingU.tracks || {})

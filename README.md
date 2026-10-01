@@ -166,7 +166,7 @@ Localhost works for PWA install in Chromium.
 
 ## Smoke demo (2.3 trusted-home sprint)
 
-1. Load once online → DevTools → Application → Service Worker registered; Cache Storage shows `einstein-math-v2.3.6` (or the current `CACHE` in `sw.js`).
+1. Load once online → DevTools → Application → Service Worker registered; Cache Storage shows `einstein-math-v2.3.7` (or the current `CACHE` in `sw.js`).
 2. Go offline (DevTools Network → Offline) → reload → landing / Mission Map still usable.
 3. Create two explorers, earn progress → **Export all profiles** → clear site data → **Import** merge → both kids restored.
 4. Toggle **Read aloud** → Einstein bubbles speak; **Replay** repeats the last line.
@@ -245,3 +245,7 @@ Question types: `mc` (multiple choice) and `fill` (typed answer). Prefer keeping
 - Keep comic voice across all age bands — older tracks go deeper, not drier.
 - Mastery is formative: reviews and remediation keep practice light and local.
 - Parent view stays calmer and factual while remaining comic-adjacent.
+
+## Comic avatar (W1b)
+
+Progress → **Comic avatar** turns a profile photo into a comic explorer avatar **on the device** (`js/comicify.js`). Two small vendored MediaPipe models (Apache-2.0, [`vendor/mediapipe/`](vendor/mediapipe/README.md)) find the person and the hair, and skin vs clothes is split by colour inside the person; the models and the single SIMD wasm build load only when a photo is picked, never from a CDN, and are cached for offline use after first use. If it can't load, the letter avatar stays. The parent drags and zooms the photo into a head-and-shoulders outline, previews the 512 px result and the 48 px circle, then saves or keeps the letter avatar. Only the generated 128 px and 512 px PNGs are stored on the profile (and travel in export/import); the original photo is never kept. Cloud comicify is off. Look and acceptance rules: [`docs/comic-avatar-style.md`](docs/comic-avatar-style.md).

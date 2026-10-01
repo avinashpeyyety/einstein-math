@@ -1,5 +1,7 @@
 /* Einstein Math service worker — caches app shell + curriculum + panels for offline play */
-const CACHE = 'einstein-math-v2.3.6';
+const CACHE = 'einstein-math-v2.3.7';
+// W1b: on-device comic-avatar model (~40 MB) is cached on first use only, and kept across app versions
+const MODEL_CACHE = 'einstein-math-models-v1';
 const PRECACHE = [
   './',
   './index.html',
@@ -7,6 +9,7 @@ const PRECACHE = [
   './css/comic.css',
   './js/storage.js',
   './js/subjects.js',
+  './js/comicify.js',
   './js/einstein.js',
   './js/student.js',
   './js/app.js',
@@ -35,7 +38,7 @@ self.addEventListener('install', (event) => {
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) =>
-      Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k)))
+      Promise.all(keys.filter((k) => k !== CACHE && k !== MODEL_CACHE).map((k) => caches.delete(k)))
     ).then(() => self.clients.claim())
   );
 });
@@ -57,6 +60,17 @@ self.addEventListener('fetch', (event) => {
           return res;
         })
         .catch(() => caches.match('./index.html'))
+    );
+    return;
+  }
+
+  // Comic-avatar model files: cache-first in their own long-lived cache (never precached)
+  if (url.pathname.includes('/vendor/mediapipe/')) {
+    event.respondWith(
+      caches.open(MODEL_CACHE).then((c) => c.match(req).then((hit) => hit || fetch(req).then((res) => {
+        if (res && res.ok) c.put(req, res.clone());
+        return res;
+      })))
     );
     return;
   }

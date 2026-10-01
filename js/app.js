@@ -190,8 +190,15 @@
     const av = $('#user-avatar');
     const nameEl = $('#user-name');
     if (av) {
-      av.textContent = letter;
-      av.style.background = u.avatarColor || '#FF6B35';
+      if (u.avatarImage) {
+        av.classList.add('has-img');
+        av.innerHTML = `<img src="${escapeAttr(u.avatarImage)}" alt="">`;
+        av.style.background = '';
+      } else {
+        av.classList.remove('has-img');
+        av.textContent = letter;
+        av.style.background = u.avatarColor || '#FF6B35';
+      }
     }
     if (nameEl) nameEl.textContent = u.displayName;
     const trackMeta = $('#user-track-label');
@@ -200,6 +207,7 @@
       trackMeta.textContent = t ? t.label : '';
     }
     updateSubjectChip();
+    refreshAvatarButtons();
   }
 
   function updateSubjectChip() {
@@ -1076,7 +1084,7 @@
       const letter = (u.displayName || 'E').charAt(0).toUpperCase();
       const active = u.id === activeId ? ' active' : '';
       return `<button type="button" class="user-card${active}" data-user-id="${u.id}">
-        <span class="user-avatar" style="background:${escapeAttr(u.avatarColor || '#FF6B35')}">${escapeHtml(letter)}</span>
+        ${avatarSpanHtml(u)}
         <span class="user-card-text">
           <strong>${escapeHtml(u.displayName)}</strong>
           <span class="muted">${escapeHtml(t ? t.label : u.trackId)}</span>
@@ -1828,6 +1836,16 @@
     }
   }
 
+
+  /** W1b: comic avatar when present, else the letter-in-colour circle (always valid fallback). */
+  function avatarSpanHtml(u, color) {
+    const letter = escapeHtml(((u && u.displayName) || 'E').trim().charAt(0).toUpperCase());
+    if (u && u.avatarImage) {
+      return `<span class="user-avatar has-img"><img src="${escapeAttr(u.avatarImage)}" alt=""></span>`;
+    }
+    return `<span class="user-avatar" style="background:${escapeAttr((u && u.avatarColor) || color || '#FF6B35')}">${letter}</span>`;
+  }
+
   function escapeHtml(s) {
     return String(s)
       .replace(/&/g, '&amp;')
@@ -1883,6 +1901,154 @@
     modal.classList.remove('hidden');
   }
 
+
+  /* ---------- W1b comic avatar (device-local) ---------- */
+  const avatarCtx = { src: null, cx: 0, cy: 0, side: 0, base: 0, result: null, drag: null };
+
+  function drawAvatarCrop() {
+    const cv = $('#avatar-crop');
+    if (!cv || !avatarCtx.src) return;
+    const g = cv.getContext('2d');
+    const W = cv.width;
+    const { src, cx, cy, side } = avatarCtx;
+    g.fillStyle = '#FFF8E7';
+    g.fillRect(0, 0, W, W);
+    g.drawImage(src, cx - side / 2, cy - side / 2, side, side, 0, 0, W, W);
+    // head-and-shoulders guide (same shape Comicify keeps)
+    g.save();
+    g.setLineDash([8, 6]);
+    g.lineWidth = 3;
+    g.strokeStyle = '#1A1A2E';
+    g.beginPath();
+    g.ellipse(W * 0.5, W * 0.40, W * 0.31, W * 0.37, 0, 0, Math.PI * 2);
+    g.moveTo(W * 0.20, W * 0.68); g.lineTo(W * 0.0, W * 0.92);
+    g.moveTo(W * 0.80, W * 0.68); g.lineTo(W * 1.0, W * 0.92);
+    g.stroke();
+    g.restore();
+  }
+
+  function clampAvatarCrop() {
+    const { src } = avatarCtx;
+    const zoom = parseFloat($('#avatar-zoom')?.value || '1') || 1;
+    avatarCtx.side = avatarCtx.base / zoom;
+    const half = avatarCtx.side / 2;
+    avatarCtx.cx = Math.min(src.width - half, Math.max(half, avatarCtx.cx));
+    avatarCtx.cy = Math.min(src.height - half, Math.max(half, avatarCtx.cy));
+  }
+
+  function showAvatarStep(step) {
+    $('#avatar-step-crop')?.classList.toggle('hidden', step !== 'crop');
+    $('#avatar-step-preview')?.classList.toggle('hidden', step !== 'preview');
+  }
+
+  function closeAvatarModal() {
+    $('#avatar-modal')?.classList.add('hidden');
+    if (avatarCtx.src && avatarCtx.src.close) avatarCtx.src.close();
+    avatarCtx.src = null;
+    avatarCtx.result = null;
+  }
+
+  async function startComicAvatar(file) {
+    if (typeof Comicify === 'undefined') return;
+    try {
+      // lazy: the vendored on-device model loads only when a photo is picked; no model → letter avatar
+      const [{ src, box }] = await Promise.all([Comicify.load(file), Comicify.loadSegmenter('vendor/mediapipe/')]);
+      avatarCtx.src = src;
+      avatarCtx.base = Math.min(src.width, src.height);
+      avatarCtx.cx = box.x + box.side / 2;
+      avatarCtx.cy = box.y + box.side / 2;
+      const zoomEl = $('#avatar-zoom');
+      if (zoomEl) zoomEl.value = String(Math.max(1, Math.min(4, avatarCtx.base / box.side)));
+      clampAvatarCrop();
+      showAvatarStep('crop');
+      $('#avatar-modal')?.classList.remove('hidden');
+      drawAvatarCrop();
+    } catch (err) {
+      alert('Comic avatar is not available on this device right now. Keeping the letter avatar.');
+    }
+  }
+
+  async function makeComicAvatar() {
+    const u = activeUser();
+    if (!u || !avatarCtx.src) return;
+    const btn = $('#btn-avatar-make');
+    if (btn) { btn.disabled = true; btn.textContent = 'Inking…'; }
+    try {
+      const crop = { x: avatarCtx.cx - avatarCtx.side / 2, y: avatarCtx.cy - avatarCtx.side / 2, side: avatarCtx.side };
+      avatarCtx.result = await Comicify.render(avatarCtx.src, crop, { avatarColor: u.avatarColor, modelBase: 'vendor/mediapipe/' });
+      $('#avatar-preview-big').src = avatarCtx.result.png512;
+      $('#avatar-preview-small').src = avatarCtx.result.png128;
+      showAvatarStep('preview');
+    } catch (err) {
+      alert(((err && err.message) || 'Comicify failed.') + ' Keeping the letter avatar.');
+      closeAvatarModal();
+    } finally {
+      if (btn) { btn.disabled = false; btn.textContent = 'Make my comic'; }
+    }
+  }
+
+  function refreshAvatarButtons() {
+    const u = activeUser();
+    $('#btn-remove-avatar')?.classList.toggle('hidden', !(u && u.avatarImage));
+  }
+
+  function wireComicAvatar() {
+    const input = $('#input-avatar-photo');
+    $('#btn-comic-avatar')?.addEventListener('click', () => {
+      if (!activeUser() || !input) return;
+      input.value = '';
+      input.click();
+    });
+    input?.addEventListener('change', (e) => {
+      const f = e.target.files && e.target.files[0];
+      if (f) startComicAvatar(f);
+    });
+    $('#btn-remove-avatar')?.addEventListener('click', () => {
+      const u = activeUser();
+      if (!u) return;
+      Storage.clearComicAvatar(store, u.id);
+      store = Storage.loadStore();
+      updateHeaderUser();
+      refreshAvatarButtons();
+    });
+    const cv = $('#avatar-crop');
+    cv?.addEventListener('pointerdown', (e) => {
+      avatarCtx.drag = { x: e.clientX, y: e.clientY };
+      cv.setPointerCapture(e.pointerId);
+    });
+    cv?.addEventListener('pointermove', (e) => {
+      if (!avatarCtx.drag || !avatarCtx.src) return;
+      const k = avatarCtx.side / cv.getBoundingClientRect().width;
+      avatarCtx.cx -= (e.clientX - avatarCtx.drag.x) * k;
+      avatarCtx.cy -= (e.clientY - avatarCtx.drag.y) * k;
+      avatarCtx.drag = { x: e.clientX, y: e.clientY };
+      clampAvatarCrop();
+      drawAvatarCrop();
+    });
+    const endDrag = () => { avatarCtx.drag = null; };
+    cv?.addEventListener('pointerup', endDrag);
+    cv?.addEventListener('pointercancel', endDrag);
+    $('#avatar-zoom')?.addEventListener('input', () => {
+      if (!avatarCtx.src) return;
+      clampAvatarCrop();
+      drawAvatarCrop();
+    });
+    $('#btn-avatar-make')?.addEventListener('click', makeComicAvatar);
+    $('#btn-avatar-retry')?.addEventListener('click', () => showAvatarStep('crop'));
+    $('#btn-avatar-cancel')?.addEventListener('click', closeAvatarModal);
+    $('#btn-avatar-keep')?.addEventListener('click', closeAvatarModal);
+    $('#btn-avatar-use')?.addEventListener('click', () => {
+      const u = activeUser();
+      if (!u || !avatarCtx.result) return;
+      Storage.setComicAvatar(store, u.id, avatarCtx.result.png128, avatarCtx.result.png512);
+      store = Storage.loadStore();
+      closeAvatarModal();
+      updateHeaderUser();
+      refreshAvatarButtons();
+      if ($('#screen-progress')?.classList.contains('active')) renderProgress();
+    });
+  }
+
   function openSwitcher() {
     const modal = $('#switcher-modal');
     if (!modal) return;
@@ -1892,7 +2058,7 @@
       const t = curriculum.tracks[u.trackId];
       const letter = (u.displayName || 'E').charAt(0).toUpperCase();
       return `<button type="button" class="user-card" data-switch-id="${u.id}">
-        <span class="user-avatar" style="background:${escapeAttr(u.avatarColor || '#FF6B35')}">${escapeHtml(letter)}</span>
+        ${avatarSpanHtml(u)}
         <span class="user-card-text">
           <strong>${escapeHtml(u.displayName)}</strong>
           <span class="muted">${escapeHtml(t ? t.label : '')}</span>
@@ -1975,6 +2141,7 @@
       if (e.target.id === 'switcher-modal') e.target.classList.add('hidden');
     });
     $('#btn-subject-chip')?.addEventListener('click', openSubjectModal);
+    wireComicAvatar();
     $('#btn-close-subject')?.addEventListener('click', () => {
       $('#subject-modal')?.classList.add('hidden');
     });

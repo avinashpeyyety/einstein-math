@@ -204,6 +204,9 @@
         <div style="margin-top:1rem;display:flex;gap:0.5rem;flex-wrap:wrap;">
           <button type="button" class="btn btn-cyan" id="btn-to-hub">Mission Map</button>
           <button type="button" class="btn btn-ghost btn-sm" id="btn-rename">Rename</button>
+          <button type="button" class="btn btn-ghost btn-sm" id="btn-comic-avatar">Comic avatar</button>
+          <button type="button" class="btn btn-ghost btn-sm hidden" id="btn-remove-avatar">Use letter avatar</button>
+          <input type="file" id="input-avatar-photo" accept="image/*" class="hidden" />
           <button type="button" class="btn btn-ghost btn-sm" id="btn-reset">Reset This Track</button>
           <button type="button" class="btn btn-ghost btn-sm" id="btn-delete-user">Delete Explorer</button>
         </div>
@@ -234,6 +237,34 @@
       <button type="button" class="btn btn-ghost btn-sm" data-nav="hub" style="margin-top:0.5rem;">← Exit to Map</button>
     </section>
 
+    <!-- Comic avatar modal (W1b) -->
+    <div id="avatar-modal" class="modal-backdrop hidden">
+      <div class="comic-panel modal-panel avatar-modal-panel">
+        <h2 class="panel-title">Comic avatar</h2>
+        <div id="avatar-step-crop">
+          <p class="muted avatar-tip">Drag to move, slide to zoom. Fit one face and the hair inside the dashed outline.</p>
+          <canvas id="avatar-crop" class="avatar-crop" width="320" height="320"></canvas>
+          <label class="avatar-zoom">Zoom <input type="range" id="avatar-zoom" min="1" max="4" step="0.01" value="1" /></label>
+          <div class="avatar-actions">
+            <button type="button" class="btn btn-cyan btn-sm" id="btn-avatar-make">Make my comic</button>
+            <button type="button" class="btn btn-ghost btn-sm" id="btn-avatar-cancel">Cancel</button>
+          </div>
+        </div>
+        <div id="avatar-step-preview" class="hidden">
+          <div class="avatar-preview-row">
+            <img id="avatar-preview-big" class="avatar-preview-big" alt="Comic avatar preview" />
+            <span class="user-avatar avatar-preview-small"><img id="avatar-preview-small" alt="" /></span>
+          </div>
+          <div class="avatar-actions">
+            <button type="button" class="btn btn-cyan btn-sm" id="btn-avatar-use">Use this avatar</button>
+            <button type="button" class="btn btn-ghost btn-sm" id="btn-avatar-retry">Adjust crop</button>
+            <button type="button" class="btn btn-ghost btn-sm" id="btn-avatar-keep">Keep letter avatar</button>
+          </div>
+        </div>
+        <p class="privacy-note">Made on this device. The photo is never uploaded or saved, only the comic picture is. Cloud comicify: <strong>off</strong>.</p>
+      </div>
+    </div>
+
     <!-- Subject modal (Track P) -->
     <div id="subject-modal" class="modal-backdrop hidden">
       <div class="comic-panel modal-panel">
@@ -254,12 +285,13 @@
     </div>
 
     <footer class="site-footer">
-      Einstein Math · Ages 5–10 · v2.3.6 · Progress stays on your device (no accounts) · Installable / offline after first visit
+      Einstein Math · Ages 5–10 · v2.3.7 · Progress stays on your device (no accounts) · Installable / offline after first visit
     </footer>
   </div>
 
   <script src="js/storage.js"></script>
   <script src="js/subjects.js"></script>
+  <script src="js/comicify.js"></script>
   <script src="js/einstein.js"></script>
   <script src="js/student.js"></script>
   <script src="js/app.js"></script>

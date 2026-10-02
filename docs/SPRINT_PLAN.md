@@ -8,7 +8,7 @@
 
 ## 0. North star
 
-One **comic-led, age-tracked, offline-capable PWA hub**. Subjects ship as **modules** that share profile, mastery, spaced review, Today’s path, and parent export/import. Math proves the engine; science, geography, and later subjects plug into the same spine → a **one-stop gamified education** product by age track.
+One **comic-led, age-tracked, offline-capable PWA hub**. Subjects ship as **modules** that share profile, mastery, spaced review, Today’s path, and parent export/import. Math proves the engine; **physics** is the first science module (see [`EXPANSION_PLAN.md`](EXPANSION_PLAN.md)). SQL is **not** part of Einstein Math (separate adult portal). Active ticket queue + Friday polish cadence live in the expansion plan.
 
 ---
 
@@ -25,7 +25,7 @@ Keep forever (math or not):
 | PWA / offline | SW cache; bump cache name on ship |
 | Parent summary | Print/PDF + JSON download |
 
-**Math remains the proving ground** for the shared engine until Track P + first Science pilot prove the module pattern.
+**Math remains the proving ground** for the shared engine; Track P (X1–X3) shipped schema v3 + live subject switcher. Next platform/content work is physics (`js/sims/` + pilot units) per EXPANSION_PLAN §5.
 
 ---
 
@@ -46,13 +46,12 @@ Keep forever (math or not):
 ### Curriculum shape (target schema v3)
 
 ```text
-curriculum.json  (or split packs later)
-  subjects: {
-    math:       { tracks: { "ages-5-6": …, "ages-7-8": …, "ages-9-10": … } },
-    science:    { tracks: { … } },
-    geography:  { tracks: { … } },
-    …
-  }
+data/subjects/<subject>.json   (lazy packs; math precached, others on first use)
+  meta + tracks: { "ages-5-6": …, "ages-7-8": …, "ages-9-10": … }
+
+Schema v3 store (einstein-math-v3):
+  subjects live: math; soon: physics
+  progress keys: subject:track  (e.g. math:ages-7-8)
 ```
 
 Progress keys **namespaced** by `subject + track` so multi-subject explorers stay clean.
@@ -70,28 +69,23 @@ Progress keys **namespaced** by `subject + track` so multi-subject explorers sta
 
 ### Track P — Platform (enables multi-subject)
 
-- Subject switcher in UI (Math default)
-- Curriculum schema v3: `subjects: { math, science, geography, … }` each with tracks
-- Progress namespaced by subject + track
-- SW cache / versioning discipline for multi-pack assets
+- ✅ Subject switcher live (Math + Physics coming-soon; X3) — Today's path + parent summary follow subject
+- ✅ Schema v3 + lazy packs `data/subjects/*.json` (X1/X2); subjects = math (live) + physics (soon)
+- ✅ Progress namespaced `subject:track`
+- SW cache / versioning discipline for multi-pack assets (`einstein-math-packs-v1`)
 - **Personalized comic profile:** ✅ **Shipped (v2.4.0)** · UI on Home (v2.4.1) · comicify quality pass (v2.4.2, ~640px PNG) — in-browser comicify (canvas; no external APIs) → explorer avatar on chip / Home cards / Progress / student portrait; stored as `avatarDataUrl` with device-local profile + export/import; photo never leaves the device
 - **Home profile controls (v2.4.2):** rename + comic photo upload/clear moved to Home Who’s Playing cards and Create / + New Explorer form; Progress keeps identity row only (no upload/rename tools)
 
-### Track S — Science (first expansion)
+### Track S — Physics (first science module; replaces generic Science pilot)
 
-- Pilot **1 unit per age band** (e.g. living things / matter / earth-sky)
-- Same lesson phases: explain → example → practice → check
-- Reuse Einstein comic voice + shared progress UI
+- Active tickets in [`EXPANSION_PLAN.md`](EXPANSION_PLAN.md) §5: **X4** physics engine `js/sims/` + ramp sim → **X5/X6/X12/X16** age-band units
+- Same lesson phases + new lesson type `sim`; reuse mastery / review / Today's path
+- Einstein teaches physics in his own voice; Studio panels when a ticket needs art
 
-### Track G — Geography (second expansion)
+### Track G / other subjects — parked
 
-- Pilot maps / places / climate-lite per age band
-- After S proves the module pattern
-
-### Track X — More subjects (backlog)
-
-- Reading / history / coding-lite
-- **Park** until P + S prove the module pattern
+- Geography, reading, history, coding-lite: **parked** until physics proves the module pattern
+- **SQL:** on hold forever for Einstein Math (separate adult portal) — never add SQL tickets here
 
 ---
 
@@ -105,12 +99,11 @@ Progress keys **namespaced** by `subject + track` so multi-subject explorers sta
 |------|-----------------|
 | W1 | ✅ Track P: schema v3 stub + subject switcher (Math-only still works) |
 | W1b | ✅ Track P: profile photo upload → comicify → personalized explorer avatar — v2.4.0/2.4.2 photo + rename UI on Home; device-local MediaPipe comic avatar (W1b) merged in v2.4.3 |
-| W2 | Track S: science pilot unit for ages 5–6 |
-| W3 | Track S: science pilots for 7–8 and/or 9–10 |
-| W4 | Track M: math depth / visuals OR Track G kickoff |
-| Ongoing | Track M fills gaps whenever platform tickets idle |
+| X1–X3 | ✅ Schema v3, lazy packs, subject switcher (2026-10-01/02) |
+| Next | EXPANSION_PLAN §5 top unchecked (**X4** physics engine) — Mon–Thu ship; Fri = polish/docs |
+| Ongoing | Math depth (X9/X10/X11/…) interleaved after physics pilot proves `sim` |
 
-Start EM continuous work **after Mahabharata clears**, or when Avinash explicitly parallelizes.
+Autonomous paced sprints are pre-authorized (see EXPANSION_PLAN §6).
 
 ---
 
@@ -120,7 +113,7 @@ Start EM continuous work **after Mahabharata clears**, or when Avinash explicitl
 |------|------------------|
 | **Forge** | Product, engine, UI, schema, SW, subject modules |
 | **Studio** | Comic art / Imagine panels when a ticket needs visuals |
-| **Chief** | Assign **one** ticket per cycle from this plan |
+| **Chief** | Assign **one** ticket per cycle from [`EXPANSION_PLAN.md`](EXPANSION_PLAN.md) §5 (Fri = polish) |
 | **Pulse** | Keep Einstein Math on **COMMAND Next** until continuous cadence is routine |
 
 ---
@@ -136,7 +129,7 @@ Start EM continuous work **after Mahabharata clears**, or when Avinash explicitl
 
 ## Vision (Avinash)
 
-Continuous development. Not math-only forever. Expand into **science, geography, and other subjects** as a **comprehensive one-stop gamified education** product, **graded by age groups**, keeping the existing 5–6 / 7–8 / 9–10 tracks as the age spine.
+Continuous development. Not math-only forever. Next subject is **physics** (Einstein-voiced sims); deeper math tracks (11–14) and fluency/puzzles follow in EXPANSION_PLAN. Other subjects stay parked. SQL is a separate adult portal — not Einstein Math. Age spine stays 5–6 / 7–8 / 9–10 (with 11–14 queued).
 
 ---
 

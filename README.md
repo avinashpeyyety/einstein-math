@@ -2,7 +2,7 @@
 
 Public interactive math program for **ages 5–10** (US K–5), delivered by **Einstein** as an 80s comic-book teacher — big hair, mustache, sweater/lab coat, speech bubbles, bold ink outlines, warm primary colors.
 
-**Continuous sprint plan:** see [`docs/SPRINT_PLAN.md`](docs/SPRINT_PLAN.md) — math continuous + platform for multi-subject (science → geography → more), age tracks 5–6 / 7–8 / 9–10.
+**Continuous sprint plan:** see [`docs/EXPANSION_PLAN.md`](docs/EXPANSION_PLAN.md) (active ticket queue: math depth + physics; SQL on hold as a separate portal) and [`docs/SPRINT_PLAN.md`](docs/SPRINT_PLAN.md) (spine + shipped platform notes). Age tracks 5–6 / 7–8 / 9–10 today; 11–14 queued in the expansion plan.
 
 ## Features
 
@@ -27,7 +27,7 @@ Public interactive math program for **ages 5–10** (US K–5), delivered by **E
 
 ### Device-local only
 
-No accounts, no passwords, no server sync API. Clearing site data erases progress. Profiles live under the key `einstein-math-v2`. Parent exports and multi-device handoff files are snapshots of that local data only — **you** copy the JSON between devices.
+No accounts, no passwords, no server sync API. Clearing site data erases progress. Profiles live under the key `einstein-math-v3` (a leftover `einstein-math-v2` key is kept as a rollback/migration copy). Parent exports and multi-device handoff files are snapshots of that local data only — **you** copy the JSON between devices. Use **💾 Backup** to download or restore a progress file.
 
 ## Install / offline (PWA)
 
@@ -179,7 +179,7 @@ Localhost works for PWA install in Chromium.
 
 ## Smoke demo (2.3 trusted-home sprint)
 
-1. Load once online → DevTools → Application → Service Worker registered; Cache Storage shows `einstein-math-v2.4.3` (or the current `CACHE` in `sw.js`).
+1. Load once online → DevTools → Application → Service Worker registered; Cache Storage shows `einstein-math-v2.4.7` (or the current `CACHE` in `sw.js`).
 2. Go offline (DevTools Network → Offline) → reload → landing / Mission Map still usable.
 3. Create two explorers, earn progress → **Export all profiles** → clear site data → **Import** merge → both kids restored.
 4. Toggle **Read aloud** → Einstein bubbles speak; **Replay** repeats the last line.

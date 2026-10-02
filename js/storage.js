@@ -38,9 +38,22 @@ const Storage = {
   },
 
   sanitizeSubject(id) {
-    // Only live subjects can be active; physics is still "soon", so anything else falls back to math.
-    const live = (typeof Subjects !== 'undefined' && Subjects.isLive) ? Subjects.isLive(id) : id === DEFAULT_SUBJECT;
-    return id && SUBJECT_IDS.includes(id) && live ? id : DEFAULT_SUBJECT;
+    // X3: math or physics can be active (physics shows a coming-soon state); stub-era ids fall back to math.
+    return id && SUBJECT_IDS.includes(id) ? id : DEFAULT_SUBJECT;
+  },
+
+  /** Age track for a subject: the per-subject choice, else the user's (math) age track. */
+  subjectTrackId(user, subjectId) {
+    if (!user) return null;
+    const sid = subjectId || DEFAULT_SUBJECT;
+    return (user.trackBySubject && user.trackBySubject[sid]) || user.trackId || null;
+  },
+
+  /** Read a subject:track progress blob without creating a key (summaries must not write empty subjects). */
+  peekTrackProgress(user, trackId, subjectId) {
+    const key = this.progressKey(subjectId || DEFAULT_SUBJECT, trackId);
+    const raw = user && user.progress && user.progress[key];
+    return raw ? this.normalizeTrackProgress(raw) : this.trackDefaults();
   },
 
   /**
@@ -536,7 +549,8 @@ const Storage = {
     if (!user) return null;
     user.trackId = trackId;
     if (!user.trackBySubject) user.trackBySubject = {};
-    user.trackBySubject[DEFAULT_SUBJECT] = trackId;
+    // the age track is per explorer: every subject follows it (progress stays under each subject:track key)
+    SUBJECT_IDS.forEach(sid => { user.trackBySubject[sid] = trackId; });
     this.ensureTrackProgress(user, trackId);
     this.touchUser(user);
     this.saveStore(store);
@@ -738,12 +752,19 @@ const Storage = {
    * Parent / family overview for one explorer (device-local only).
    * curriculum: full curriculum object (for labels + unit titles).
    */
-  getParentSummary(store, userId, curriculum) {
+  /** Parent summary for one subject (default: the curriculum's active subject, else math). X3: stars, lessons,
+   *  reviews and recent activity come only from that subject's `subject:track` progress. */
+  getParentSummary(store, userId, curriculum, subjectId) {
     const user = store.users[userId];
     if (!user) return null;
-    const trackId = user.trackId;
-    const track = curriculum && curriculum.tracks ? curriculum.tracks[trackId] : null;
-    const tp = this.normalizeTrackProgress(this.getTrackProgress(user, trackId));
+    const sid = this.sanitizeSubject(subjectId || (curriculum && curriculum.activeSubjectId) || DEFAULT_SUBJECT);
+    const trackId = this.subjectTrackId(user, sid);
+    const subj = curriculum && curriculum.subjects ? curriculum.subjects[sid] : null;
+    const subjTracks = subj ? (subj.tracks || {}) : (sid === DEFAULT_SUBJECT && curriculum ? curriculum.tracks || {} : {});
+    const track = subjTracks[trackId] || null;
+    const ageTracks = (curriculum && curriculum.subjects && curriculum.subjects.math && curriculum.subjects.math.tracks) || (curriculum && curriculum.tracks) || {};
+    const ageTrack = ageTracks[trackId] || null;
+    const tp = this.peekTrackProgress(user, trackId, sid);
     const lessonDefs = track ? track.lessons : {};
     const allIds = Object.keys(lessonDefs);
     let done = 0;
@@ -793,9 +814,12 @@ const Storage = {
       displayName: user.displayName,
       avatarColor: user.avatarColor,
       avatarImage: this.avatarSrc(user),
+      subjectId: sid,
+      subjectLabel: (subj && subj.label) || (sid === DEFAULT_SUBJECT ? 'Math' : sid),
+      subjectReady: !!track,
       trackId,
-      trackLabel: track?.label || trackId,
-      ageRange: track?.ageRange || '',
+      trackLabel: track?.label || ageTrack?.label || trackId,
+      ageRange: track?.ageRange || ageTrack?.ageRange || '',
       stars: tp.stars || 0,
       lessonsTotal: allIds.length,
       lessonsDone: done,

@@ -12,14 +12,49 @@
     return Storage.getActiveUser(store);
   }
 
-  function activeTrackId() {
-    const u = activeUser();
-    return (u && u.trackId) || curriculum?.meta?.defaultTrackId || 'ages-7-8';
+  /* X3: the active subject (math | physics) scopes the track, progress, Today's path and parent summary */
+  function activeSubjectId() {
+    return Storage.getActiveSubject(store);
   }
 
+  function activeTrackId() {
+    const u = activeUser();
+    return (u && Storage.subjectTrackId(u, activeSubjectId())) || curriculum?.meta?.defaultTrackId || 'ages-7-8';
+  }
+
+  /** Age tracks (labels / picker) come from math, the subject every explorer has. */
+  function ageTracks() {
+    return (curriculum && curriculum.subjects && curriculum.subjects.math && curriculum.subjects.math.tracks) || (curriculum && curriculum.tracks) || {};
+  }
+
+  /** Lessons for the active subject + track, or null when the subject has none yet (physics stub). */
   function activeTrack() {
+    if (!curriculum) return null;
     const id = activeTrackId();
+    if (activeSubjectId() !== 'math') return curriculum.tracks[id] || null;
     return curriculum.tracks[id] || curriculum.tracks['ages-7-8'];
+  }
+
+  function subjectReady() {
+    return !!activeTrack();
+  }
+
+  /** Friendly empty state for a subject without lessons yet (physics stub). */
+  function comingSoonHtml(compact) {
+    const sub = Subjects.get(activeSubjectId());
+    return `
+      <div class="todays-path-inner todays-path-empty subject-soon">
+        <h3 class="todays-path-title">${escapeHtml(sub.label)} with Einstein — coming soon!</h3>
+        <p class="todays-path-lede">Ramps, magnets, light and sinking-or-floating experiments are being built right now.</p>
+        ${compact ? '' : '<p class="todays-path-empty-copy">Your Math stars and lessons are safe — they stay under Math.</p>'}
+        <button type="button" class="btn btn-cyan btn-sm" data-switch-subject="math">Back to Math</button>
+      </div>`;
+  }
+
+  function wireComingSoon(host) {
+    host.querySelectorAll('[data-switch-subject]').forEach(btn => {
+      btn.addEventListener('click', () => switchSubject(btn.dataset.switchSubject));
+    });
   }
 
 
@@ -57,14 +92,17 @@
       refreshStudentCast();
       return;
     }
-    progress = Storage.getTrackProgress(u, u.trackId);
+    // a subject without lessons gets an in-memory blank (no empty subject:track key is written)
+    progress = subjectReady()
+      ? Storage.getTrackProgress(u, activeTrackId(), activeSubjectId())
+      : Storage.trackDefaults();
     refreshStudentCast();
   }
 
   function persistProgress() {
     const u = activeUser();
-    if (!u) return;
-    Storage.saveTrackProgress(store, u.id, u.trackId, progress);
+    if (!u || !subjectReady()) return;
+    Storage.saveTrackProgress(store, u.id, activeTrackId(), progress, activeSubjectId());
   }
 
   function syncSpeechFromStore() {
@@ -111,6 +149,12 @@
       return;
     }
     syncProgressFromStore();
+    if (!subjectReady()) {
+      host.classList.remove('hidden');
+      host.innerHTML = comingSoonHtml(false);
+      wireComingSoon(host);
+      return;
+    }
     if (!progress.diagnosticDone && !progress.started) {
       host.classList.add('hidden');
       host.innerHTML = '';
@@ -155,6 +199,10 @@
   /** Smarter Continue: due review → needs_review → recommended → next ready / in_progress */
   function continueAdventure() {
     syncProgressFromStore();
+    if (!subjectReady()) {
+      renderHub();
+      return;
+    }
     if (!progress.diagnosticDone) {
       startDiagnostic();
       return;
@@ -193,7 +241,7 @@
     if (nameEl) nameEl.textContent = u.displayName;
     const trackMeta = $('#user-track-label');
     if (trackMeta && curriculum) {
-      const t = activeTrack();
+      const t = ageTracks()[activeTrackId()];
       trackMeta.textContent = t ? t.label : '';
     }
     updateSubjectChip();
@@ -460,7 +508,7 @@
   }
 
   function trackButtonsHtml(selectedId, namePrefix) {
-    const tracks = curriculum.tracks;
+    const tracks = ageTracks();
     const order = ['ages-5-6', 'ages-7-8', 'ages-9-10'];
     return order.map(id => {
       const t = tracks[id];
@@ -1312,7 +1360,8 @@
       }
       updateHeaderUser();
       refreshStudentCast();
-      // New users go to diagnostic for their track
+      // New users go to diagnostic for their track (Math, if the active subject has no lessons yet)
+      if (!subjectReady()) await switchSubject('math');
       startDiagnostic();
     });
 
@@ -1328,7 +1377,7 @@
     const users = Storage.listUsers(store);
     const activeId = store.activeUserId;
     list.innerHTML = users.map(u => {
-      const t = curriculum.tracks[u.trackId];
+      const t = ageTracks()[u.trackId];
       const active = u.id === activeId ? ' active' : '';
       const photoId = 'input-photo-card-' + u.id;
       return `<div class="user-card-row${active}" data-user-id="${escapeAttr(u.id)}">
@@ -1412,6 +1461,10 @@
       return;
     }
     syncProgressFromStore();
+    if (!subjectReady()) {
+      renderHub();
+      return;
+    }
     diagIndex = 0;
     diagAnswers = {};
     progress.started = true;
@@ -1508,6 +1561,20 @@
     syncProgressFromStore();
     const track = activeTrack();
     showScreen('screen-hub');
+    if (!track) {
+      const sub = Subjects.get(activeSubjectId());
+      Einstein.mount($('#hub-einstein'), 'think');
+      Einstein.speak($('#hub-speech'), `${sub.label} missions are still in my workshop! Switch back to Math any time — your stars are waiting.`);
+      const tl = $('#hub-track-label');
+      const age = ageTracks()[activeTrackId()];
+      if (tl) tl.textContent = `${sub.label} · ${age ? age.label : ''}`;
+      renderTodaysPath('hub-todays-path');
+      const rh = $('#review-due-panel');
+      if (rh) { rh.classList.add('hidden'); rh.innerHTML = ''; }
+      const g = $('#unit-grid');
+      g.innerHTML = `<div class="unit-card subject-soon-card" style="border-top: 8px solid #A78BFA"><div class="unit-icon">⚛️</div><h3>${escapeHtml(sub.label)} units</h3><p>Coming soon: push &amp; pull, ramps &amp; friction, sink or float.</p></div>`;
+      return;
+    }
     const due = Storage.getDueReviews(progress);
     Einstein.mount($('#hub-einstein'), due.length ? 'think' : 'idle');
     Einstein.speak($('#hub-speech'),
@@ -1642,9 +1709,10 @@
           ${avatarSpanHtml({ displayName: summary.displayName, avatarColor: summary.avatarColor || '#4ECDC4', avatarImage: summary.avatarImage })}
           <div>
             <strong>${escapeHtml(summary.displayName)}</strong>
-            <div class="muted">${escapeHtml(summary.trackLabel)}${summary.ageRange ? ' · ' + escapeHtml(summary.ageRange) : ''}</div>
+            <div class="muted" data-summary-subject="${escapeHtml(summary.subjectId)}">${escapeHtml(summary.subjectLabel)} · ${escapeHtml(summary.trackLabel)}${summary.ageRange ? ' · ' + escapeHtml(summary.ageRange) : ''}</div>
           </div>
         </div>
+        ${summary.subjectReady ? '' : `<p class="privacy-note subject-soon-note">${escapeHtml(summary.subjectLabel)} lessons are coming soon — nothing to report yet. Switch back to Math to see math progress.</p>`}
         <div class="stat-row parent-stats">
           <div class="stat-box"><div class="num">${summary.stars}</div><div class="label">Stars</div></div>
           <div class="stat-box"><div class="num">${summary.lessonsDone}/${summary.lessonsTotal}</div><div class="label">Lessons Done</div></div>
@@ -1692,7 +1760,8 @@
       return;
     }
     syncProgressFromStore();
-    const track = activeTrack();
+    const track = activeTrack() || { label: (ageTracks()[activeTrackId()] || {}).label || '', lessons: {}, units: [] };
+    const sub = Subjects.get(activeSubjectId());
     showScreen('screen-progress');
     const allIds = Object.keys(track.lessons);
     const done = allIds.filter(id => progress.lessons[id]?.status === 'done').length;
@@ -1709,8 +1778,8 @@
         <div class="profile-identity-row">
           ${avatarSpanHtml(u, 'avatar-lg')}
           <div class="profile-identity-text">
-            <strong>${escapeHtml(u.displayName)}</strong> · ${escapeHtml(track.label)}
-            <span class="muted">(progress for this age track)</span>
+            <strong>${escapeHtml(u.displayName)}</strong> · ${escapeHtml(sub.label)} · ${escapeHtml(track.label)}
+            <span class="muted">(progress for this subject &amp; age track)</span>
           </div>
         </div>`;
     }
@@ -1731,7 +1800,7 @@
     }
 
     const list = $('#progress-lesson-list');
-    list.innerHTML = allIds.map(id => {
+    list.innerHTML = !subjectReady() ? `<li><span>${escapeHtml(sub.label)} lessons are coming soon — Math progress is under Math.</span></li>` : allIds.map(id => {
       const L = track.lessons[id];
       const st = Storage.lessonStatus(progress, id, track);
       const saved = progress.lessons[id] ? Storage.normalizeLesson(progress.lessons[id]) : null;
@@ -1755,7 +1824,7 @@
         btn.addEventListener('click', () => {
           const next = btn.getAttribute('data-prog-track');
           if (next === u.trackId) return;
-          const tNext = curriculum.tracks[next];
+          const tNext = ageTracks()[next];
           if (!confirm(`Switch ${u.displayName} to ${tNext.label}? Progress on ${track.label} stays saved.`)) return;
           Storage.setUserTrack(store, u.id, next);
           store = Storage.loadStore();
@@ -1782,6 +1851,7 @@
 
   function startLesson(lessonId, opts = {}) {
     const track = activeTrack();
+    if (!track) return;
     const lesson = track.lessons[lessonId];
     if (!lesson) return;
     syncProgressFromStore();
@@ -2152,6 +2222,28 @@
   }
 
 
+  /** X3: switch the active subject — loads its pack on first use (X2), then progress / Today's path / summary
+   *  read and write `<subject>:<track>`. The choice persists in prefs.activeSubject. */
+  async function switchSubject(id) {
+    if (!Subjects.isSelectable(id)) return false;
+    try {
+      curriculum = Subjects.isPackLoaded(curriculum, id)
+        ? Subjects.normalizeCurriculum(curriculum, id)
+        : Subjects.applyPack(curriculum, id, await Subjects.loadPack(id), id);
+    } catch (err) {
+      notice(((err && err.message) || 'Could not load that subject.') + ' Staying on ' + Subjects.get(activeSubjectId()).label + '.');
+      return false;
+    }
+    store = Storage.setActiveSubject(store, id);
+    store = Storage.loadStore();
+    syncProgressFromStore();
+    updateSubjectChip();
+    if ($('#screen-progress')?.classList.contains('active')) renderProgress();
+    else if ($('#screen-hub')?.classList.contains('active')) renderHub();
+    else { showScreen('screen-landing'); renderLanding(); }
+    return true;
+  }
+
   function openSubjectModal() {
     const modal = $('#subject-modal');
     if (!modal || typeof Subjects === 'undefined') return;
@@ -2161,7 +2253,7 @@
       const soon = sub.status !== 'live';
       const sel = sub.id === activeId ? ' selected' : '';
       const badge = soon ? '<span class="soon-badge">soon</span>' : '';
-      return `<button type="button" class="user-card subject-card${soon ? ' soon' : ''}${sel}" data-subject-id="${escapeAttr(sub.id)}" ${soon ? 'aria-disabled="true"' : ''}>
+      return `<button type="button" class="user-card subject-card${soon ? ' soon' : ''}${sel}" data-subject-id="${escapeAttr(sub.id)}" aria-pressed="${sub.id === activeId ? 'true' : 'false'}">
         <span class="user-card-text">
           <strong>${escapeHtml(sub.label)}${badge}</strong>
           <span class="muted">${escapeHtml(sub.blurb || '')}</span>
@@ -2170,25 +2262,7 @@
     }).join('');
     $$('[data-subject-id]', list).forEach((btn) => {
       btn.addEventListener('click', async () => {
-        const id = btn.dataset.subjectId;
-        if (!Subjects.isLive(id)) {
-          alert((Subjects.get(id).label || 'That subject') + ' is coming soon — Math stays active for now.');
-          return;
-        }
-        // X2: fetch the subject's pack on first open (SW caches it for offline); stay put if it can't load
-        try {
-          curriculum = Subjects.isPackLoaded(curriculum, id)
-            ? Subjects.normalizeCurriculum(curriculum, id)
-            : Subjects.applyPack(curriculum, id, await Subjects.loadPack(id), id);
-        } catch (err) {
-          notice(((err && err.message) || 'Could not load that subject.') + ' Staying on ' + Subjects.get(Storage.getActiveSubject(store)).label + '.');
-          return;
-        }
-        store = Storage.setActiveSubject(store, id);
-        modal.classList.add('hidden');
-        updateSubjectChip();
-        showScreen('screen-landing');
-        renderLanding();
+        if (await switchSubject(btn.dataset.subjectId)) modal.classList.add('hidden');
       });
     });
     modal.classList.remove('hidden');
@@ -2349,7 +2423,7 @@
     const list = $('#switcher-list');
     const users = Storage.listUsers(store);
     list.innerHTML = users.map(u => {
-      const t = curriculum.tracks[u.trackId];
+      const t = ageTracks()[u.trackId];
       return `<button type="button" class="user-card" data-switch-id="${escapeAttr(u.id)}">
         ${avatarSpanHtml(u)}
         <span class="user-card-text">
@@ -2399,8 +2473,10 @@
       const u = activeUser();
       if (!u) return;
       const track = activeTrack();
-      if (confirm(`Reset ${u.displayName}'s progress on ${track.label} only? Other tracks & explorers stay safe.`)) {
-        progress = Storage.resetTrackProgress(store, u.id, u.trackId);
+      if (!track) return;
+      const subLabel = Subjects.get(activeSubjectId()).label;
+      if (confirm(`Reset ${u.displayName}'s ${subLabel} progress on ${track.label} only? Other subjects, tracks & explorers stay safe.`)) {
+        progress = Storage.resetTrackProgress(store, u.id, activeTrackId(), activeSubjectId());
         store = Storage.loadStore();
         syncProgressFromStore();
         renderProgress();
@@ -2515,7 +2591,7 @@
       // X2: lazy subject packs — only data/subjects/math.json (+ the active subject's pack) is fetched
       store = Storage.loadStore();
       curriculum = await Subjects.loadCurriculum(Storage.getActiveSubject(store));
-      if (!curriculum.tracks || !Object.keys(curriculum.tracks).length) throw new Error('Curriculum missing tracks');
+      if (!Object.keys(ageTracks()).length) throw new Error('Curriculum missing tracks');
     } catch (err) {
       document.body.innerHTML = `
         <div class="app"><div class="comic-panel">

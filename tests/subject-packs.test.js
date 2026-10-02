@@ -52,11 +52,17 @@ async function t(name, fn) {
     assert.ok(!S.isPackLoaded(cur, 'physics'));
   });
 
-  await t('3. a "soon" active subject (physics) never forces its pack at boot; math stays active', async () => {
+  await t('3. X3: an active physics choice loads the physics pack at boot (math always the base); physics has no math lessons', async () => {
     const S = loadSubjects(), log = [];
     const cur = await S.loadCurriculum('physics', fakeFetch(log));
-    assert.deepStrictEqual(log, ['data/subjects/math.json']);
-    assert.strictEqual(cur.activeSubjectId, 'math');
+    assert.deepStrictEqual(log, ['data/subjects/math.json', 'data/subjects/physics.json']);
+    assert.strictEqual(cur.activeSubjectId, 'physics');
+    assert.deepStrictEqual(cur.tracks, {}, 'stub physics never shows math tracks');
+    assert.strictEqual(Object.keys(cur.subjects.math.tracks).length, 3);
+    const S2 = loadSubjects(), log2 = [];
+    const cur2 = await S2.loadCurriculum('science', fakeFetch(log2));
+    assert.deepStrictEqual(log2, ['data/subjects/math.json'], 'non-catalog subject ignored');
+    assert.strictEqual(cur2.activeSubjectId, 'math');
   });
 
   await t('4. loadPack fetches each pack once per session (memoised) and on demand only', async () => {
@@ -68,15 +74,14 @@ async function t(name, fn) {
     assert.deepStrictEqual(log, ['data/subjects/math.json', 'data/subjects/physics.json']);
   });
 
-  await t('5. applyPack merges a subject pack without touching math; live subject switch re-points tracks', async () => {
+  await t('5. applyPack merges a subject pack without touching math; subject switch re-points tracks', async () => {
     const S = loadSubjects(), f = fakeFetch([]);
     let cur = await S.loadCurriculum('math', f);
     cur = S.applyPack(cur, 'physics', { meta: { subject: 'physics' }, tracks: { 'ages-7-8': { id: 'ages-7-8', units: [], lessons: { 'phy-1': {} } } } }, 'math');
     assert.ok(S.isPackLoaded(cur, 'physics'));
     assert.deepStrictEqual(Object.keys(cur.subjects.physics.tracks), ['ages-7-8']);
     assert.strictEqual(Object.keys(cur.subjects.math.tracks).length, 3);
-    assert.strictEqual(cur.tracks, cur.subjects.math.tracks, 'physics is not live yet, math stays active');
-    S.CATALOG.find((s) => s.id === 'physics').status = 'live';
+    assert.strictEqual(cur.tracks, cur.subjects.math.tracks, 'math stays active until the switcher picks physics');
     const sw = S.normalizeCurriculum(cur, 'physics');
     assert.strictEqual(sw.activeSubjectId, 'physics');
     assert.ok(sw.tracks['ages-7-8'].lessons['phy-1']);

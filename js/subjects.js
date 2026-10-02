@@ -1,5 +1,6 @@
 /* Track P — multi-subject catalog + curriculum normalize (schema v3, X1) + lazy subject packs (X2).
- * Subjects: math (live) + physics (soon). Progress is keyed `subject:track` in js/storage.js. */
+ * Subjects: math (live) + physics (soon — selectable since X3, shows a coming-soon state until its pack has
+ * lessons). Progress is keyed `subject:track` in js/storage.js. No other subjects (Chief: math + physics only). */
 const Subjects = {
   CATALOG: [
     { id: 'math', label: 'Math', status: 'live', blurb: 'Numbers, shapes & cosmic adventures' },
@@ -10,6 +11,11 @@ const Subjects = {
 
   get(id) {
     return this.CATALOG.find((s) => s.id === id) || this.CATALOG[0];
+  },
+
+  /** X3: any catalog subject can be chosen in the switcher (physics shows its coming-soon state). */
+  isSelectable(id) {
+    return this.CATALOG.some((x) => x.id === id);
   },
 
   isLive(id) {
@@ -69,7 +75,7 @@ const Subjects = {
   /** Boot / switch helper: the math pack is always the base; the active subject's pack is added on demand. */
   async loadCurriculum(activeSubjectId, fetchFn) {
     let cur = this.applyPack(null, this.defaultId, await this.loadPack(this.defaultId, fetchFn), this.defaultId);
-    const sid = this.isLive(activeSubjectId) ? activeSubjectId : this.defaultId;
+    const sid = this.isSelectable(activeSubjectId) ? activeSubjectId : this.defaultId;
     if (sid !== this.defaultId) cur = this.applyPack(cur, sid, await this.loadPack(sid, fetchFn), sid);
     return cur;
   },
@@ -80,7 +86,7 @@ const Subjects = {
    */
   normalizeCurriculum(raw, activeSubjectId) {
     if (!raw || typeof raw !== 'object') return raw;
-    const sid = this.isLive(activeSubjectId) ? activeSubjectId : this.defaultId;
+    const sid = this.isSelectable(activeSubjectId) ? activeSubjectId : this.defaultId;
     let subjects = raw.subjects;
     if (!subjects || typeof subjects !== 'object') {
       subjects = {
@@ -98,10 +104,11 @@ const Subjects = {
     if (!subjects.math.tracks || !Object.keys(subjects.math.tracks).length) {
       subjects.math.tracks = raw.tracks || {};
     }
+    // X3: curriculum.tracks is the active subject's own tracks — never math lessons under another subject
     const active = subjects[sid] || subjects.math;
-    const tracks = (active && active.tracks && Object.keys(active.tracks).length)
-      ? active.tracks
-      : subjects.math.tracks;
+    const tracks = sid === this.defaultId
+      ? subjects.math.tracks
+      : ((active && active.tracks) || {});
     return {
       ...raw,
       meta: {

@@ -469,6 +469,55 @@
         else if (fs[fl[p]] > 400) lab[p] = SEG.CLOTH;  // skin-coloured patch up at hair height: fabric, not a neck
         else lab[p] = SEG.FACE;
       }
+      // clothes never reach above the jaw inside the face's own columns (a shadowed jaw / neck that lost the
+      // skin test and joined the collar). Only within the face's column span and below its top, so a hijab
+      // framing the face is untouched. Sandwiched between face pixels in a column → always skin; in the band
+      // just under the chin line → skin only if it looks like (shaded) skin rather than the garment below.
+      {
+        const ftop = new Int32Array(w).fill(h), fbot = new Int32Array(w).fill(-1);
+        let fx0 = w, fx1 = -1;
+        for (let p = 0; p < N; p++) if (lab[p] === SEG.FACE) { const x = p % w, y = (p / w) | 0; if (y < ftop[x]) ftop[x] = y; if (y > fbot[x]) fbot[x] = y; if (x < fx0) fx0 = x; if (x > fx1) fx1 = x; }
+        if (fx1 > fx0) {
+          const cxi = Math.round((fx0 + fx1) / 2), faceTop = ftop[cxi] < h ? ftop[cxi] : Math.min(...ftop);
+          const jawBand = Math.round(chin + Math.max(0, chin - faceTop) * 0.45);
+          const below = new Uint8Array(N);
+          for (let p = Math.min(N, jawBand * w); p < N; p++) below[p] = lab[p] === SEG.CLOTH ? 1 : 0;
+          const cref = medianColor(flat, below) || medianColor(flat, cloth);
+          const deep = shade(seed, 0.55);
+          const skinHue = (p) => { const r = flat[p * 4], g = flat[p * 4 + 1], b = flat[p * 4 + 2], S = r + g + b + 1; return Math.hypot(r / S - sr, g / S - sg) < 0.06; };
+          const d2 = (p, c) => (flat[p * 4] - c[0]) ** 2 + (flat[p * 4 + 1] - c[1]) ** 2 + (flat[p * 4 + 2] - c[2]) ** 2;
+          const cand = new Uint8Array(N);
+          for (let x = fx0; x <= fx1; x++) {
+            if (fbot[x] < 0) continue;
+            for (let y = ftop[x] + 1; y < Math.min(h, jawBand); y++) {
+              const p = y * w + x;
+              if (lab[p] !== SEG.CLOTH) continue;
+              if (y < fbot[x]) lab[p] = SEG.BODY;
+              else if (cref && skinHue(p) && Math.min(d2(p, seed), d2(p, deep)) < d2(p, cref)) cand[p] = 1;
+            }
+          }
+          // a skin-looking patch only flips when it is a real piece of skin touching the face / neck
+          const [cl, cs] = components(cand, w, h), okC = new Uint8Array(cs.length);
+          for (let p = 0; p < N; p++) {
+            if (cl[p] < 0 || okC[cl[p]] || cs[cl[p]] < 150) continue;
+            const x = p % w;
+            for (const q of [x > 0 ? p - 1 : -1, x < w - 1 ? p + 1 : -1, p - w, p + w]) if (q >= 0 && q < N && (lab[q] === SEG.FACE || lab[q] === SEG.BODY)) { okC[cl[p]] = 1; break; }
+          }
+          let changed = false;
+          for (let p = 0; p < N; p++) if (cl[p] >= 0 && okC[cl[p]]) { lab[p] = SEG.BODY; changed = true; }
+          // clothes left stranded above the jaw inside the face's columns (cut off from the garment) are skin too
+          if (changed) {
+            const cm = new Uint8Array(N); for (let p = 0; p < N; p++) cm[p] = lab[p] === SEG.CLOTH ? 1 : 0;
+            const [ol, , ob] = components(cm, w, h);
+            for (let p = 0; p < N; p++) {
+              if (ol[p] < 0) continue;
+              const b = ob[ol[p]];
+              if (b[3] < jawBand && b[3] < h - 3 && b[0] >= fx0 && b[2] <= fx1 && b[1] > faceTop) lab[p] = SEG.BODY;
+            }
+            lab = smoothLabels(lab, w, h, 3, 1);
+          }
+        }
+      }
     }
 
     const is = (c) => { const m = new Uint8Array(N); for (let p = 0; p < N; p++) m[p] = lab[p] === c ? 1 : 0; return m; };
@@ -505,8 +554,33 @@
       for (let p = 0; p < N; p++) teeth[p] = (okT && tl[p] === bi) ? 1 : 0;
     }
     // interior features (brows, lids, nose underside, mouth line): darker-than-surroundings valleys inside the core
-    let valley = new Uint8Array(N);
+    // small faces (avatar-sized photos, far-away selfies): brows / lids would only add noise, so skip them
+    // (face mask bbox, cut where the mask suddenly widens into shoulders / skin-toned clothes on a far-away photo)
+    let faceBW = 0, faceBH = 0;
     {
+      const rx0 = new Int32Array(h).fill(w), rx1 = new Int32Array(h).fill(-1);
+      for (let p = 0; p < N; p++) if (faceM[p]) { const x = p % w, y = (p / w) | 0; if (x < rx0[y]) rx0[y] = x; if (x > rx1[y]) rx1[y] = x; }
+      // the face narrows into the neck and widens again into the shoulders: cut the box at the neck
+      let fy0 = -1, fy1 = -1;
+      for (let y = 0; y < h; y++) if (rx1[y] >= 0) { if (fy0 < 0) fy0 = y; fy1 = y; }
+      let yEnd = fy1;
+      if (fy0 >= 0) {
+        const wd = (y) => (rx1[y] >= 0 ? rx1[y] - rx0[y] + 1 : 0);
+        let maxW = 0, neckY = -1, neckW = 1e9;
+        for (let y = fy0; y <= fy1; y++) {
+          const v = wd(y);
+          if (neckY < 0 && v > maxW) maxW = v;
+          if (v > 0 && v < 0.8 * maxW && v < neckW) { neckW = v; neckY = y; }
+          if (neckY >= 0 && v > maxW) { yEnd = neckY; break; }
+        }
+      }
+      let x0 = w, x1 = -1, y0 = fy0, y1 = yEnd;
+      for (let y = Math.max(0, fy0); y <= y1; y++) if (rx1[y] >= 0) { if (rx0[y] < x0) x0 = rx0[y]; if (rx1[y] > x1) x1 = rx1[y]; }
+      if (x1 >= 0) { faceBW = x1 - x0 + 1; faceBH = y1 - y0 + 1; }
+    }
+    const smallFace = Math.min(faceBW, faceBH) < 120;
+    let valley = new Uint8Array(N);
+    if (!smallFace) {
       const near = boxBlurLum(L, w, h, 1), around = boxBlurLum(L, w, h, 7);
       const dv = []; for (let p = 0; p < N; p += 2) if (core[p]) dv.push(around[p] - near[p]);
       dv.sort((a, b) => a - b);
@@ -536,6 +610,47 @@
     const fg = new Uint8Array(N); for (let p = 0; p < N; p++) fg[p] = lab[p] ? 1 : 0;
     majority(toned, fg, w, h, 2);
     for (let p = 0; p < N; p++) if (teeth[p]) { toned[p * 4] = TEETH[0]; toned[p * 4 + 1] = TEETH[1]; toned[p * 4 + 2] = TEETH[2]; }
+    // merge small skin-tone patches (blotches across cheeks / beard) into the neighbouring tone, before ink
+    let mergedPatches = 0;
+    {
+      let faceArea = 0; for (let p = 0; p < N; p++) faceArea += faceM[p];
+      const minPatch = Math.max(40, faceArea * 0.015);
+      const TONES = [skin, SKIN_SH, SKIN_DEEP].map((c) => c.map((v) => Math.min(255, Math.max(0, Math.round(v)))));
+      const tone = new Int8Array(N).fill(-1);
+      for (let p = 0; p < N; p++) {
+        if (!skinM[p] || teeth[p]) continue;
+        for (let k = 0; k < 3; k++) if (Math.abs(toned[p * 4] - TONES[k][0]) + Math.abs(toned[p * 4 + 1] - TONES[k][1]) + Math.abs(toned[p * 4 + 2] - TONES[k][2]) <= 3) { tone[p] = k; break; }
+      }
+      for (let pass = 0; pass < 3; pass++) {
+        const cl = new Int32Array(N).fill(-1), st = [], sizes = [];
+        for (let s0 = 0; s0 < N; s0++) {
+          if (tone[s0] < 0 || cl[s0] >= 0) continue;
+          const id = sizes.length, t = tone[s0]; let n = 0;
+          cl[s0] = id; st.push(s0);
+          while (st.length) {
+            const p = st.pop(), x = p % w; n++;
+            for (const q of [x > 0 ? p - 1 : -1, x < w - 1 ? p + 1 : -1, p - w, p + w]) if (q >= 0 && q < N && cl[q] < 0 && tone[q] === t) { cl[q] = id; st.push(q); }
+          }
+          sizes.push(n);
+        }
+        const votes = new Map();
+        for (let p = 0; p < N; p++) {
+          const id = cl[p]; if (id < 0 || sizes[id] >= minPatch) continue;
+          const x = p % w;
+          for (const q of [x > 0 ? p - 1 : -1, x < w - 1 ? p + 1 : -1, p - w, p + w]) {
+            if (q < 0 || q >= N || tone[q] < 0 || cl[q] === id) continue;
+            let v = votes.get(id); if (!v) { v = [0, 0, 0]; votes.set(id, v); }
+            v[tone[q]] += sizes[cl[q]] >= minPatch ? 4 : 1;   // prefer joining a big surrounding patch
+          }
+        }
+        if (!votes.size) break;
+        const to = new Map();
+        for (const [id, v] of votes) { let b = 0; for (let k = 1; k < 3; k++) if (v[k] > v[b]) b = k; to.set(id, b); }
+        for (let p = 0; p < N; p++) if (cl[p] >= 0 && to.has(cl[p])) tone[p] = to.get(cl[p]);
+        mergedPatches += votes.size;
+      }
+      for (let p = 0; p < N; p++) if (tone[p] >= 0) { const c = TONES[tone[p]]; toned[p * 4] = c[0]; toned[p * 4 + 1] = c[1]; toned[p * 4 + 2] = c[2]; }
+    }
 
     // hair strand ink (DoG) in hair only; the face gets only the interior feature pass above
     const g1 = boxBlurLum(Ls, w, h, 1), g2 = boxBlurLum(Ls, w, h, 4);
@@ -602,7 +717,7 @@
     return {
       png512: big.dataUrl, png128: small.dataUrl,
       report: { size: SIZE, smallSize: SMALL, bytes512: big.bytes, bytes128: small.bytes, opaque: true, ink: '#1A1A2E',
-        segmenter: 'mediapipe-selfie+hair', colorStep: step, local: true }
+        segmenter: 'mediapipe-selfie+hair', colorStep: step, local: true, faceBox: [faceBW, faceBH], featureInk: !smallFace, mergedPatches }
     };
   }
 

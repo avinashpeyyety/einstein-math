@@ -273,9 +273,16 @@
    * Only the SIMD wasm build ships; a browser without wasm SIMD fails here and keeps the letter avatar. */
   const SEG = { BG: 0, HAIR: 1, BODY: 2, FACE: 3, CLOTH: 4 };
   let segPromise = null;
+  /** wasm SIMD feature test (only the SIMD build ships): a tiny module using v128 must validate. */
+  function wasmSimd() {
+    try {
+      return typeof WebAssembly === 'object' && WebAssembly.validate(new Uint8Array([0, 97, 115, 109, 1, 0, 0, 0, 1, 5, 1, 96, 0, 1, 123, 3, 2, 1, 0, 10, 10, 1, 8, 0, 65, 0, 253, 15, 253, 98, 11]));
+    } catch (_) { return false; }
+  }
   function loadSegmenter(baseUrl) {
     if (!segPromise) {
       segPromise = (async () => {
+        if (!wasmSimd()) throw new Error('This browser has no WebAssembly SIMD');
         const abs = new URL(baseUrl || 'vendor/mediapipe/', document.baseURI).href;
         const vision = await import(abs + 'vision_bundle.mjs');
         const fileset = { wasmLoaderPath: abs + 'wasm/vision_wasm_internal.js', wasmBinaryPath: abs + 'wasm/vision_wasm_internal.wasm' };
@@ -721,5 +728,5 @@
     };
   }
 
-  window.Comicify = { load, render, fromFile, inGuide, loadSegmenter, MAX_BYTES, SIZE, SMALL };
+  window.Comicify = { load, render, fromFile, inGuide, loadSegmenter, wasmSimd, MAX_BYTES, SIZE, SMALL };
 })();

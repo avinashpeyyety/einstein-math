@@ -237,94 +237,124 @@
     return `<span class="user-avatar${extra}" style="background:${escapeAttr((u && u.avatarColor) || '#FF6B35')}">${letter}</span>`;
   }
 
-  /**
-   * In-browser comicify: ~640px, soft contrast, mild posterize, clean ink edges.
-   * Pure canvas — never calls external APIs. Returns PNG data URL for sharper avatars.
-   */
-  function comicifyImageFile(file) {
-    return new Promise((resolve, reject) => {
-      if (!file || !String(file.type || '').startsWith('image/')) {
-        reject(new Error('Please choose an image file.'));
-        return;
+  /* ---------- one photo flow ----------
+   * Home card upload, the create form and the profile "Comic avatar" modal all go through
+   * renderExplorerAvatar() and saveExplorerAvatar() (avatarImage + avatarImage512, read via Storage.avatarSrc).
+   * W1b MediaPipe comicify first; origin's canvas filter only when the model can't run on this browser
+   * (no wasm SIMD / model failed to load); the letter avatar is the last resort. Never any network call. */
+  const MODEL_BASE = 'vendor/mediapipe/';
+
+  /** Non-blocking notice (no alert(), so a fallback never stops the flow). */
+  function notice(msg) {
+    const t = document.createElement('div');
+    t.className = 'backup-toast';
+    t.setAttribute('role', 'status');
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 4000);
+  }
+
+  const dataUrlBytes = (u) => Math.floor((u.length - u.indexOf(',') - 1) * 3 / 4);
+
+  /** Fallback: origin's simple canvas comic filter (posterize + warm + edge ink + ink frame) on the square crop. */
+  function filterAvatar(src, crop) {
+    const MAX = (typeof Comicify !== 'undefined' && Comicify.MAX_BYTES) || 150 * 1024;
+    const draw = (levels) => {
+      const w = 512, h = 512;
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d', { willReadFrequently: true });
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+      ctx.fillStyle = '#FFF8E7';
+      ctx.fillRect(0, 0, w, h);
+      ctx.drawImage(src, crop.x, crop.y, crop.side, crop.side, 0, 0, w, h);
+      const imageData = ctx.getImageData(0, 0, w, h);
+      const data = imageData.data;
+      // Posterize (`levels`, 8 by default) + gentle contrast/warmth (less muddy than 5-level)
+      const step = 255 / (levels - 1);
+      for (let i = 0; i < data.length; i += 4) {
+        let r = data[i], g = data[i + 1], b = data[i + 2];
+        // Contrast midtones slightly before quantize
+        const contrast = 1.12;
+        r = (r - 128) * contrast + 128;
+        g = (g - 128) * contrast + 128;
+        b = (b - 128) * contrast + 128;
+        r = Math.round(Math.min(255, Math.max(0, r)) / step) * step;
+        g = Math.round(Math.min(255, Math.max(0, g)) / step) * step;
+        b = Math.round(Math.min(255, Math.max(0, b)) / step) * step;
+        r = Math.min(255, r * 1.04 + 8);
+        g = Math.min(255, g * 1.01 + 4);
+        b = Math.min(255, b * 0.96);
+        data[i] = r; data[i + 1] = g; data[i + 2] = b;
       }
-      const objUrl = URL.createObjectURL(file);
-      const img = new Image();
-      img.onload = () => {
-        URL.revokeObjectURL(objUrl);
-        try {
-          const maxSide = 640;
-          let w = img.naturalWidth || img.width;
-          let h = img.naturalHeight || img.height;
-          if (!w || !h) throw new Error('Could not read image size.');
-          const scale = Math.min(1, maxSide / Math.max(w, h));
-          w = Math.max(1, Math.round(w * scale));
-          h = Math.max(1, Math.round(h * scale));
-          const canvas = document.createElement('canvas');
-          canvas.width = w;
-          canvas.height = h;
-          const ctx = canvas.getContext('2d', { willReadFrequently: true });
-          ctx.imageSmoothingEnabled = true;
-          ctx.imageSmoothingQuality = 'high';
-          ctx.drawImage(img, 0, 0, w, h);
-          const imageData = ctx.getImageData(0, 0, w, h);
-          const data = imageData.data;
-          // Milder posterize (8 levels) + gentle contrast/warmth (less muddy than 5-level)
-          const levels = 8;
-          const step = 255 / (levels - 1);
-          for (let i = 0; i < data.length; i += 4) {
-            let r = data[i], g = data[i + 1], b = data[i + 2];
-            // Contrast midtones slightly before quantize
-            const contrast = 1.12;
-            r = (r - 128) * contrast + 128;
-            g = (g - 128) * contrast + 128;
-            b = (b - 128) * contrast + 128;
-            r = Math.round(Math.min(255, Math.max(0, r)) / step) * step;
-            g = Math.round(Math.min(255, Math.max(0, g)) / step) * step;
-            b = Math.round(Math.min(255, Math.max(0, b)) / step) * step;
-            r = Math.min(255, r * 1.04 + 8);
-            g = Math.min(255, g * 1.01 + 4);
-            b = Math.min(255, b * 0.96);
-            data[i] = r; data[i + 1] = g; data[i + 2] = b;
+      // Sobel-ish edge ink (thinner, higher threshold → less blotchy)
+      const copy = new Uint8ClampedArray(data);
+      const lum = (i) => 0.299 * copy[i] + 0.587 * copy[i + 1] + 0.114 * copy[i + 2];
+      const thr = 52;
+      for (let y = 1; y < h - 1; y++) {
+        for (let x = 1; x < w - 1; x++) {
+          const i = (y * w + x) * 4;
+          const c = lum(i);
+          const gx = Math.abs(c - lum(i + 4)) + Math.abs(c - lum(i - 4));
+          const gy = Math.abs(c - lum(i + w * 4)) + Math.abs(c - lum(i - w * 4));
+          if (gx + gy > thr) {
+            const ink = 0.55;
+            data[i] = Math.round(data[i] * (1 - ink) + 22 * ink);
+            data[i + 1] = Math.round(data[i + 1] * (1 - ink) + 18 * ink);
+            data[i + 2] = Math.round(data[i + 2] * (1 - ink) + 28 * ink);
           }
-          // Sobel-ish edge ink (thinner, higher threshold → less blotchy)
-          const copy = new Uint8ClampedArray(data);
-          const lum = (i) => 0.299 * copy[i] + 0.587 * copy[i + 1] + 0.114 * copy[i + 2];
-          const thr = 52;
-          for (let y = 1; y < h - 1; y++) {
-            for (let x = 1; x < w - 1; x++) {
-              const i = (y * w + x) * 4;
-              const c = lum(i);
-              const gx = Math.abs(c - lum(i + 4)) + Math.abs(c - lum(i - 4));
-              const gy = Math.abs(c - lum(i + w * 4)) + Math.abs(c - lum(i - w * 4));
-              if (gx + gy > thr) {
-                const ink = 0.55;
-                data[i] = Math.round(data[i] * (1 - ink) + 22 * ink);
-                data[i + 1] = Math.round(data[i + 1] * (1 - ink) + 18 * ink);
-                data[i + 2] = Math.round(data[i + 2] * (1 - ink) + 28 * ink);
-              }
-            }
-          }
-          ctx.putImageData(imageData, 0, 0);
-          // Lighter paper wash (was heavy yellow mud)
-          ctx.globalCompositeOperation = 'soft-light';
-          ctx.fillStyle = 'rgba(255, 228, 170, 0.14)';
-          ctx.fillRect(0, 0, w, h);
-          ctx.globalCompositeOperation = 'source-over';
-          // Slimmer ink frame
-          ctx.strokeStyle = '#1a1a2e';
-          ctx.lineWidth = Math.max(2, Math.round(Math.min(w, h) * 0.012));
-          ctx.strokeRect(1, 1, w - 2, h - 2);
-          resolve(canvas.toDataURL('image/png'));
-        } catch (err) {
-          reject(err);
         }
-      };
-      img.onerror = () => {
-        URL.revokeObjectURL(objUrl);
-        reject(new Error('Could not load that image.'));
-      };
-      img.src = objUrl;
-    });
+      }
+      ctx.putImageData(imageData, 0, 0);
+      ctx.globalCompositeOperation = 'soft-light';
+      ctx.fillStyle = 'rgba(255, 228, 170, 0.14)';
+      ctx.fillRect(0, 0, w, h);
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.strokeStyle = '#1a1a2e';
+      ctx.lineWidth = Math.max(2, Math.round(Math.min(w, h) * 0.012));
+      ctx.strokeRect(1, 1, w - 2, h - 2);
+      return canvas;
+    };
+    let big = null, png512 = '';
+    for (const levels of [8, 6, 4, 3]) {
+      big = draw(levels);
+      png512 = big.toDataURL('image/png');
+      if (dataUrlBytes(png512) <= MAX) break;
+    }
+    if (dataUrlBytes(png512) > MAX) png512 = big.toDataURL('image/jpeg', 0.82);
+    const sm = document.createElement('canvas');
+    sm.width = 128;
+    sm.height = 128;
+    const sctx = sm.getContext('2d');
+    sctx.imageSmoothingQuality = 'high';
+    sctx.drawImage(big, 0, 0, 128, 128);
+    return { png512, png128: sm.toDataURL('image/png'), mode: 'filter' };
+  }
+
+  /** The one avatar builder: W1b comic when the vendored model runs, else the canvas filter. Render errors
+   *  (e.g. no person in the photo) are thrown so the caller keeps the letter avatar. */
+  async function renderExplorerAvatar(src, crop, avatarColor) {
+    let modelOk = typeof Comicify !== 'undefined';
+    if (modelOk) {
+      try { await Comicify.loadSegmenter(MODEL_BASE); } catch (_) { modelOk = false; }
+    }
+    if (!modelOk) return filterAvatar(src, crop);
+    const r = await Comicify.render(src, crop, { avatarColor, modelBase: MODEL_BASE });
+    return { png128: r.png128, png512: r.png512, mode: 'comic' };
+  }
+
+  function saveExplorerAvatar(userId, result) {
+    Storage.setComicAvatar(store, userId, result.png128, result.png512);
+    store = Storage.loadStore();
+    syncProgressFromStore();
+  }
+
+  /** Read a picked photo (canvas only; works without the model). */
+  async function loadExplorerPhoto(file) {
+    if (typeof Comicify === 'undefined') throw new Error('Photo tools did not load.');
+    return Comicify.load(file);
   }
 
   function refreshAfterProfileChange() {
@@ -336,18 +366,24 @@
     else if (onProgress) renderProgress();
   }
 
+  /** Home card + create form: auto face crop, no crop step, no blocking alert. */
   async function applyExplorerPhoto(file, userId) {
     const id = userId || activeUser()?.id;
-    if (!id || !file) return;
-    if (!store.users[id]) return;
+    if (!id || !file || !store.users[id]) return false;
+    let src = null;
     try {
-      const dataUrl = await comicifyImageFile(file);
-      Storage.setUserAvatar(store, id, dataUrl);
-      store = Storage.loadStore();
-      syncProgressFromStore();
-      refreshAfterProfileChange();
+      const loaded = await loadExplorerPhoto(file);
+      src = loaded.src;
+      const res = await renderExplorerAvatar(src, loaded.box, store.users[id].avatarColor);
+      saveExplorerAvatar(id, res);
+      if (res.mode === 'filter') notice('Comic style isn\'t available on this device, so we used a simple photo filter.');
+      return true;
     } catch (err) {
-      alert(err && err.message ? err.message : 'Photo comicify failed.');
+      notice(((err && err.message) || 'That photo did not work.') + ' Keeping the letter avatar.');
+      return false;
+    } finally {
+      if (src && src.close) src.close();
+      refreshAfterProfileChange();
     }
   }
 
@@ -357,7 +393,7 @@
     const u = store.users[id];
     if (!u || !Storage.avatarSrc(u)) return;
     if (!confirm('Clear comic photo avatar for ' + u.displayName + '?')) return;
-    Storage.clearUserAvatar(store, id);
+    Storage.clearComicAvatar(store, id);
     store = Storage.loadStore();
     syncProgressFromStore();
     refreshAfterProfileChange();
@@ -1269,16 +1305,7 @@
       store = Storage.loadStore();
       syncProgressFromStore();
       const photoFile = $('#input-photo-' + mode)?.files?.[0];
-      if (photoFile && created?.id) {
-        try {
-          const dataUrl = await comicifyImageFile(photoFile);
-          Storage.setUserAvatar(store, created.id, dataUrl);
-          store = Storage.loadStore();
-          syncProgressFromStore();
-        } catch (err) {
-          alert(err && err.message ? err.message : 'Photo comicify failed.');
-        }
-      }
+      if (photoFile && created?.id) await applyExplorerPhoto(photoFile, created.id);
       if (mode === 'new') {
         $('#new-explorer-form')?.classList.add('hidden');
         renderLanding();
@@ -2206,11 +2233,12 @@
     avatarCtx.result = null;
   }
 
+  /** Profile modal: same builder as the Home card, plus the drag/zoom crop step and a preview. */
   async function startComicAvatar(file) {
-    if (typeof Comicify === 'undefined') return;
     try {
-      // lazy: the vendored on-device model loads only when a photo is picked; no model → letter avatar
-      const [{ src, box }] = await Promise.all([Comicify.load(file), Comicify.loadSegmenter('vendor/mediapipe/')]);
+      const { src, box } = await loadExplorerPhoto(file);
+      // warm the vendored model while the parent adjusts the crop; if it can't load, Make → canvas filter
+      if (typeof Comicify !== 'undefined') Comicify.loadSegmenter(MODEL_BASE).catch(() => {});
       avatarCtx.src = src;
       avatarCtx.base = Math.min(src.width, src.height);
       avatarCtx.cx = box.x + box.side / 2;
@@ -2222,7 +2250,7 @@
       $('#avatar-modal')?.classList.remove('hidden');
       drawAvatarCrop();
     } catch (err) {
-      alert('Comic avatar is not available on this device right now. Keeping the letter avatar.');
+      notice(((err && err.message) || 'That photo did not work.') + ' Keeping the letter avatar.');
     }
   }
 
@@ -2233,12 +2261,13 @@
     if (btn) { btn.disabled = true; btn.textContent = 'Inking…'; }
     try {
       const crop = { x: avatarCtx.cx - avatarCtx.side / 2, y: avatarCtx.cy - avatarCtx.side / 2, side: avatarCtx.side };
-      avatarCtx.result = await Comicify.render(avatarCtx.src, crop, { avatarColor: u.avatarColor, modelBase: 'vendor/mediapipe/' });
+      avatarCtx.result = await renderExplorerAvatar(avatarCtx.src, crop, u.avatarColor);
       $('#avatar-preview-big').src = avatarCtx.result.png512;
       $('#avatar-preview-small').src = avatarCtx.result.png128;
       showAvatarStep('preview');
+      if (avatarCtx.result.mode === 'filter') notice('Comic style isn\'t available on this device, so this is a simple photo filter.');
     } catch (err) {
-      alert(((err && err.message) || 'Comicify failed.') + ' Keeping the letter avatar.');
+      notice(((err && err.message) || 'Comicify failed.') + ' Keeping the letter avatar.');
       closeAvatarModal();
     } finally {
       if (btn) { btn.disabled = false; btn.textContent = 'Make my comic'; }
@@ -2266,7 +2295,8 @@
       if (!u) return;
       Storage.clearComicAvatar(store, u.id);
       store = Storage.loadStore();
-      updateHeaderUser();
+      syncProgressFromStore();
+      refreshAfterProfileChange();
       refreshAvatarButtons();
     });
     const cv = $('#avatar-crop');
@@ -2298,12 +2328,10 @@
     $('#btn-avatar-use')?.addEventListener('click', () => {
       const u = activeUser();
       if (!u || !avatarCtx.result) return;
-      Storage.setComicAvatar(store, u.id, avatarCtx.result.png128, avatarCtx.result.png512);
-      store = Storage.loadStore();
+      saveExplorerAvatar(u.id, avatarCtx.result);
       closeAvatarModal();
-      updateHeaderUser();
+      refreshAfterProfileChange();
       refreshAvatarButtons();
-      if ($('#screen-progress')?.classList.contains('active')) renderProgress();
     });
   }
 

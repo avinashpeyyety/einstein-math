@@ -321,7 +321,7 @@ test('7. v3-newer lesson wins over older v2 copy (and newer v2 lesson wins over 
   assert.strictEqual(L[ids78[2]].status, 'done', 'v2 newer lesson wins');
 });
 
-test('8. real live-site (v2.4.2) export imports — plain, BOM+CRLF, merge, replace, avatarDataUrl kept', () => {
+test('8. real live-site (v2.4.2) export imports — plain, BOM+CRLF, merge, replace, avatar kept as avatarImage', () => {
   const text = fs.readFileSync(path.join(__dirname, 'fixtures/v2-live-2.4.2-export.json'), 'utf8');
   const exp = JSON.parse(text);
   assert.strictEqual(exp.format, 'einstein-math-v2');
@@ -338,7 +338,8 @@ test('8. real live-site (v2.4.2) export imports — plain, BOM+CRLF, merge, repl
       for (const tid of Object.keys(u.tracks)) {
         assert.deepStrictEqual(plain(rep.users[id].progress['math:' + tid]), plain(S.normalizeTrackProgress(plain(u.tracks[tid]))), name + ' ' + id + ' ' + tid);
       }
-      assert.strictEqual(rep.users[id].avatarDataUrl, u.avatarDataUrl, name + ' avatarDataUrl kept on replace');
+      assert.strictEqual(rep.users[id].avatarImage, u.avatarDataUrl || undefined, name + ' avatarDataUrl → avatarImage on replace');
+      assert.ok(!('avatarDataUrl' in rep.users[id]), name + ' avatarDataUrl dropped after copy');
     }
     const after = S.loadStore();
     assert.deepStrictEqual(Object.keys(after.users).sort(), Object.keys(exp.users).sort(), name + ': replace not undone by legacy v2 at next boot');
@@ -353,8 +354,53 @@ test('8. real live-site (v2.4.2) export imports — plain, BOM+CRLF, merge, repl
     S2.saveTrackProgress(st, mid, 'ages-7-8', tp);
     const { store: merged } = S2.mergeImportedStore(S2.loadStore(), S2.parseImportPayload(raw));
     assert.ok(merged.users[mid].progress['math:ages-7-8'].lessons[ids78[7]], name + ' local lesson kept on merge');
-    assert.strictEqual(merged.users[mid].avatarDataUrl, exp.users[mid].avatarDataUrl, name + ' avatarDataUrl kept on merge');
+    assert.strictEqual(merged.users[mid].avatarImage, exp.users[mid].avatarDataUrl, name + ' avatar kept on merge (as avatarImage)');
   }
+});
+
+
+test('9. origin/main v2.4.2 export WITH avatarDataUrl restores as avatarImage (backup restore + import + migration + old tab)', () => {
+  const text = fs.readFileSync(path.join(__dirname, 'fixtures/v2-origin-2.4.2-avatar-export.json'), 'utf8');
+  const exp = JSON.parse(text);
+  const [uid] = Object.keys(exp.users);
+  const url = exp.users[uid].avatarDataUrl;
+  assert.ok(/^data:image\/png;base64,/.test(url));
+  // backup.js restore path: parseImportPayload → replaceAllFromImport
+  const ls = fakeLocalStorage();
+  const S = loadStorage(NEW, ls);
+  S.replaceAllFromImport(S.parseImportPayload('\uFEFF' + text));
+  let u = S.loadStore().users[uid];
+  assert.strictEqual(u.avatarImage, url);
+  assert.ok(!('avatarDataUrl' in u));
+  assert.strictEqual(S.avatarSrc(u), url);
+  assert.strictEqual(S.avatarSrc(u, true), url);
+  assert.deepStrictEqual(plain(u.progress['math:ages-9-10']), plain(S.normalizeTrackProgress(plain(exp.users[uid].tracks['ages-9-10']))));
+  assert.strictEqual(S.getParentSummary(S.loadStore(), uid, curriculum).avatarImage, url);
+  // clear removes it for good (no stale second field)
+  S.clearUserAvatar(S.loadStore(), uid);
+  assert.strictEqual(S.avatarSrc(S.loadStore().users[uid]), null);
+  // import button path (merge into a device that has the same user without avatar)
+  const r = S.mergeImportedStore(S.loadStore(), S.parseImportPayload(text));
+  assert.strictEqual(r.store.users[uid].avatarImage, url, 'merge restores avatar from newer-or-only side');
+  // W1b avatar wins when both exist; setUserAvatar writes avatarImage
+  const both = S.migrateUserToV3({ id: 'x', avatarImage: 'data:image/png;base64,W1B', avatarImage512: 'data:image/png;base64,W1B512', avatarDataUrl: url, tracks: {} });
+  assert.strictEqual(both.avatarImage, 'data:image/png;base64,W1B');
+  assert.strictEqual(both.avatarImage512, 'data:image/png;base64,W1B512');
+  assert.ok(!('avatarDataUrl' in both));
+  const st = S.loadStore();
+  S.setUserAvatar(st, uid, url);
+  assert.strictEqual(S.loadStore().users[uid].avatarImage, url);
+  // v2 store in localStorage (live user's first v3 load) migrates its avatar
+  const v2store = { version: 2, appVersion: '2.4.0', activeUserId: uid, prefs: { speechEnabled: false }, users: plain(exp.users) };
+  const ls2 = fakeLocalStorage({ 'einstein-math-v2': JSON.stringify(v2store) });
+  const S2 = loadStorage(NEW, ls2);
+  assert.strictEqual(S2.loadStore().users[uid].avatarImage, url);
+  // old v2.4.x tab sets a photo after migration → boot merge copies it
+  const ls3 = fakeLocalStorage({ 'einstein-math-v2': JSON.stringify({ ...v2store, users: { [uid]: { ...plain(exp.users[uid]), avatarDataUrl: null } } }) });
+  const S3 = loadStorage(NEW, ls3);
+  assert.strictEqual(S3.avatarSrc(S3.loadStore().users[uid]), null);
+  oldTabSave(ls3, v2 => { v2.users[uid].avatarDataUrl = url; v2.users[uid].updatedAt = new Date(Date.now() + 1000).toISOString(); });
+  assert.strictEqual(S3.loadStore().users[uid].avatarImage, url, 'old-tab avatar merged as avatarImage');
 });
 
 console.log(`\n${passed} passed${process.exitCode ? ', some FAILED' : ''}`);

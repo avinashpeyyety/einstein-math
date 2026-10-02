@@ -1,0 +1,64 @@
+{
+  "format": "einstein-math-v2",
+  "exportedAt": "2026-10-02T00:09:54.196Z",
+  "note": "Multi-device handoff snapshot (not cloud sync). Import on another device to merge or replace.",
+  "version": 2,
+  "appVersion": "2.4.0",
+  "activeUserId": "u_sy0f9n84hx5e",
+  "prefs": {
+    "speechEnabled": false
+  },
+  "users": {
+    "u_sy0f9n84hx5e": {
+      "id": "u_sy0f9n84hx5e",
+      "displayName": "Ava",
+      "createdAt": "2026-10-02T00:09:54.194Z",
+      "updatedAt": "2026-10-02T00:09:54.196Z",
+      "trackId": "ages-9-10",
+      "avatarColor": "#A78BFA",
+      "avatarDataUrl": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAIAAADYYG7QAAAAk0lEQVR42u3Yuw2AMAwEUM/hPViDRViTlpmgDxL4E0dn6Sz3eV18J/t1Qq0QRBBBBFlX/2YdSD1TC9LolICGN+5j+96YSSooGZYb5NK8TRNASY3XJAs0LpMVlNQMpiBorsZo6gOq0FhMBBFEEEEEtQXxc+14DyFejHA3NWLqQMxlcMkVNNsjth+g/RArPYIIag16ALdwiPsEf5V5AAAAAElFTkSuQmCC",
+      "tracks": {
+        "ages-9-10": {
+          "started": true,
+          "diagnosticDone": true,
+          "diagnosticScores": {},
+          "recommendedUnits": [],
+          "lessons": {
+            "g4-multi-add": {
+              "status": "done",
+              "mastery": 1,
+              "masteryLevel": "mastered",
+              "practiceCorrect": 4,
+              "practiceTotal": 4,
+              "checkCorrect": 3,
+              "checkTotal": 3,
+              "attempts": 1,
+              "streak": 1,
+              "reviewIntervalDays": 1,
+              "lastAt": "2026-10-02T00:09:54.196Z",
+              "nextReviewAt": "2026-10-03T00:09:54.196Z",
+              "missedCheckIds": []
+            },
+            "g4-multi-sub": {
+              "status": "done",
+              "mastery": 0.6666666666666666,
+              "masteryLevel": "practicing",
+              "practiceCorrect": 3,
+              "practiceTotal": 4,
+              "checkCorrect": 2,
+              "checkTotal": 3,
+              "attempts": 1,
+              "streak": 0,
+              "reviewIntervalDays": 1,
+              "lastAt": "2026-10-02T00:09:54.196Z",
+              "nextReviewAt": "2026-10-03T00:09:54.196Z",
+              "missedCheckIds": []
+            }
+          },
+          "currentLessonId": "g4-multi-sub",
+          "stars": 2
+        }
+      }
+    }
+  }
+}

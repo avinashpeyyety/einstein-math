@@ -47,8 +47,42 @@ const Storage = {
    * v2 → v3 for one user. Moves user.tracks[tid] → user.progress["math:tid"].
    * Idempotent; never drops data (a key present on both sides is merged, newer lesson wins).
    */
+  isImageDataUrl(v) {
+    return typeof v === 'string' && v.startsWith('data:image/');
+  },
+
+  /**
+   * One avatar for every reader: W1b avatarImage (128) / avatarImage512, else the live
+   * v2.4.x avatarDataUrl (data that has not been through migrateUserToV3 yet). big → prefer 512.
+   */
+  avatarSrc(user, big) {
+    if (!user) return null;
+    const order = big
+      ? [user.avatarImage512, user.avatarImage, user.avatarDataUrl]
+      : [user.avatarImage, user.avatarImage512, user.avatarDataUrl];
+    return order.find(v => this.isImageDataUrl(v)) || null;
+  },
+
+  /**
+   * v2.4.x avatarDataUrl → avatarImage (only when avatarImage is missing), then drop avatarDataUrl
+   * so there is one source of truth: no duplicate 100 KB+ data URLs in localStorage, and
+   * "remove avatar" can't be undone by a stale second field. The v2 key keeps the original.
+   */
+  unifyAvatarFields(user) {
+    if (!user || typeof user !== 'object') return user;
+    if (!this.isImageDataUrl(user.avatarImage) && this.isImageDataUrl(user.avatarDataUrl)) {
+      user.avatarImage = user.avatarDataUrl;
+      delete user.avatarImage512; // a 512 from another image would not match
+    }
+    if (user.avatarImage != null && !this.isImageDataUrl(user.avatarImage)) delete user.avatarImage;
+    if (user.avatarImage512 != null && !this.isImageDataUrl(user.avatarImage512)) delete user.avatarImage512;
+    delete user.avatarDataUrl;
+    return user;
+  },
+
   migrateUserToV3(user) {
     if (!user || typeof user !== 'object') return user;
+    this.unifyAvatarFields(user);
     if (!user.progress || typeof user.progress !== 'object') user.progress = {};
     const legacy = user.tracks;
     if (legacy && typeof legacy === 'object') {
@@ -166,7 +200,7 @@ const Storage = {
   emptyStore() {
     return {
       version: SCHEMA_VERSION,
-      appVersion: '2.3.0',
+      appVersion: '2.4.0',
       activeUserId: null,
       users: {},
       prefs: {
@@ -339,7 +373,7 @@ const Storage = {
   saveStore(store) {
     store.version = SCHEMA_VERSION;
     store.updatedAt = new Date().toISOString();
-    store.appVersion = store.appVersion || '2.3.0';
+    store.appVersion = store.appVersion || '2.4.0';
     if (!store.prefs || typeof store.prefs !== 'object') store.prefs = { speechEnabled: false, activeSubject: DEFAULT_SUBJECT };
     if (!store.prefs.activeSubject) store.prefs.activeSubject = DEFAULT_SUBJECT;
     localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
@@ -437,6 +471,7 @@ const Storage = {
     if (!user || !png128) return null;
     user.avatarImage = png128;
     user.avatarImage512 = png512 || null;
+    delete user.avatarDataUrl;
     this.touchUser(user);
     try {
       this.saveStore(store);
@@ -453,6 +488,7 @@ const Storage = {
     if (!user) return null;
     delete user.avatarImage;
     delete user.avatarImage512;
+    delete user.avatarDataUrl;
     this.touchUser(user);
     this.saveStore(store);
     return user;
@@ -465,6 +501,32 @@ const Storage = {
       const rest = Object.keys(store.users);
       store.activeUserId = rest[0] || null;
     }
+    this.saveStore(store);
+    return store;
+  },
+
+  /** Comic avatar data URL (device-local; included in export/import). */
+  setUserAvatar(store, userId, dataUrl) {
+    // v2.4.x Home-card / create-form photo (canvas comicify). Writes the unified avatarImage field.
+    const user = store.users[userId];
+    if (!user) return null;
+    if (!this.isImageDataUrl(dataUrl)) return this.clearUserAvatar(store, userId);
+    user.avatarImage = String(dataUrl);
+    delete user.avatarImage512;
+    delete user.avatarDataUrl;
+    this.touchUser(user);
+    this.saveStore(store);
+    return user;
+  },
+
+  clearUserAvatar(store, userId) {
+    return this.clearComicAvatar(store, userId);
+  },
+
+  /** Wipe all explorers on this device (keeps prefs). Distinct from import replace. */
+  resetAllUsers(store) {
+    store.users = {};
+    store.activeUserId = null;
     this.saveStore(store);
     return store;
   },
@@ -730,6 +792,7 @@ const Storage = {
       userId: user.id,
       displayName: user.displayName,
       avatarColor: user.avatarColor,
+      avatarImage: this.avatarSrc(user),
       trackId,
       trackLabel: track?.label || trackId,
       ageRange: track?.ageRange || '',
@@ -756,7 +819,7 @@ const Storage = {
 
   normalizeStoreMeta(store) {
     if (!store || typeof store !== 'object') return this.emptyStore();
-    store.appVersion = store.appVersion || '2.3.0';
+    store.appVersion = store.appVersion || '2.4.0';
     if (!store.prefs || typeof store.prefs !== 'object') {
       store.prefs = { speechEnabled: false, activeSubject: DEFAULT_SUBJECT };
     } else {
@@ -803,7 +866,7 @@ const Storage = {
       exportedAt: new Date().toISOString(),
       note: 'Multi-device handoff snapshot (not cloud sync). Import on another device to merge or replace.',
       version: SCHEMA_VERSION,
-      appVersion: s.appVersion || '2.3.0',
+      appVersion: s.appVersion || '2.4.0',
       activeUserId: s.activeUserId || null,
       prefs: s.prefs || { speechEnabled: false },
       users: s.users || {}
@@ -896,11 +959,6 @@ const Storage = {
       out.avatarImage = avSrc.avatarImage;
       if (avSrc.avatarImage512) out.avatarImage512 = avSrc.avatarImage512;
     }
-    // Live site v2.4.x stores its photo avatar as avatarDataUrl — keep it through merges.
-    const dataUrl = preferIncoming
-      ? (incomingU.avatarDataUrl !== undefined ? incomingU.avatarDataUrl : localU.avatarDataUrl)
-      : (localU.avatarDataUrl !== undefined ? localU.avatarDataUrl : incomingU.avatarDataUrl);
-    if (dataUrl !== undefined) out.avatarDataUrl = dataUrl;
     const keys = new Set([
       ...Object.keys(localU.progress || {}),
       ...Object.keys(incomingU.progress || {})
@@ -964,7 +1022,7 @@ const Storage = {
     }
     const store = this.normalizeStoreMeta({
       version: SCHEMA_VERSION,
-      appVersion: incoming.appVersion || '2.3.0',
+      appVersion: incoming.appVersion || '2.4.0',
       activeUserId: incoming.activeUserId || null,
       prefs: incoming.prefs && typeof incoming.prefs === 'object'
         ? { speechEnabled: !!incoming.prefs.speechEnabled, activeSubject: incoming.prefs.activeSubject }

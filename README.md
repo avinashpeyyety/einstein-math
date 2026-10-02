@@ -16,7 +16,9 @@ Public interactive math program for **ages 5–10** (US K–5), delivered by **E
 - **Multi-device handoff** — **Export all profiles** / **Import profiles** (merge by id or replace-all) until real sync exists
 - **PWA / offline** — installable app shell; service worker caches curriculum + panels after first online visit
 - **Einstein read-aloud** — optional Web Speech API narration of speech bubbles (toggle in header)
-- **Local multi-user profiles** — named explorers on one device; progress nested per age track
+- **Local multi-user profiles** — named explorers on one device; progress nested per age track; **rename** anytime (Home cards + Progress)
+- **Comic photo avatar** — two on-device paths: Home card / create-form photo → canvas comicify (v2.4.x), or Progress → **Comic avatar** (W1b MediaPipe segmenters, crop + preview). Both store `avatarImage` on the user (W1b also `avatarImage512`); older `avatarDataUrl` data is read as a fallback and copied into `avatarImage` on load/import; shows on chip, Home cards, Progress, and student portrait; replace/clear supported; included in export/import
+- **Remove all explorers** — Progress double-confirm wipe of every profile + `activeUserId` (keeps prefs); distinct from Import → Replace
 - Landing: create profile (name + track) or pick an existing explorer
 - Richer diagnostic (10 items) → suggested unit path (per track)
 - Full playable lessons with Einstein UI (explain → worked example → practice → quick check)
@@ -156,7 +158,9 @@ Progress is keyed **`subject:track`** (`math:ages-7-8`; physics later as `physic
 
 **v2 → v3 migration (X1):** on load, a v2 or stub-v3 store (key `einstein-math-v2`, `user.tracks` keyed by bare track id) is copied to `einstein-math-v3` with each `tracks[<id>]` moved to `progress["math:<id>"]` — same lessons, stars, streaks and review dates, so Today's path is unchanged. It is idempotent (re-running is a no-op; a key on both sides is merged, newer lesson wins) and non-destructive (the `einstein-math-v2` key is left in place as a rollback copy). Storage APIs still take a bare track id and default to math (`getTrackProgress(user, 'ages-7-8')`). Export writes `format: "einstein-math-v3"`; import/merge accepts both v2 and v3 files.
 
-**Old tabs (X1 follow-up):** a tab still running pre-v3 code keeps saving to `einstein-math-v2`. The v3 store records which v2 content it has absorbed (`legacyV2: { hash, absorbedAt, v2UpdatedAt }`, a content hash of the v2 key). On every load, if the v2 key's hash differs, the v2 store is migrated in memory and merged into v3 (newest lesson wins, like import), then the marker is updated, so it never merges twice and never writes the v2 key. A replace-import marks the current v2 copy as absorbed. Every save also stamps a store-level `updatedAt`. Import strips a UTF-8 BOM, and keeps the live site's `avatarDataUrl` field.
+**Old tabs (X1 follow-up):** a tab still running pre-v3 code keeps saving to `einstein-math-v2`. The v3 store records which v2 content it has absorbed (`legacyV2: { hash, absorbedAt, v2UpdatedAt }`, a content hash of the v2 key). On every load, if the v2 key's hash differs, the v2 store is migrated in memory and merged into v3 (newest lesson wins, like import), then the marker is updated, so it never merges twice and never writes the v2 key. A replace-import marks the current v2 copy as absorbed. Every save also stamps a store-level `updatedAt`. Import strips a UTF-8 BOM.
+
+**Avatar field (v2.4.3):** one field, `avatarImage` (plus optional `avatarImage512`). Readers use `Storage.avatarSrc(user)` = `avatarImage || avatarImage512 || avatarDataUrl`. The v3 migration, the old-tab merge and every import copy a v2.4.x `avatarDataUrl` into `avatarImage` when it is missing and then drop `avatarDataUrl` (no duplicate data URLs in localStorage; removing an avatar can't be undone by a stale second field; the untouched `einstein-math-v2` key still has the original).
 
 On first load, legacy `einstein-math-progress-v1` (if present) migrates into a default user **Explorer** on the ages 7–8 track.
 
@@ -175,12 +179,23 @@ Localhost works for PWA install in Chromium.
 
 ## Smoke demo (2.3 trusted-home sprint)
 
-1. Load once online → DevTools → Application → Service Worker registered; Cache Storage shows `einstein-math-v2.3.10` (or the current `CACHE` in `sw.js`).
+1. Load once online → DevTools → Application → Service Worker registered; Cache Storage shows `einstein-math-v2.4.3` (or the current `CACHE` in `sw.js`).
 2. Go offline (DevTools Network → Offline) → reload → landing / Mission Map still usable.
 3. Create two explorers, earn progress → **Export all profiles** → clear site data → **Import** merge → both kids restored.
 4. Toggle **Read aloud** → Einstein bubbles speak; **Replay** repeats the last line.
 5. Seed a due review (`nextReviewAt` in the past) → Home/Map **Today's path** + **Continue** open that review first.
 6. Fail a check (&lt;60%) → Retry Weak Spots → success nudges mastery / can clear needs_review.
+7. **Rename** from a Home explorer card or Progress → name updates on chip + cards.
+8. Progress → **Upload photo** → comic avatar appears on chip / Home / student portrait; **Clear photo** restores letter + stock panels.
+9. Progress → **Remove All Explorers** (two confirms) → empty landing create form (prefs kept).
+
+## Sprint notes (2.4.0)
+
+| Goal | Result |
+|------|--------|
+| Rename explorer after create | Home card ✎ + Progress Rename; `Storage.renameUser` bumps `updatedAt` |
+| Photo → local comicify → avatar | Canvas comicify (~320px, posterize, ink, warm wash); `avatarDataUrl` on user (now `avatarImage` since v2.4.3); export/import via merge |
+| Reset/remove all explorers | Progress **Remove All Explorers** double-confirm; `Storage.resetAllUsers`; single delete confirm kept |
 
 ## Sprint notes (2.3.0)
 

@@ -1129,3 +1129,71 @@ h1, h2, h3, .logo, .burst-text {
 .backup-status { min-height: 1.2em; font-weight: 600; }
 .backup-landing { margin-top: 0.9rem; font-size: 0.95rem; }
 .backup-toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); background: #FFE66D; color: #1a1a1a; border: 3px solid #1a1a1a; border-radius: 10px; padding: 0.55rem 1rem; font-weight: 700; box-shadow: 4px 4px 0 #1a1a1a; z-index: 9999; }
+/* —— Comic photo avatar —— */
+.user-avatar.has-photo {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  color: transparent;
+  text-shadow: none;
+}
+.user-avatar.avatar-lg {
+  width: 3.25rem;
+  height: 3.25rem;
+  font-size: 1.5rem;
+}
+.profile-identity-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+.profile-identity-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  font-weight: 700;
+}
+.profile-photo-tools {
+  margin-top: 0.5rem;
+  padding: 0.75rem 0.85rem;
+  border: 3px dashed var(--ink);
+  border-radius: 8px;
+  background: rgba(255, 230, 109, 0.25);
+}
+.profile-photo-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  align-items: center;
+}
+.profile-photo-actions label.btn {
+  cursor: pointer;
+  margin: 0;
+}
+.user-card-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 0.35rem;
+}
+.user-card-row.active .user-card {
+  background: var(--burst-yellow);
+  box-shadow: 3px 3px 0 var(--ink), inset 0 0 0 2px var(--burst-orange);
+}
+.user-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  padding-left: 0.25rem;
+  align-items: center;
+}
+.user-card-actions label.btn {
+  cursor: pointer;
+  margin: 0;
+}
+.student-panel.student-panel-avatar {
+  object-fit: cover;
+  object-position: center top;
+  filter: contrast(1.05) saturate(1.08);
+}

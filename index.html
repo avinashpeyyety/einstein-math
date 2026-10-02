@@ -12,6 +12,19 @@
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="apple-touch-icon" href="assets/icons/icon-192.png" />
   <title>Einstein Math — Cosmic Number Adventures!</title>
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Einstein Math" />
+  <meta property="og:title" content="Einstein Math — Cosmic Number Adventures!" />
+  <meta property="og:description" content="Cosmic comic-book math adventures for ages 5 to 10. Einstein teaches, your explorer learns beside him, with read-aloud missions and progress tracking." />
+  <meta property="og:url" content="https://avinashpeyyety.github.io/einstein-math/" />
+  <meta property="og:image" content="https://avinashpeyyety.github.io/einstein-math/assets/og-image.jpg?v=1" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Einstein Math: comic-style Einstein and a student explorer beside the headline Cosmic Adventures in Numbers" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Einstein Math — Cosmic Number Adventures!" />
+  <meta name="twitter:description" content="Cosmic comic-book math adventures for ages 5 to 10. Einstein teaches, your explorer learns beside him, with read-aloud missions and progress tracking." />
+  <meta name="twitter:image" content="https://avinashpeyyety.github.io/einstein-math/assets/og-image.jpg?v=1" />
   <link rel="stylesheet" href="css/comic.css" />
   <link rel="icon" href="assets/icons/icon.svg" type="image/svg+xml" />
 </head>
@@ -84,7 +97,7 @@
           <button type="button" class="btn btn-pink" id="btn-show-new">+ New Explorer</button>
         </div>
         <div id="new-explorer-form" class="hidden" style="margin-top:1rem;"></div>
-        <p class="privacy-note">Profiles &amp; progress stay on this device only (localStorage) — no accounts, no passwords, no cloud sync. Use Parent / Progress export &amp; import to hand off between devices.</p>
+        <p class="privacy-note">Profiles &amp; progress stay on this device only (localStorage) — no accounts, no passwords, no cloud sync. Rename, upload or clear a comic photo, or delete from each Home card; optional photo on Create / + New Explorer (comicified on-device). Use Parent / Progress export &amp; import to hand off between devices. Progress also has <strong>Remove All Explorers</strong> (double confirm).</p>
       </div>
 
       <div class="comic-panel">
@@ -95,7 +108,7 @@
           <li>Mission Map: explain → example → practice → check across ~28–30 lessons per track</li>
           <li><strong>Mastery &amp; spaced review</strong> — hit ~80% on the check to master; reviews pop up later so skills stick</li>
           <li>Missed the check? Retry weak spots before a full redo — Einstein coaches gently</li>
-          <li>Multiple kids on one device — each keeps separate stars (device-local only)</li>
+          <li>Multiple kids on one device — each keeps separate stars (device-local only); rename &amp; comic photo on Home explorer cards / create form (comicified on-device)</li>
           <li><strong>Install / offline</strong> — after one online visit, Chromium can install this PWA; play offline from the cache</li>
           <li><strong>Multi-device</strong> — export all profiles on Progress, import on another device (merge or replace) until real sync exists</li>
         </ul>
@@ -209,8 +222,9 @@
           <input type="file" id="input-avatar-photo" accept="image/*" class="hidden" />
           <button type="button" class="btn btn-ghost btn-sm" id="btn-reset">Reset This Track</button>
           <button type="button" class="btn btn-ghost btn-sm" id="btn-delete-user">Delete Explorer</button>
+          <button type="button" class="btn btn-ghost btn-sm" id="btn-reset-all-explorers" title="Wipe all explorers on this device">Remove All Explorers</button>
         </div>
-        <p class="privacy-note">Device-local only. Clearing browser data erases progress (export first if you need a backup).</p>
+        <p class="privacy-note">Device-local only. Clearing browser data erases progress (export first if you need a backup). <strong>Remove All Explorers</strong> double-confirms a full local wipe (keeps read-aloud prefs) — distinct from Import → Replace.</p>
       </div>
     </section>
 
@@ -285,7 +299,7 @@
     </div>
 
     <footer class="site-footer">
-      Einstein Math · Ages 5–10 · v2.3.10 · Progress stays on your device (no accounts) · Installable / offline after first visit
+      Einstein Math · Ages 5–10 · v2.4.3 · Progress stays on your device (no accounts) · Installable / offline after first visit
     </footer>
   </div>
 

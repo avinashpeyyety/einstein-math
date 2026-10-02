@@ -46,7 +46,8 @@
     if (typeof Student === 'undefined') return;
     const u = activeUser();
     const name = (u && u.displayName) || 'Explorer';
-    Student.refreshAll(name, state);
+    const avatar = Storage.avatarSrc(u, true); // avatarImage512 || avatarImage || avatarDataUrl
+    Student.refreshAll(name, state, avatar);
   }
 
   function syncProgressFromStore() {
@@ -186,20 +187,9 @@
       return;
     }
     chip.classList.remove('hidden');
-    const letter = (u.displayName || 'E').trim().charAt(0).toUpperCase();
     const av = $('#user-avatar');
     const nameEl = $('#user-name');
-    if (av) {
-      if (u.avatarImage) {
-        av.classList.add('has-img');
-        av.innerHTML = `<img src="${escapeAttr(u.avatarImage)}" alt="">`;
-        av.style.background = '';
-      } else {
-        av.classList.remove('has-img');
-        av.textContent = letter;
-        av.style.background = u.avatarColor || '#FF6B35';
-      }
-    }
+    if (av) paintAvatarEl(av, u);
     if (nameEl) nameEl.textContent = u.displayName;
     const trackMeta = $('#user-track-label');
     if (trackMeta && curriculum) {
@@ -216,6 +206,221 @@
     const id = Storage.getActiveSubject(store);
     const sub = Subjects.get(id);
     label.textContent = sub ? sub.label : 'Math';
+  }
+
+  /** Letter or comic avatar into a .user-avatar element (one field: avatarImage || avatarDataUrl) */
+  function paintAvatarEl(el, u) {
+    if (!el || !u) return;
+    const letter = (u.displayName || 'E').trim().charAt(0).toUpperCase();
+    const src = Storage.avatarSrc(u);
+    el.classList.remove('has-photo');
+    el.style.backgroundImage = '';
+    if (src) {
+      el.classList.add('has-img');
+      el.innerHTML = `<img src="${escapeAttr(src)}" alt="">`;
+      el.style.background = '';
+    } else {
+      el.classList.remove('has-img');
+      el.textContent = letter;
+      el.style.background = u.avatarColor || '#FF6B35';
+    }
+  }
+
+  /** Comic avatar when present (avatarImage || avatarDataUrl), else the letter-in-colour circle. */
+  function avatarSpanHtml(u, extraClass = '') {
+    const letter = escapeHtml(((u && u.displayName) || 'E').trim().charAt(0).toUpperCase());
+    const extra = extraClass ? ' ' + extraClass : '';
+    const src = Storage.avatarSrc(u);
+    if (src) {
+      return `<span class="user-avatar has-img${extra}"><img src="${escapeAttr(src)}" alt=""></span>`;
+    }
+    return `<span class="user-avatar${extra}" style="background:${escapeAttr((u && u.avatarColor) || '#FF6B35')}">${letter}</span>`;
+  }
+
+  /**
+   * In-browser comicify: ~640px, soft contrast, mild posterize, clean ink edges.
+   * Pure canvas — never calls external APIs. Returns PNG data URL for sharper avatars.
+   */
+  function comicifyImageFile(file) {
+    return new Promise((resolve, reject) => {
+      if (!file || !String(file.type || '').startsWith('image/')) {
+        reject(new Error('Please choose an image file.'));
+        return;
+      }
+      const objUrl = URL.createObjectURL(file);
+      const img = new Image();
+      img.onload = () => {
+        URL.revokeObjectURL(objUrl);
+        try {
+          const maxSide = 640;
+          let w = img.naturalWidth || img.width;
+          let h = img.naturalHeight || img.height;
+          if (!w || !h) throw new Error('Could not read image size.');
+          const scale = Math.min(1, maxSide / Math.max(w, h));
+          w = Math.max(1, Math.round(w * scale));
+          h = Math.max(1, Math.round(h * scale));
+          const canvas = document.createElement('canvas');
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext('2d', { willReadFrequently: true });
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = 'high';
+          ctx.drawImage(img, 0, 0, w, h);
+          const imageData = ctx.getImageData(0, 0, w, h);
+          const data = imageData.data;
+          // Milder posterize (8 levels) + gentle contrast/warmth (less muddy than 5-level)
+          const levels = 8;
+          const step = 255 / (levels - 1);
+          for (let i = 0; i < data.length; i += 4) {
+            let r = data[i], g = data[i + 1], b = data[i + 2];
+            // Contrast midtones slightly before quantize
+            const contrast = 1.12;
+            r = (r - 128) * contrast + 128;
+            g = (g - 128) * contrast + 128;
+            b = (b - 128) * contrast + 128;
+            r = Math.round(Math.min(255, Math.max(0, r)) / step) * step;
+            g = Math.round(Math.min(255, Math.max(0, g)) / step) * step;
+            b = Math.round(Math.min(255, Math.max(0, b)) / step) * step;
+            r = Math.min(255, r * 1.04 + 8);
+            g = Math.min(255, g * 1.01 + 4);
+            b = Math.min(255, b * 0.96);
+            data[i] = r; data[i + 1] = g; data[i + 2] = b;
+          }
+          // Sobel-ish edge ink (thinner, higher threshold → less blotchy)
+          const copy = new Uint8ClampedArray(data);
+          const lum = (i) => 0.299 * copy[i] + 0.587 * copy[i + 1] + 0.114 * copy[i + 2];
+          const thr = 52;
+          for (let y = 1; y < h - 1; y++) {
+            for (let x = 1; x < w - 1; x++) {
+              const i = (y * w + x) * 4;
+              const c = lum(i);
+              const gx = Math.abs(c - lum(i + 4)) + Math.abs(c - lum(i - 4));
+              const gy = Math.abs(c - lum(i + w * 4)) + Math.abs(c - lum(i - w * 4));
+              if (gx + gy > thr) {
+                const ink = 0.55;
+                data[i] = Math.round(data[i] * (1 - ink) + 22 * ink);
+                data[i + 1] = Math.round(data[i + 1] * (1 - ink) + 18 * ink);
+                data[i + 2] = Math.round(data[i + 2] * (1 - ink) + 28 * ink);
+              }
+            }
+          }
+          ctx.putImageData(imageData, 0, 0);
+          // Lighter paper wash (was heavy yellow mud)
+          ctx.globalCompositeOperation = 'soft-light';
+          ctx.fillStyle = 'rgba(255, 228, 170, 0.14)';
+          ctx.fillRect(0, 0, w, h);
+          ctx.globalCompositeOperation = 'source-over';
+          // Slimmer ink frame
+          ctx.strokeStyle = '#1a1a2e';
+          ctx.lineWidth = Math.max(2, Math.round(Math.min(w, h) * 0.012));
+          ctx.strokeRect(1, 1, w - 2, h - 2);
+          resolve(canvas.toDataURL('image/png'));
+        } catch (err) {
+          reject(err);
+        }
+      };
+      img.onerror = () => {
+        URL.revokeObjectURL(objUrl);
+        reject(new Error('Could not load that image.'));
+      };
+      img.src = objUrl;
+    });
+  }
+
+  function refreshAfterProfileChange() {
+    updateHeaderUser();
+    refreshStudentCast();
+    const onLanding = $('#screen-landing')?.classList.contains('active');
+    const onProgress = $('#screen-progress')?.classList.contains('active');
+    if (onLanding) renderLanding();
+    else if (onProgress) renderProgress();
+  }
+
+  async function applyExplorerPhoto(file, userId) {
+    const id = userId || activeUser()?.id;
+    if (!id || !file) return;
+    if (!store.users[id]) return;
+    try {
+      const dataUrl = await comicifyImageFile(file);
+      Storage.setUserAvatar(store, id, dataUrl);
+      store = Storage.loadStore();
+      syncProgressFromStore();
+      refreshAfterProfileChange();
+    } catch (err) {
+      alert(err && err.message ? err.message : 'Photo comicify failed.');
+    }
+  }
+
+  function clearExplorerPhoto(userId) {
+    const id = userId || activeUser()?.id;
+    if (!id) return;
+    const u = store.users[id];
+    if (!u || !Storage.avatarSrc(u)) return;
+    if (!confirm('Clear comic photo avatar for ' + u.displayName + '?')) return;
+    Storage.clearUserAvatar(store, id);
+    store = Storage.loadStore();
+    syncProgressFromStore();
+    refreshAfterProfileChange();
+  }
+
+  function renameActiveExplorer() {
+    const u = activeUser();
+    if (!u) return;
+    const next = prompt('Explorer name:', u.displayName);
+    if (next == null) return;
+    Storage.renameUser(store, u.id, next);
+    store = Storage.loadStore();
+    syncProgressFromStore();
+    updateHeaderUser();
+    refreshStudentCast();
+    const onProgress = $('#screen-progress')?.classList.contains('active');
+    if (onProgress) renderProgress();
+    else renderLanding();
+  }
+
+  function renameExplorerById(userId) {
+    const u = store.users[userId];
+    if (!u) return;
+    const next = prompt('Explorer name:', u.displayName);
+    if (next == null) return;
+    Storage.renameUser(store, userId, next);
+    store = Storage.loadStore();
+    syncProgressFromStore();
+    updateHeaderUser();
+    refreshStudentCast();
+    renderLanding();
+  }
+
+  function deleteExplorerById(userId) {
+    const u = store.users[userId];
+    if (!u) return;
+    if (!confirm(`Delete explorer "${u.displayName}" and all their progress on this device?`)) return;
+    Storage.deleteUser(store, userId);
+    store = Storage.loadStore();
+    syncProgressFromStore();
+    updateHeaderUser();
+    showScreen('screen-landing');
+    renderLanding();
+  }
+
+  function resetAllExplorers() {
+    const n = Object.keys(store.users || {}).length;
+    if (!n) {
+      alert('No explorers to remove.');
+      return;
+    }
+    if (!confirm(
+      `Remove ALL ${n} explorer(s) on this device?\n\n` +
+      'This clears every profile and progress under Einstein Math on this browser. Prefs (like read-aloud) stay.\n\n' +
+      'This is NOT an import replace — it just wipes local explorers.\n\nOK to continue…'
+    )) return;
+    if (!confirm('Final confirm: permanently delete all explorers on this device?')) return;
+    Storage.resetAllUsers(store);
+    store = Storage.loadStore();
+    syncProgressFromStore();
+    updateHeaderUser();
+    showScreen('screen-landing');
+    renderLanding();
   }
 
   function trackButtonsHtml(selectedId, namePrefix) {
@@ -1036,6 +1241,9 @@
       <input type="text" id="input-name-${mode}" class="text-input" maxlength="24" placeholder="e.g. Sam" autocomplete="nickname" />
       <p class="field-label" style="margin-top:0.75rem;">Age track</p>
       <div class="track-grid" id="track-grid-${mode}">${trackButtonsHtml(defaultTrack, mode)}</div>
+      <p class="field-label" style="margin-top:0.75rem;">Upload comic photo <span class="muted">(optional)</span></p>
+      <input type="file" id="input-photo-${mode}" accept="image/*" />
+      <p class="muted" style="margin-top:0.35rem;margin-bottom:0;">We comicify it on this device — no cloud upload.</p>
       <div style="margin-top:1rem;display:flex;gap:0.5rem;flex-wrap:wrap;">
         <button type="button" class="btn btn-primary" id="btn-save-profile-${mode}">${mode === 'create' ? 'Start Adventure!' : 'Create Explorer'}</button>
         ${mode === 'new' ? `<button type="button" class="btn btn-ghost" id="btn-cancel-new">Cancel</button>` : ''}
@@ -1051,19 +1259,32 @@
       });
     });
 
-    $('#btn-save-profile-' + mode)?.addEventListener('click', () => {
+    $('#btn-save-profile-' + mode)?.addEventListener('click', async () => {
       const name = ($('#input-name-' + mode)?.value || '').trim();
       if (!name) {
         $('#input-name-' + mode)?.focus();
         return;
       }
-      Storage.createUser(store, { displayName: name, trackId: selected });
+      const created = Storage.createUser(store, { displayName: name, trackId: selected });
       store = Storage.loadStore();
       syncProgressFromStore();
+      const photoFile = $('#input-photo-' + mode)?.files?.[0];
+      if (photoFile && created?.id) {
+        try {
+          const dataUrl = await comicifyImageFile(photoFile);
+          Storage.setUserAvatar(store, created.id, dataUrl);
+          store = Storage.loadStore();
+          syncProgressFromStore();
+        } catch (err) {
+          alert(err && err.message ? err.message : 'Photo comicify failed.');
+        }
+      }
       if (mode === 'new') {
         $('#new-explorer-form')?.classList.add('hidden');
         renderLanding();
       }
+      updateHeaderUser();
+      refreshStudentCast();
       // New users go to diagnostic for their track
       startDiagnostic();
     });
@@ -1081,15 +1302,24 @@
     const activeId = store.activeUserId;
     list.innerHTML = users.map(u => {
       const t = curriculum.tracks[u.trackId];
-      const letter = (u.displayName || 'E').charAt(0).toUpperCase();
       const active = u.id === activeId ? ' active' : '';
-      return `<button type="button" class="user-card${active}" data-user-id="${u.id}">
-        ${avatarSpanHtml(u)}
-        <span class="user-card-text">
-          <strong>${escapeHtml(u.displayName)}</strong>
-          <span class="muted">${escapeHtml(t ? t.label : u.trackId)}</span>
-        </span>
-      </button>`;
+      const photoId = 'input-photo-card-' + u.id;
+      return `<div class="user-card-row${active}" data-user-id="${escapeAttr(u.id)}">
+        <button type="button" class="user-card${active}" data-user-id="${escapeAttr(u.id)}">
+          ${avatarSpanHtml(u)}
+          <span class="user-card-text">
+            <strong>${escapeHtml(u.displayName)}</strong>
+            <span class="muted">${escapeHtml(t ? t.label : u.trackId)}</span>
+          </span>
+        </button>
+        <div class="user-card-actions">
+          <button type="button" class="btn btn-ghost btn-sm btn-rename-card" data-rename-id="${escapeAttr(u.id)}" title="Rename">✎ Rename</button>
+          <label class="btn btn-cyan btn-sm btn-photo-card" for="${escapeAttr(photoId)}" data-photo-id="${escapeAttr(u.id)}" title="Upload comic photo">Upload photo</label>
+          <input type="file" id="${escapeAttr(photoId)}" class="hidden input-photo-card" accept="image/*" data-photo-user="${escapeAttr(u.id)}" />
+          ${Storage.avatarSrc(u) ? `<button type="button" class="btn btn-ghost btn-sm btn-clear-photo-card" data-clear-photo-id="${escapeAttr(u.id)}" title="Clear photo">Clear photo</button>` : ''}
+          <button type="button" class="btn btn-ghost btn-sm btn-delete-card" data-delete-id="${escapeAttr(u.id)}" title="Delete">Delete</button>
+        </div>
+      </div>`;
     }).join('');
 
     $$('.user-card', list).forEach(btn => {
@@ -1098,6 +1328,37 @@
         store = Storage.loadStore();
         syncProgressFromStore();
         renderLanding();
+      });
+    });
+    $$('.btn-rename-card', list).forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        renameExplorerById(btn.dataset.renameId);
+      });
+    });
+    $$('.btn-photo-card', list).forEach(label => {
+      label.addEventListener('click', (e) => e.stopPropagation());
+    });
+    $$('.input-photo-card', list).forEach(input => {
+      input.addEventListener('click', (e) => e.stopPropagation());
+      input.addEventListener('change', (e) => {
+        e.stopPropagation();
+        const f = e.target.files && e.target.files[0];
+        const uid = e.target.dataset.photoUser;
+        if (f && uid) applyExplorerPhoto(f, uid);
+        e.target.value = '';
+      });
+    });
+    $$('.btn-clear-photo-card', list).forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        clearExplorerPhoto(btn.dataset.clearPhotoId);
+      });
+    });
+    $$('.btn-delete-card', list).forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        deleteExplorerById(btn.dataset.deleteId);
       });
     });
 
@@ -1351,7 +1612,7 @@
     host.innerHTML = `
       <div class="parent-card">
         <div class="parent-identity">
-          <span class="user-avatar" style="background:${escapeHtml(summary.avatarColor || '#4ECDC4')}">${escapeHtml((summary.displayName || '?')[0].toUpperCase())}</span>
+          ${avatarSpanHtml({ displayName: summary.displayName, avatarColor: summary.avatarColor || '#4ECDC4', avatarImage: summary.avatarImage })}
           <div>
             <strong>${escapeHtml(summary.displayName)}</strong>
             <div class="muted">${escapeHtml(summary.trackLabel)}${summary.ageRange ? ' · ' + escapeHtml(summary.ageRange) : ''}</div>
@@ -1417,8 +1678,14 @@
     $('#progress-pct').textContent = pct + '%';
     const profileLine = $('#progress-profile-line');
     if (profileLine) {
-      profileLine.innerHTML = `<strong>${escapeHtml(u.displayName)}</strong> · ${escapeHtml(track.label)}
-        <span class="muted">(progress for this age track)</span>`;
+      profileLine.innerHTML = `
+        <div class="profile-identity-row">
+          ${avatarSpanHtml(u, 'avatar-lg')}
+          <div class="profile-identity-text">
+            <strong>${escapeHtml(u.displayName)}</strong> · ${escapeHtml(track.label)}
+            <span class="muted">(progress for this age track)</span>
+          </div>
+        </div>`;
     }
 
     const dueCount = Storage.getDueReviews(progress).length;
@@ -1837,15 +2104,6 @@
   }
 
 
-  /** W1b: comic avatar when present, else the letter-in-colour circle (always valid fallback). */
-  function avatarSpanHtml(u, color) {
-    const letter = escapeHtml(((u && u.displayName) || 'E').trim().charAt(0).toUpperCase());
-    if (u && u.avatarImage) {
-      return `<span class="user-avatar has-img"><img src="${escapeAttr(u.avatarImage)}" alt=""></span>`;
-    }
-    return `<span class="user-avatar" style="background:${escapeAttr((u && u.avatarColor) || color || '#FF6B35')}">${letter}</span>`;
-  }
-
   function escapeHtml(s) {
     return String(s)
       .replace(/&/g, '&amp;')
@@ -1989,7 +2247,7 @@
 
   function refreshAvatarButtons() {
     const u = activeUser();
-    $('#btn-remove-avatar')?.classList.toggle('hidden', !(u && u.avatarImage));
+    $('#btn-remove-avatar')?.classList.toggle('hidden', !Storage.avatarSrc(u));
   }
 
   function wireComicAvatar() {
@@ -2056,8 +2314,7 @@
     const users = Storage.listUsers(store);
     list.innerHTML = users.map(u => {
       const t = curriculum.tracks[u.trackId];
-      const letter = (u.displayName || 'E').charAt(0).toUpperCase();
-      return `<button type="button" class="user-card" data-switch-id="${u.id}">
+      return `<button type="button" class="user-card" data-switch-id="${escapeAttr(u.id)}">
         ${avatarSpanHtml(u)}
         <span class="user-card-text">
           <strong>${escapeHtml(u.displayName)}</strong>
@@ -2113,26 +2370,12 @@
         renderProgress();
       }
     });
-    $('#btn-rename')?.addEventListener('click', () => {
-      const u = activeUser();
-      if (!u) return;
-      const next = prompt('New explorer name:', u.displayName);
-      if (next == null) return;
-      Storage.renameUser(store, u.id, next);
-      store = Storage.loadStore();
-      renderProgress();
-      updateHeaderUser();
-    });
     $('#btn-delete-user')?.addEventListener('click', () => {
       const u = activeUser();
       if (!u) return;
-      if (!confirm(`Delete explorer "${u.displayName}" and all their progress on this device?`)) return;
-      Storage.deleteUser(store, u.id);
-      store = Storage.loadStore();
-      syncProgressFromStore();
-      showScreen('screen-landing');
-      renderLanding();
+      deleteExplorerById(u.id);
     });
+    $('#btn-reset-all-explorers')?.addEventListener('click', () => resetAllExplorers());
     $('#user-chip')?.addEventListener('click', openSwitcher);
     $('#btn-close-switcher')?.addEventListener('click', () => {
       $('#switcher-modal')?.classList.add('hidden');

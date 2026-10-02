@@ -1,0 +1,197 @@
+{
+  "version": 2,
+  "appVersion": "2.3.0",
+  "activeUserId": "u_realv2_b",
+  "users": {
+    "u_realv2_a": {
+      "id": "u_realv2_a",
+      "displayName": "Explorer A",
+      "createdAt": "2026-09-16T03:18:30.195Z",
+      "updatedAt": "2026-09-30T01:43:06.055Z",
+      "trackId": "ages-7-8",
+      "avatarColor": "#FF6B35",
+      "tracks": {
+        "ages-7-8": {
+          "started": true,
+          "diagnosticDone": false,
+          "diagnosticScores": {},
+          "recommendedUnits": [],
+          "lessons": {
+            "fr-halves-fourths": {
+              "status": "in_progress",
+              "mastery": 0,
+              "masteryLevel": "learning",
+              "practiceCorrect": 0,
+              "practiceTotal": 0,
+              "checkCorrect": 0,
+              "checkTotal": 0,
+              "attempts": 0,
+              "streak": 0,
+              "reviewIntervalDays": 1,
+              "lastAt": "2026-09-16T03:20:45.113Z",
+              "nextReviewAt": null,
+              "missedCheckIds": []
+            },
+            "ms-length-inch-cm": {
+              "status": "done",
+              "mastery": 1,
+              "masteryLevel": "mastered",
+              "practiceCorrect": 3,
+              "practiceTotal": 3,
+              "checkCorrect": 2,
+              "checkTotal": 2,
+              "attempts": 2,
+              "streak": 2,
+              "reviewIntervalDays": 3,
+              "lastAt": "2026-09-21T02:21:48.253Z",
+              "nextReviewAt": "2026-09-24T02:21:48.253Z",
+              "missedCheckIds": []
+            },
+            "ms-time-5min": {
+              "status": "done",
+              "mastery": 1,
+              "masteryLevel": "mastered",
+              "practiceCorrect": 3,
+              "practiceTotal": 3,
+              "checkCorrect": 2,
+              "checkTotal": 2,
+              "attempts": 2,
+              "streak": 2,
+              "reviewIntervalDays": 3,
+              "lastAt": "2026-09-21T02:23:26.336Z",
+              "nextReviewAt": "2026-09-24T02:23:26.336Z",
+              "missedCheckIds": []
+            },
+            "ns-place-value-basics": {
+              "status": "done",
+              "mastery": 1,
+              "masteryLevel": "mastered",
+              "practiceCorrect": 3,
+              "practiceTotal": 3,
+              "checkCorrect": 2,
+              "checkTotal": 2,
+              "attempts": 2,
+              "streak": 2,
+              "reviewIntervalDays": 3,
+              "lastAt": "2026-09-30T01:43:06.055Z",
+              "nextReviewAt": "2026-10-03T01:43:06.055Z",
+              "missedCheckIds": []
+            },
+            "ns-compare-numbers": {
+              "status": "in_progress",
+              "mastery": 0,
+              "masteryLevel": "learning",
+              "practiceCorrect": 0,
+              "practiceTotal": 0,
+              "checkCorrect": 0,
+              "checkTotal": 0,
+              "attempts": 0,
+              "streak": 0,
+              "reviewIntervalDays": 1,
+              "lastAt": "2026-09-21T02:38:19.596Z",
+              "nextReviewAt": null,
+              "missedCheckIds": []
+            }
+          },
+          "currentLessonId": "ns-place-value-basics",
+          "stars": 6
+        }
+      },
+      "avatarDataUrl": null
+    },
+    "u_realv2_b": {
+      "id": "u_realv2_b",
+      "displayName": "Explorer B",
+      "createdAt": "2026-09-16T15:26:36.540Z",
+      "updatedAt": "2026-09-30T02:14:12.133Z",
+      "trackId": "ages-5-6",
+      "avatarColor": "#FFE66D",
+      "tracks": {
+        "ages-5-6": {
+          "started": true,
+          "diagnosticDone": false,
+          "diagnosticScores": {},
+          "recommendedUnits": [],
+          "lessons": {
+            "k-count-to-20": {
+              "status": "done",
+              "mastery": 1,
+              "masteryLevel": "mastered",
+              "practiceCorrect": 3,
+              "practiceTotal": 3,
+              "checkCorrect": 2,
+              "checkTotal": 2,
+              "attempts": 2,
+              "streak": 2,
+              "reviewIntervalDays": 3,
+              "lastAt": "2026-09-21T02:41:23.695Z",
+              "nextReviewAt": "2026-09-24T02:41:23.695Z",
+              "missedCheckIds": []
+            },
+            "k-teen-numbers": {
+              "status": "done",
+              "mastery": 1,
+              "masteryLevel": "mastered",
+              "practiceCorrect": 3,
+              "practiceTotal": 3,
+              "checkCorrect": 2,
+              "checkTotal": 2,
+              "attempts": 2,
+              "streak": 2,
+              "reviewIntervalDays": 3,
+              "lastAt": "2026-09-30T02:14:12.133Z",
+              "nextReviewAt": "2026-10-03T02:14:12.133Z",
+              "missedCheckIds": []
+            }
+          },
+          "currentLessonId": "k-teen-numbers",
+          "stars": 4
+        }
+      },
+      "avatarDataUrl": null
+    },
+    "u_realv2_c": {
+      "id": "u_realv2_c",
+      "displayName": "Explorer C",
+      "createdAt": "2026-09-16T15:27:09.722Z",
+      "updatedAt": "2026-09-18T14:32:48.113Z",
+      "trackId": "ages-5-6",
+      "avatarColor": "#A78BFA",
+      "tracks": {
+        "ages-5-6": {
+          "started": true,
+          "diagnosticDone": false,
+          "diagnosticScores": {},
+          "recommendedUnits": [],
+          "lessons": {},
+          "currentLessonId": null,
+          "stars": 0
+        }
+      },
+      "avatarDataUrl": null
+    },
+    "u_realv2_d": {
+      "id": "u_realv2_d",
+      "displayName": "Explorer D",
+      "createdAt": "2026-09-18T14:40:26.408Z",
+      "updatedAt": "2026-09-18T14:40:39.325Z",
+      "trackId": "ages-5-6",
+      "avatarColor": "#FF6B9D",
+      "avatarDataUrl": null,
+      "tracks": {
+        "ages-5-6": {
+          "started": true,
+          "diagnosticDone": false,
+          "diagnosticScores": {},
+          "recommendedUnits": [],
+          "lessons": {},
+          "currentLessonId": null,
+          "stars": 0
+        }
+      }
+    }
+  },
+  "prefs": {
+    "speechEnabled": false
+  }
+}

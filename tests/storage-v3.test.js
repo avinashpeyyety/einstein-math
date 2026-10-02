@@ -403,4 +403,43 @@ test('9. origin/main v2.4.2 export WITH avatarDataUrl restores as avatarImage (b
   assert.strictEqual(S3.loadStore().users[uid].avatarImage, url, 'old-tab avatar merged as avatarImage');
 });
 
+test('10. real v2 progress export (iPad handoff, sanitized) maps every lesson/star to math:<track> — restore, merge, boot migrate', () => {
+  const text = fs.readFileSync(path.join(__dirname, 'fixtures/v2-real-progress-export.json'), 'utf8');
+  const exp = JSON.parse(text);
+  assert.strictEqual(exp.version, 2);
+  assert.ok(!('format' in exp), 'raw store dump (no format/exportedAt wrapper)');
+  const lessonTotal = Object.values(exp.users).reduce((n, u) => n + Object.values(u.tracks).reduce((m, t) => m + Object.keys(t.lessons).length, 0), 0);
+  assert.strictEqual(Object.keys(exp.users).length, 4);
+  assert.strictEqual(lessonTotal, 7);
+  const AV = 'data:image/png;base64,REALV2AV';
+  const withAvatar = plain(exp); withAvatar.users[exp.activeUserId].avatarDataUrl = AV;
+  const expectSame = (label, store, S, src) => {
+    assert.strictEqual(store.version, 3, label + ' v3');
+    for (const [id, u] of Object.entries(src.users)) {
+      const t = store.users[id];
+      assert.ok(t, label + ' user kept ' + id);
+      assert.strictEqual(t.displayName, u.displayName);
+      assert.strictEqual(t.trackId, u.trackId);
+      assert.ok(!('tracks' in t), label + ' no legacy tracks left');
+      assert.deepStrictEqual(Object.keys(t.progress).sort(), Object.keys(u.tracks).map((k) => 'math:' + k).sort(), label + ' math:<track> keys');
+      for (const [tid, tp] of Object.entries(u.tracks)) {
+        const got = t.progress['math:' + tid];
+        assert.strictEqual(got.stars, tp.stars, label + ' stars ' + tid);
+        assert.strictEqual(got.currentLessonId, tp.currentLessonId, label + ' currentLessonId ' + tid);
+        assert.deepStrictEqual(Object.keys(got.lessons).sort(), Object.keys(tp.lessons).sort(), label + ' lesson ids ' + tid);
+        for (const [lid, L] of Object.entries(tp.lessons)) assert.deepStrictEqual(plain(got.lessons[lid]), plain({ ...got.lessons[lid], ...L }), label + ' lesson fields ' + lid);
+      }
+      assert.strictEqual(S.avatarSrc(t), u.avatarDataUrl || null, label + ' avatar');
+    }
+  };
+  for (const src of [exp, withAvatar]) {
+    const raw = JSON.stringify(src, null, 2);
+    const tag = src === exp ? 'plain' : 'avatar';
+    { const S = loadStorage(NEW, fakeLocalStorage()); expectSame(tag + ' restore', S.replaceAllFromImport(S.parseImportPayload(raw)), S, src); expectSame(tag + ' restore+reload', S.loadStore(), S, src); }
+    { const S = loadStorage(NEW, fakeLocalStorage()); const s = S.loadStore(); S.createUser(s, { displayName: 'Other' });
+      const { store } = S.mergeImportedStore(S.loadStore(), S.parseImportPayload(raw)); expectSame(tag + ' merge', store, S, src); assert.strictEqual(Object.keys(store.users).length, 5); }
+    { const S = loadStorage(NEW, fakeLocalStorage({ 'einstein-math-v2': raw })); const st = S.loadStore(); expectSame(tag + ' boot v2→v3', st, S, src); assert.strictEqual(st.activeUserId, src.activeUserId); }
+  }
+});
+
 console.log(`\n${passed} passed${process.exitCode ? ', some FAILED' : ''}`);

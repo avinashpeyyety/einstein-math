@@ -1,0 +1,102 @@
+{
+  "format": "einstein-math-v2",
+  "exportedAt": "2026-10-02T00:03:42.204Z",
+  "note": "Multi-device handoff snapshot (not cloud sync). Import on another device to merge or replace.",
+  "version": 2,
+  "appVersion": "2.4.0",
+  "activeUserId": "u_albuqfcp9y4b",
+  "prefs": {
+    "speechEnabled": false
+  },
+  "users": {
+    "u_albuqfcp9y4b": {
+      "id": "u_albuqfcp9y4b",
+      "displayName": "Mira",
+      "createdAt": "2026-10-02T00:03:42.203Z",
+      "updatedAt": "2026-10-02T00:03:42.204Z",
+      "trackId": "ages-7-8",
+      "avatarColor": "#FF6B9D",
+      "avatarDataUrl": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==",
+      "tracks": {
+        "ages-7-8": {
+          "started": true,
+          "diagnosticDone": true,
+          "diagnosticScores": {},
+          "recommendedUnits": [],
+          "lessons": {
+            "ns-place-value-basics": {
+              "status": "done",
+              "mastery": 1,
+              "masteryLevel": "mastered",
+              "practiceCorrect": 4,
+              "practiceTotal": 4,
+              "checkCorrect": 2,
+              "checkTotal": 2,
+              "attempts": 1,
+              "streak": 1,
+              "reviewIntervalDays": 1,
+              "lastAt": "2026-10-02T00:03:42.204Z",
+              "nextReviewAt": "2026-10-03T00:03:42.204Z",
+              "missedCheckIds": []
+            },
+            "as-add-within-100": {
+              "status": "done",
+              "mastery": 0.3333333333333333,
+              "masteryLevel": "needs_review",
+              "practiceCorrect": 2,
+              "practiceTotal": 4,
+              "checkCorrect": 1,
+              "checkTotal": 3,
+              "attempts": 1,
+              "streak": 0,
+              "reviewIntervalDays": 1,
+              "lastAt": "2026-10-02T00:03:42.204Z",
+              "nextReviewAt": "2026-10-03T00:03:42.204Z",
+              "missedCheckIds": [
+                "c2",
+                "c3"
+              ]
+            },
+            "md-equal-groups": {
+              "status": "in_progress",
+              "mastery": 0,
+              "masteryLevel": "learning",
+              "practiceCorrect": 0,
+              "practiceTotal": 0,
+              "checkCorrect": 0,
+              "checkTotal": 0,
+              "attempts": 0,
+              "streak": 0,
+              "reviewIntervalDays": 1,
+              "lastAt": "2026-10-02T00:03:42.204Z",
+              "nextReviewAt": null,
+              "missedCheckIds": []
+            }
+          },
+          "currentLessonId": "md-equal-groups",
+          "stars": 1
+        }
+      }
+    },
+    "u_2jyi90k89y4c": {
+      "id": "u_2jyi90k89y4c",
+      "displayName": "Kai",
+      "createdAt": "2026-10-02T00:03:42.204Z",
+      "updatedAt": "2026-10-02T00:03:42.204Z",
+      "trackId": "ages-5-6",
+      "avatarColor": "#FFE66D",
+      "avatarDataUrl": null,
+      "tracks": {
+        "ages-5-6": {
+          "started": false,
+          "diagnosticDone": false,
+          "diagnosticScores": {},
+          "recommendedUnits": [],
+          "lessons": {},
+          "currentLessonId": null,
+          "stars": 0
+        }
+      }
+    }
+  }
+}

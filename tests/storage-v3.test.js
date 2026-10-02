@@ -139,7 +139,9 @@ test('2. migration is idempotent (load twice / migrate twice → same result)', 
   const c = plain(S.migrateStoreToV3(plain(a)));
   assert.deepStrictEqual(c, a);
   S.saveStore(S.loadStore());
-  assert.deepStrictEqual(JSON.parse(ls.getItem('einstein-math-v3')), JSON.parse(afterFirst));
+  const noTs = o => { const c = JSON.parse(o); delete c.updatedAt; return c; };
+  assert.deepStrictEqual(noTs(ls.getItem('einstein-math-v3')), noTs(afterFirst));
+  assert.strictEqual(a.legacyV2.hash, S.hashString(JSON.stringify(v2Fixture)), 'migration records absorbed-v2 marker');
   // a v3 store that somehow also carries a legacy tracks blob merges (no loss, no dupes)
   const mixed = plain(a);
   mixed.users.u_mira.tracks = plain(v2Fixture.users.u_mira.tracks);
@@ -215,6 +217,144 @@ test('4. import: old v2 export merges + replaces; v3 export round-trips; avatars
   const ada = Object.values(s1.users)[0];
   assert.strictEqual(ada.progress['math:ages-7-8'].stars, 2);
   assert.strictEqual(ls1.getItem('einstein-math-progress-v1'), null);
+});
+
+
+// ---------- follow-up: old-tab v2 saves after migration ----------
+function migrated() {
+  const ls = fakeLocalStorage({ 'einstein-math-v2': JSON.stringify(v2Fixture) });
+  const S = loadStorage(NEW, ls);
+  S.loadStore();
+  return { ls, S };
+}
+/** What an old (pre-X1) tab does: mutate its in-memory v2 store and JSON.stringify it to the v2 key. */
+function oldTabSave(ls, mutate) {
+  const v2 = JSON.parse(ls.getItem('einstein-math-v2'));
+  mutate(v2);
+  ls.setItem('einstein-math-v2', JSON.stringify(v2));
+}
+const iso = n => new Date(Date.now() + n * 864e5).toISOString();
+
+test('5. old-tab save after migration is merged into v3 at boot (v3-only progress kept)', () => {
+  const { ls, S } = migrated();
+  // new tab earns a lesson in v3
+  let st = S.loadStore();
+  const tp = S.getTrackProgress(st.users.u_mira, 'ages-7-8');
+  S.markLessonDone(tp, ids78[4], { checkCorrect: 2, checkTotal: 2 });
+  S.saveTrackProgress(st, 'u_mira', 'ages-7-8', tp);
+  // old tab (still on v2 code) finishes a different lesson and a 5-6 lesson, and saves
+  oldTabSave(ls, v2 => {
+    const u = v2.users.u_mira;
+    u.updatedAt = iso(0);
+    u.tracks['ages-7-8'].lessons[ids78[5]] = { status: 'done', mastery: 1, masteryLevel: 'mastered', checkCorrect: 2, checkTotal: 2, attempts: 1, streak: 1, reviewIntervalDays: 1, lastAt: iso(0), nextReviewAt: iso(1), missedCheckIds: [] };
+    u.tracks['ages-7-8'].stars = 4;
+    u.tracks['ages-5-6'].lessons[ids56[1]] = { status: 'in_progress', lastAt: iso(0) };
+  });
+  const rawV2 = ls.getItem('einstein-math-v2');
+  st = S.loadStore();
+  const t78 = st.users.u_mira.progress['math:ages-7-8'];
+  assert.ok(t78.lessons[ids78[4]], 'v3-only lesson kept');
+  assert.strictEqual(t78.lessons[ids78[5]].status, 'done', 'old-tab lesson merged');
+  assert.strictEqual(st.users.u_mira.progress['math:ages-5-6'].lessons[ids56[1]].status, 'in_progress');
+  assert.strictEqual(t78.stars, 5, 'stars: v3 base 3 + v3 lesson 1 + old-tab lesson 1');
+  assert.ok(!st.users.u_mira.tracks);
+  assert.strictEqual(st.legacyV2.hash, S.hashString(rawV2), 'marker = hash of absorbed v2 content');
+  assert.strictEqual(ls.getItem('einstein-math-v2'), rawV2, 'v2 key untouched');
+  const saved = JSON.parse(ls.getItem('einstein-math-v3'));
+  assert.ok(saved.users.u_mira.progress['math:ages-7-8'].lessons[ids78[5]], 'merge persisted');
+  assert.ok(saved.updatedAt, 'store-level updatedAt on save');
+  assert.strictEqual(saved.users.u_mira.avatarImage512, 'data:image/png;base64,AAA512');
+  if (process.env.V2_STORAGE) {
+    // same thing driven by the real pre-X1 storage.js
+    const Sold = loadStorage(process.env.V2_STORAGE, ls);
+    const os = Sold.loadStore();
+    const otp = Sold.getTrackProgress(os.users.u_old, 'ages-9-10');
+    Sold.markLessonDone(otp, ids910[2], { checkCorrect: 3, checkTotal: 3 });
+    Sold.saveTrackProgress(os, 'u_old', 'ages-9-10', otp);
+    const st2 = S.loadStore();
+    assert.strictEqual(st2.users.u_old.progress['math:ages-9-10'].lessons[ids910[2]].masteryLevel, 'mastered', 'real old-code save merged');
+    assert.ok(st2.users.u_mira.progress['math:ages-7-8'].lessons[ids78[4]], 'v3-only lesson still kept');
+    console.log('     (also verified with a save from the real pre-X1 storage.js)');
+  }
+});
+
+test('6. second boot does not re-merge (marker idempotent); deleted v3 user not resurrected', () => {
+  const { ls, S } = migrated();
+  let st = S.loadStore();
+  S.deleteUser(st, 'u_old');
+  oldTabSave(ls, v2 => { v2.users.u_mira.updatedAt = iso(0); v2.users.u_mira.tracks['ages-7-8'].lessons[ids78[6]] = { status: 'in_progress', lastAt: iso(0) }; });
+  st = S.loadStore();
+  assert.ok(!st.users.u_old, 'u_old (deleted in v3, untouched by old tab) not resurrected');
+  assert.ok(st.users.u_mira.progress['math:ages-7-8'].lessons[ids78[6]]);
+  const v3a = ls.getItem('einstein-math-v3');
+  // second + third boot: no write, same content
+  const st2 = S.loadStore(); S.loadStore();
+  assert.strictEqual(ls.getItem('einstein-math-v3'), v3a, 'no re-merge / no rewrite on later boots');
+  assert.strictEqual(S.absorbLegacyV2(st2, ls.getItem('einstein-math-v2')), false);
+  // v3 tab makes progress, reboot: v2 unchanged so v3 progress is not disturbed
+  const tp = S.getTrackProgress(st2.users.u_mira, 'ages-7-8');
+  S.setLessonProgress(tp, ids78[6], { status: 'in_progress', practiceCorrect: 9 });
+  S.saveTrackProgress(st2, 'u_mira', 'ages-7-8', tp);
+  assert.strictEqual(S.loadStore().users.u_mira.progress['math:ages-7-8'].lessons[ids78[6]].practiceCorrect, 9);
+  // a user created in the old tab after migration IS added
+  oldTabSave(ls, v2 => { v2.users.u_new = { id: 'u_new', displayName: 'New', createdAt: iso(0), updatedAt: iso(0), trackId: 'ages-5-6', avatarColor: '#FFE66D', tracks: { 'ages-5-6': { started: true, stars: 1, lessons: {} } } }; });
+  assert.strictEqual(S.loadStore().users.u_new.progress['math:ages-5-6'].stars, 1);
+});
+
+test('7. v3-newer lesson wins over older v2 copy (and newer v2 lesson wins over older v3)', () => {
+  const { ls, S } = migrated();
+  let st = S.loadStore();
+  const tp = S.getTrackProgress(st.users.u_mira, 'ages-7-8');
+  // v3 retakes lesson 1 (was needs_review in v2) → mastered now
+  S.applyRemediationSuccess(tp, ids78[1], { checkCorrect: 2, checkTotal: 2 });
+  S.saveTrackProgress(st, 'u_mira', 'ages-7-8', tp);
+  const v3L1 = plain(S.loadStore().users.u_mira.progress['math:ages-7-8'].lessons[ids78[1]]);
+  oldTabSave(ls, v2 => {
+    const L = v2.users.u_mira.tracks['ages-7-8'].lessons;
+    L[ids78[1]].practiceCorrect = 1;                       // stale copy, older lastAt
+    L[ids78[2]] = { ...L[ids78[2]], status: 'done', mastery: 0.7, masteryLevel: 'practicing', checkCorrect: 2, checkTotal: 3, lastAt: iso(1) }; // newer in v2
+  });
+  st = S.loadStore();
+  const L = st.users.u_mira.progress['math:ages-7-8'].lessons;
+  assert.deepStrictEqual(plain(L[ids78[1]]), v3L1, 'v3 newer lesson kept');
+  assert.strictEqual(L[ids78[1]].masteryLevel, 'mastered');
+  assert.strictEqual(L[ids78[2]].status, 'done', 'v2 newer lesson wins');
+});
+
+test('8. real live-site (v2.4.2) export imports — plain, BOM+CRLF, merge, replace, avatarDataUrl kept', () => {
+  const text = fs.readFileSync(path.join(__dirname, 'fixtures/v2-live-2.4.2-export.json'), 'utf8');
+  const exp = JSON.parse(text);
+  assert.strictEqual(exp.format, 'einstein-math-v2');
+  assert.strictEqual(exp.version, 2);
+  const variants = { plain: text, bomCrlf: '\uFEFF' + text.replace(/\n/g, '\r\n') + '\r\n', padded: '\n  ' + text + '\n\n' };
+  for (const [name, raw] of Object.entries(variants)) {
+    // replace-all on a device that still has a v2 key (restore steps)
+    const ls = fakeLocalStorage({ 'einstein-math-v2': JSON.stringify(v2Fixture) });
+    const S = loadStorage(NEW, ls);
+    S.loadStore();
+    const data = S.parseImportPayload(raw);
+    const rep = S.replaceAllFromImport(data);
+    for (const [id, u] of Object.entries(exp.users)) {
+      for (const tid of Object.keys(u.tracks)) {
+        assert.deepStrictEqual(plain(rep.users[id].progress['math:' + tid]), plain(S.normalizeTrackProgress(plain(u.tracks[tid]))), name + ' ' + id + ' ' + tid);
+      }
+      assert.strictEqual(rep.users[id].avatarDataUrl, u.avatarDataUrl, name + ' avatarDataUrl kept on replace');
+    }
+    const after = S.loadStore();
+    assert.deepStrictEqual(Object.keys(after.users).sort(), Object.keys(exp.users).sort(), name + ': replace not undone by legacy v2 at next boot');
+    // merge into an existing device copy of the same users
+    const ls2 = fakeLocalStorage();
+    const S2 = loadStorage(NEW, ls2);
+    S2.replaceAllFromImport(S2.parseImportPayload(raw));
+    const st = S2.loadStore();
+    const mid = exp.activeUserId;
+    const tp = S2.getTrackProgress(st.users[mid], 'ages-7-8');
+    S2.markLessonDone(tp, ids78[7], { checkCorrect: 2, checkTotal: 2 });
+    S2.saveTrackProgress(st, mid, 'ages-7-8', tp);
+    const { store: merged } = S2.mergeImportedStore(S2.loadStore(), S2.parseImportPayload(raw));
+    assert.ok(merged.users[mid].progress['math:ages-7-8'].lessons[ids78[7]], name + ' local lesson kept on merge');
+    assert.strictEqual(merged.users[mid].avatarDataUrl, exp.users[mid].avatarDataUrl, name + ' avatarDataUrl kept on merge');
+  }
 });
 
 console.log(`\n${passed} passed${process.exitCode ? ', some FAILED' : ''}`);

@@ -69,6 +69,77 @@ const Storage = {
     return user;
   },
 
+  /** FNV-1a 32-bit + length: cheap content fingerprint for the legacy v2 key. */
+  hashString(str) {
+    const t = String(str == null ? '' : str);
+    let h = 0x811c9dc5;
+    for (let i = 0; i < t.length; i++) {
+      h ^= t.charCodeAt(i);
+      h = Math.imul(h, 0x01000193) >>> 0;
+    }
+    return h.toString(16).padStart(8, '0') + ':' + t.length;
+  },
+
+  /**
+   * Marker for the v2 key contents v3 has absorbed: { hash, absorbedAt, v2UpdatedAt }.
+   * Stored on the v3 store as `legacyV2`; device-local (not exported).
+   */
+  legacyV2Marker(rawV2, v2Store) {
+    let v2UpdatedAt = null;
+    Object.values((v2Store && v2Store.users) || {}).forEach(u => {
+      if (u && u.updatedAt && this.isNewerISO(u.updatedAt, v2UpdatedAt)) v2UpdatedAt = u.updatedAt;
+    });
+    return { hash: this.hashString(rawV2), absorbedAt: new Date().toISOString(), v2UpdatedAt };
+  },
+
+  /**
+   * Old-tab safety: an old (pre-X1) tab keeps saving to the v2 key after migration.
+   * If the v2 key's content differs from what v3 last absorbed, migrate it in memory and merge
+   * it in (same newest-lesson-wins rule as import). v3-only progress is never dropped.
+   * Users missing from v3 are only added back if the old tab touched them after the last absorb
+   * (so a profile deleted in v3 is not resurrected by an unchanged v2 copy).
+   * Returns true if v3 changed. Never writes the v2 key.
+   */
+  absorbLegacyV2(store, rawV2) {
+    if (rawV2 == null) return false;
+    const prev = store.legacyV2 && typeof store.legacyV2 === 'object' ? store.legacyV2 : null;
+    const hash = this.hashString(rawV2);
+    if (prev && prev.hash === hash) return false;
+    let v2 = null;
+    try { v2 = JSON.parse(rawV2); } catch { v2 = null; }
+    if (this.isStoreShape(v2)) {
+      Object.keys(v2.users).forEach(id => {
+        const v2u = v2.users[id];
+        if (!v2u || typeof v2u !== 'object') return;
+        const local = store.users[id];
+        if (local) {
+          const before = JSON.parse(JSON.stringify(local.progress || {}));
+          const merged = this.mergeUser(local, { ...v2u, id });
+          // Stars: import keeps max(); here both sides grew from the same base, so also credit
+          // each lesson the old tab newly passed that v3 had not.
+          Object.keys(merged.progress || {}).forEach(key => {
+            const prevTp = before[key];
+            if (!prevTp) return;
+            const passed = L => !!L && L.status === 'done' && (!(L.checkTotal > 0) || (L.checkCorrect || 0) / L.checkTotal >= 0.6);
+            let gained = 0;
+            Object.entries(merged.progress[key].lessons || {}).forEach(([lid, L]) => {
+              if (passed(L) && !passed(prevTp.lessons && prevTp.lessons[lid])) gained++;
+            });
+            merged.progress[key].stars = Math.max(merged.progress[key].stars || 0, (prevTp.stars || 0) + gained);
+          });
+          store.users[id] = merged;
+        } else if (!prev || !this.isNewerISO(prev.absorbedAt, v2u.updatedAt)) { // touched at/after last absorb
+          store.users[id] = this.mergeUser(null, { ...v2u, id });
+        }
+      });
+      if (!store.activeUserId || !store.users[store.activeUserId]) {
+        store.activeUserId = v2.activeUserId && store.users[v2.activeUserId] ? v2.activeUserId : (Object.keys(store.users)[0] || null);
+      }
+    }
+    store.legacyV2 = this.legacyV2Marker(rawV2, v2);
+    return true;
+  },
+
   /** v2 / stub-v3 store → v3 in place. Idempotent. */
   migrateStoreToV3(store) {
     if (!store || typeof store !== 'object') return store;
@@ -236,10 +307,11 @@ const Storage = {
   loadStore() {
     try {
       let raw = localStorage.getItem(STORAGE_KEY);
+      const rawV2 = localStorage.getItem(STORAGE_KEY_V2);
       let fromLegacyKey = false;
       if (raw === null) {
         // First run on v3: read the v2 store (left in place as a rollback copy).
-        raw = localStorage.getItem(STORAGE_KEY_V2);
+        raw = rawV2;
         fromLegacyKey = raw !== null;
       }
       let store = raw ? JSON.parse(raw) : this.emptyStore();
@@ -248,7 +320,14 @@ const Storage = {
         Object.values(store.users).some(u => u && (u.tracks || !u.progress));
       store = this.migrateV1IfNeeded(store);
       store = this.normalizeStoreMeta(store); // runs migrateStoreToV3 + lesson normalize
-      if ((fromLegacyKey || needsMigration) && Object.keys(store.users).length) {
+      let absorbed = false;
+      if (fromLegacyKey) {
+        // Fresh migration: this v2 content is now absorbed.
+        store.legacyV2 = this.legacyV2Marker(rawV2, store);
+      } else if (rawV2 !== null) {
+        absorbed = this.absorbLegacyV2(store, rawV2);
+      }
+      if ((fromLegacyKey || needsMigration || absorbed) && Object.keys(store.users).length) {
         try { this.saveStore(store); } catch { /* quota: stay in memory; v2 key still holds the data */ }
       }
       return store;
@@ -259,6 +338,7 @@ const Storage = {
 
   saveStore(store) {
     store.version = SCHEMA_VERSION;
+    store.updatedAt = new Date().toISOString();
     store.appVersion = store.appVersion || '2.3.0';
     if (!store.prefs || typeof store.prefs !== 'object') store.prefs = { speechEnabled: false, activeSubject: DEFAULT_SUBJECT };
     if (!store.prefs.activeSubject) store.prefs.activeSubject = DEFAULT_SUBJECT;
@@ -816,6 +896,11 @@ const Storage = {
       out.avatarImage = avSrc.avatarImage;
       if (avSrc.avatarImage512) out.avatarImage512 = avSrc.avatarImage512;
     }
+    // Live site v2.4.x stores its photo avatar as avatarDataUrl — keep it through merges.
+    const dataUrl = preferIncoming
+      ? (incomingU.avatarDataUrl !== undefined ? incomingU.avatarDataUrl : localU.avatarDataUrl)
+      : (localU.avatarDataUrl !== undefined ? localU.avatarDataUrl : incomingU.avatarDataUrl);
+    if (dataUrl !== undefined) out.avatarDataUrl = dataUrl;
     const keys = new Set([
       ...Object.keys(localU.progress || {}),
       ...Object.keys(incomingU.progress || {})
@@ -891,6 +976,11 @@ const Storage = {
       if (!u) return;
       store.users[id] = this.mergeUser(null, { ...u, id });
     });
+    // A replace is authoritative: don't let the legacy v2 copy merge back in at next boot.
+    try {
+      const rawV2 = localStorage.getItem(STORAGE_KEY_V2);
+      if (rawV2 !== null) store.legacyV2 = this.legacyV2Marker(rawV2, null);
+    } catch { /* ignore */ }
     if (!store.activeUserId || !store.users[store.activeUserId]) {
       store.activeUserId = Object.keys(store.users)[0] || null;
     }
@@ -899,7 +989,8 @@ const Storage = {
   },
 
   parseImportPayload(raw) {
-    const data = typeof raw === 'string' ? JSON.parse(raw) : raw;
+    // Browser downloads / editors may add a UTF-8 BOM or surrounding whitespace.
+    const data = typeof raw === 'string' ? JSON.parse(raw.replace(/^\uFEFF/, '').trim()) : raw;
     if (!data || typeof data !== 'object') throw new Error('Import is not an object');
     // Accept full export (v2 or v3) OR a bare {version:2|3, users:{...}} store
     if (data.users && (data.format === 'einstein-math-v2' || data.format === 'einstein-math-v3' ||

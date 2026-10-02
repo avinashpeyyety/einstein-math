@@ -1,5 +1,5 @@
 /* Einstein Math service worker — caches app shell + curriculum + panels for offline play */
-const CACHE = 'einstein-math-v2.3.9';
+const CACHE = 'einstein-math-v2.3.10';
 // W1b: on-device comic-avatar model (~40 MB) is cached on first use only, and kept across app versions
 const MODEL_CACHE = 'einstein-math-models-v1';
 const PRECACHE = [

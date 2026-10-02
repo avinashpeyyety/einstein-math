@@ -101,14 +101,14 @@ On **Progress → Parent / Family** (active explorer):
 
 Helper: `Storage.getParentSummary(store, userId, curriculum)`.
 
-## Storage schema (`einstein-math-v2`)
+## Storage schema v3 (`einstein-math-v3`)
 
 ```json
 {
-  "version": 2,
+  "version": 3,
   "appVersion": "2.3.3",
   "activeUserId": "u_…",
-  "prefs": { "speechEnabled": false },
+  "prefs": { "speechEnabled": false, "activeSubject": "math" },
   "users": {
     "u_…": {
       "id": "u_…",
@@ -116,9 +116,12 @@ Helper: `Storage.getParentSummary(store, userId, curriculum)`.
       "createdAt": "…",
       "updatedAt": "…",
       "trackId": "ages-7-8",
+      "trackBySubject": { "math": "ages-7-8" },
       "avatarColor": "#FF6B35",
-      "tracks": {
-        "ages-7-8": {
+      "avatarImage": "data:image/png;base64,… (optional, W1b)",
+      "avatarImage512": "data:image/png;base64,… (optional, W1b)",
+      "progress": {
+        "math:ages-7-8": {
           "started": true,
           "diagnosticDone": true,
           "diagnosticScores": {},
@@ -149,6 +152,10 @@ Helper: `Storage.getParentSummary(store, userId, curriculum)`.
 }
 ```
 
+Progress is keyed **`subject:track`** (`math:ages-7-8`; physics later as `physics:<track>`). Subjects in schema v3: `math` (live) and `physics` (soon).
+
+**v2 → v3 migration (X1):** on load, a v2 or stub-v3 store (key `einstein-math-v2`, `user.tracks` keyed by bare track id) is copied to `einstein-math-v3` with each `tracks[<id>]` moved to `progress["math:<id>"]` — same lessons, stars, streaks and review dates, so Today's path is unchanged. It is idempotent (re-running is a no-op; a key on both sides is merged, newer lesson wins) and non-destructive (the `einstein-math-v2` key is left in place as a rollback copy). Storage APIs still take a bare track id and default to math (`getTrackProgress(user, 'ages-7-8')`). Export writes `format: "einstein-math-v3"`; import/merge accepts both v2 and v3 files.
+
 On first load, legacy `einstein-math-progress-v1` (if present) migrates into a default user **Explorer** on the ages 7–8 track.
 
 ## Run locally (required: HTTP, not `file://`)
@@ -166,7 +173,7 @@ Localhost works for PWA install in Chromium.
 
 ## Smoke demo (2.3 trusted-home sprint)
 
-1. Load once online → DevTools → Application → Service Worker registered; Cache Storage shows `einstein-math-v2.3.7` (or the current `CACHE` in `sw.js`).
+1. Load once online → DevTools → Application → Service Worker registered; Cache Storage shows `einstein-math-v2.3.9` (or the current `CACHE` in `sw.js`).
 2. Go offline (DevTools Network → Offline) → reload → landing / Mission Map still usable.
 3. Create two explorers, earn progress → **Export all profiles** → clear site data → **Import** merge → both kids restored.
 4. Toggle **Read aloud** → Einstein bubbles speak; **Replay** repeats the last line.

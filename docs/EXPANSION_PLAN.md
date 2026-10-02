@@ -47,7 +47,7 @@ Per Avinash (2026-10-01): SQL is for adults and will be a **separate portal**, n
 
 Effort: S ≤ 1 cycle, M = 2 cycles. Each ticket ends with smoke (0 JS errors, existing math flows pass), SW cache bump if shipped assets change, commit on the Air.
 
-- [ ] **X1 (M)** Schema v3 for real + progress key migration `subject:track` (math unchanged for users)
+- [x] **X1 (M)** Schema v3 for real + progress key migration `subject:track` (math unchanged for users) — ✅ done 2026-10-01
 - [ ] **X2 (S)** Lazy subject packs `data/subjects/*.json` + SW cache-on-first-use
 - [ ] **X3 (S)** Subject switcher live; Today's path + parent summary subject-aware
 - [ ] **X4 (M)** Physics engine `js/sims/` + first sim (ramp & friction) + lesson type `sim`
@@ -74,4 +74,5 @@ Blocked on Avinash (do not stall the queue): public GitHub/Pages create for eins
 
 ## 7. Progress log
 
+- 2026-10-01 · X1 shipped: store schema v3 (`einstein-math-v3`), progress keyed `math:<track>`, v2/stub-v3 migrate on load (v2 key kept), subjects = math (live) + physics (soon); SW v2.3.9
 - 2026-10-01 · (side ask) progress safety net: IndexedDB mirror + auto-restore + progress report download / auto-save file / restore from file

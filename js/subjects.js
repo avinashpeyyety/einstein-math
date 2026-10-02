@@ -1,9 +1,9 @@
-/* Track P — multi-subject catalog + curriculum normalize (schema v3 stub) */
+/* Track P — multi-subject catalog + curriculum normalize (schema v3, X1).
+ * Subjects: math (live) + physics (soon). Progress is keyed `subject:track` in js/storage.js. */
 const Subjects = {
   CATALOG: [
     { id: 'math', label: 'Math', status: 'live', blurb: 'Numbers, shapes & cosmic adventures' },
-    { id: 'science', label: 'Science', status: 'soon', blurb: 'Living things, matter & sky — coming soon' },
-    { id: 'geography', label: 'Geography', status: 'soon', blurb: 'Maps, places & climate-lite — coming soon' },
+    { id: 'physics', label: 'Physics', status: 'soon', blurb: 'Pushes, ramps, magnets & light with Einstein — coming soon' },
   ],
 
   defaultId: 'math',
@@ -13,12 +13,12 @@ const Subjects = {
   },
 
   isLive(id) {
-    const s = this.get(id);
+    const s = this.CATALOG.find((x) => x.id === id);
     return !!(s && s.status === 'live');
   },
 
   /**
-   * Legacy curriculum has top-level tracks. Schema v3 wraps subjects.*.tracks.
+   * Legacy curriculum has top-level tracks. Schema v3 wraps subjects.{math,physics}.tracks.
    * Keep curriculum.tracks pointing at the active subject's tracks for back-compat.
    */
   normalizeCurriculum(raw, activeSubjectId) {
@@ -28,9 +28,11 @@ const Subjects = {
     if (!subjects || typeof subjects !== 'object') {
       subjects = {
         math: { id: 'math', label: 'Math', status: 'live', tracks: raw.tracks || {} },
-        science: { id: 'science', label: 'Science', status: 'soon', tracks: {} },
-        geography: { id: 'geography', label: 'Geography', status: 'soon', tracks: {} },
+        physics: { id: 'physics', label: 'Physics', status: 'soon', tracks: {} },
       };
+    } else {
+      // Drop stub-era subjects (science/geography) — v3 is math + physics only
+      subjects = { math: subjects.math, physics: subjects.physics || { id: 'physics', label: 'Physics', status: 'soon', tracks: {} } };
     }
     // Ensure math has tracks
     if (!subjects.math) {

@@ -9,7 +9,8 @@
   'use strict';
   if (typeof Storage === 'undefined' || !Storage.saveStore) return;
 
-  const KEY = 'einstein-math-v2';
+  const KEY = Storage.STORAGE_KEY || 'einstein-math-v3';   // X1: schema v3 key
+  const LEGACY_KEY = Storage.STORAGE_KEY_V2 || 'einstein-math-v2'; // v2 copy left in place after migration
   const DB_NAME = 'einstein-math-backup';
   const RESTORED_FLAG = 'em-backup-restored';
   const FILE_NAME = 'einstein-math-progress.json';
@@ -53,7 +54,9 @@
   // ---------- 2. auto-restore when localStorage was wiped ----------
   // Only when the key is entirely missing (cleared), never when the user deleted explorers on purpose.
   // app.js writes an empty store on boot, so remember "was missing" now and accept an empty store later.
-  if (localStorage.getItem(KEY) === null && !sessionStorage.getItem(RESTORED_FLAG)) {
+  // A v2 user on first v3 load has only the legacy key: that is a migration, not a wipe.
+  // Mirrored snapshots may be v2 or v3 JSON; Storage.loadStore migrates either from KEY.
+  if (localStorage.getItem(KEY) === null && localStorage.getItem(LEGACY_KEY) === null && !sessionStorage.getItem(RESTORED_FLAG)) {
     idbGet('latest').then(snap => {
       if (snap && hasUsers(snap.data) && !hasUsers(localStorage.getItem(KEY))) {
         localStorage.setItem(KEY, snap.data);
@@ -68,10 +71,12 @@
     const store = Storage.loadStore();
     const payload = Storage.exportAllProfiles(store);
     const explorers = Storage.listUsers(store).map(u => {
-      const tracks = Object.entries(u.tracks || {}).map(([tid, tp]) => {
+      const tracks = Object.entries(u.progress || u.tracks || {}).map(([key, tp]) => {
         const lessons = Object.values((tp && tp.lessons) || {});
+        const k = Storage.parseProgressKey ? Storage.parseProgressKey(key) : { subject: 'math', trackId: key };
         return {
-          track: tid,
+          subject: k.subject,
+          track: k.trackId,
           stars: (tp && tp.stars) || 0,
           lessonsDone: lessons.filter(l => l && l.status === 'done').length,
           mastered: lessons.filter(l => l && l.masteryLevel === 'mastered').length,

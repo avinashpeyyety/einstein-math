@@ -1,8 +1,14 @@
 /* Multi-profile progress persistence via localStorage (device-local only)
- * Schema v2 with mastery + spaced review fields on each lesson blob.
+ * Schema v3 (X1): per-user progress keyed `subject:track` (e.g. "math:ages-7-8"),
+ * with mastery + spaced review fields on each lesson blob.
+ * v2 stores (user.tracks keyed by bare track id) migrate on load; the v2 key is left untouched.
  */
 const STORAGE_KEY_V1 = 'einstein-math-progress-v1';
-const STORAGE_KEY = 'einstein-math-v2';
+const STORAGE_KEY_V2 = 'einstein-math-v2';
+const STORAGE_KEY = 'einstein-math-v3';
+const SCHEMA_VERSION = 3;
+const SUBJECT_IDS = ['math', 'physics'];
+const DEFAULT_SUBJECT = 'math';
 
 const AVATAR_COLORS = ['#FF6B35', '#4ECDC4', '#FFE66D', '#FF6B9D', '#A78BFA', '#95E1D3'];
 
@@ -11,6 +17,68 @@ const REVIEW_INTERVALS_DAYS = [1, 3, 7];
 
 const Storage = {
   REVIEW_INTERVALS_DAYS,
+  STORAGE_KEY,
+  STORAGE_KEY_V2,
+  SCHEMA_VERSION,
+  SUBJECT_IDS,
+
+  /** "math" + "ages-7-8" → "math:ages-7-8". A key that already has a subject passes through. */
+  progressKey(subjectId, trackId) {
+    const t = String(trackId || '');
+    if (t.includes(':')) return t;
+    return `${subjectId || DEFAULT_SUBJECT}:${t}`;
+  },
+
+  /** "math:ages-7-8" → { subject: 'math', trackId: 'ages-7-8' }; bare v2 ids are math. */
+  parseProgressKey(key) {
+    const k = String(key || '');
+    const i = k.indexOf(':');
+    if (i < 0) return { subject: DEFAULT_SUBJECT, trackId: k };
+    return { subject: k.slice(0, i) || DEFAULT_SUBJECT, trackId: k.slice(i + 1) };
+  },
+
+  sanitizeSubject(id) {
+    // Only live subjects can be active; physics is still "soon", so anything else falls back to math.
+    const live = (typeof Subjects !== 'undefined' && Subjects.isLive) ? Subjects.isLive(id) : id === DEFAULT_SUBJECT;
+    return id && SUBJECT_IDS.includes(id) && live ? id : DEFAULT_SUBJECT;
+  },
+
+  /**
+   * v2 → v3 for one user. Moves user.tracks[tid] → user.progress["math:tid"].
+   * Idempotent; never drops data (a key present on both sides is merged, newer lesson wins).
+   */
+  migrateUserToV3(user) {
+    if (!user || typeof user !== 'object') return user;
+    if (!user.progress || typeof user.progress !== 'object') user.progress = {};
+    const legacy = user.tracks;
+    if (legacy && typeof legacy === 'object') {
+      Object.keys(legacy).forEach(tid => {
+        const key = this.progressKey(DEFAULT_SUBJECT, tid);
+        user.progress[key] = user.progress[key]
+          ? this.mergeTrackProgress(user.progress[key], legacy[tid])
+          : this.normalizeTrackProgress(legacy[tid]);
+      });
+    }
+    delete user.tracks;
+    Object.keys(user.progress).forEach(key => {
+      user.progress[key] = this.normalizeTrackProgress(user.progress[key]);
+    });
+    if (!user.trackBySubject || typeof user.trackBySubject !== 'object') user.trackBySubject = {};
+    if (user.trackId && !user.trackBySubject[DEFAULT_SUBJECT]) user.trackBySubject[DEFAULT_SUBJECT] = user.trackId;
+    if (!user.trackId && user.trackBySubject[DEFAULT_SUBJECT]) user.trackId = user.trackBySubject[DEFAULT_SUBJECT];
+    return user;
+  },
+
+  /** v2 / stub-v3 store → v3 in place. Idempotent. */
+  migrateStoreToV3(store) {
+    if (!store || typeof store !== 'object') return store;
+    if (!store.users || typeof store.users !== 'object') store.users = {};
+    Object.keys(store.users).forEach(id => {
+      if (store.users[id] && typeof store.users[id] === 'object') this.migrateUserToV3(store.users[id]);
+    });
+    store.version = SCHEMA_VERSION;
+    return store;
+  },
 
   trackDefaults() {
     return {
@@ -26,7 +94,7 @@ const Storage = {
 
   emptyStore() {
     return {
-      version: 2,
+      version: SCHEMA_VERSION,
       appVersion: '2.3.0',
       activeUserId: null,
       users: {},
@@ -147,8 +215,9 @@ const Storage = {
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         trackId,
+        trackBySubject: { [DEFAULT_SUBJECT]: trackId },
         avatarColor: this.avatarColorFor(v1.name || 'Explorer'),
-        tracks: { [trackId]: trackProg }
+        progress: { [this.progressKey(DEFAULT_SUBJECT, trackId)]: trackProg }
       };
       store.activeUserId = id;
       this.saveStore(store);
@@ -159,20 +228,29 @@ const Storage = {
     }
   },
 
+  isStoreShape(store) {
+    return !!(store && typeof store === 'object' && (store.version === 2 || store.version === SCHEMA_VERSION) &&
+      store.users && typeof store.users === 'object');
+  },
+
   loadStore() {
     try {
-      const raw = localStorage.getItem(STORAGE_KEY);
+      let raw = localStorage.getItem(STORAGE_KEY);
+      let fromLegacyKey = false;
+      if (raw === null) {
+        // First run on v3: read the v2 store (left in place as a rollback copy).
+        raw = localStorage.getItem(STORAGE_KEY_V2);
+        fromLegacyKey = raw !== null;
+      }
       let store = raw ? JSON.parse(raw) : this.emptyStore();
-      if (!store || store.version !== 2 || !store.users) store = this.emptyStore();
+      if (!this.isStoreShape(store)) { store = this.emptyStore(); fromLegacyKey = false; }
+      const needsMigration = store.version !== SCHEMA_VERSION ||
+        Object.values(store.users).some(u => u && (u.tracks || !u.progress));
       store = this.migrateV1IfNeeded(store);
-      // Normalize all lesson blobs on load
-      Object.values(store.users || {}).forEach(user => {
-        if (!user.tracks) user.tracks = {};
-        Object.keys(user.tracks).forEach(tid => {
-          user.tracks[tid] = this.normalizeTrackProgress(user.tracks[tid]);
-        });
-      });
-      store = this.normalizeStoreMeta(store);
+      store = this.normalizeStoreMeta(store); // runs migrateStoreToV3 + lesson normalize
+      if ((fromLegacyKey || needsMigration) && Object.keys(store.users).length) {
+        try { this.saveStore(store); } catch { /* quota: stay in memory; v2 key still holds the data */ }
+      }
       return store;
     } catch {
       return this.emptyStore();
@@ -180,10 +258,10 @@ const Storage = {
   },
 
   saveStore(store) {
-    store.version = 2;
+    store.version = SCHEMA_VERSION;
     store.appVersion = store.appVersion || '2.3.0';
-    if (!store.prefs || typeof store.prefs !== 'object') store.prefs = { speechEnabled: false, activeSubject: 'math' };
-    if (!store.prefs.activeSubject) store.prefs.activeSubject = 'math';
+    if (!store.prefs || typeof store.prefs !== 'object') store.prefs = { speechEnabled: false, activeSubject: DEFAULT_SUBJECT };
+    if (!store.prefs.activeSubject) store.prefs.activeSubject = DEFAULT_SUBJECT;
     localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
   },
 
@@ -202,19 +280,33 @@ const Storage = {
     return store.users[store.activeUserId] || null;
   },
 
-  ensureTrackProgress(user, trackId) {
-    if (!user.tracks) user.tracks = {};
-    if (!user.tracks[trackId]) {
-      user.tracks[trackId] = this.trackDefaults();
+  /** Track progress for subject (default math). trackId may be bare ("ages-7-8") or keyed ("math:ages-7-8"). */
+  ensureTrackProgress(user, trackId, subjectId) {
+    if (user.tracks) this.migrateUserToV3(user);
+    if (!user.progress) user.progress = {};
+    const key = this.progressKey(subjectId || DEFAULT_SUBJECT, trackId);
+    if (!user.progress[key]) {
+      user.progress[key] = this.trackDefaults();
     } else {
-      user.tracks[trackId] = this.normalizeTrackProgress(user.tracks[trackId]);
+      user.progress[key] = this.normalizeTrackProgress(user.progress[key]);
     }
-    return user.tracks[trackId];
+    return user.progress[key];
   },
 
-  getTrackProgress(user, trackId) {
+  getTrackProgress(user, trackId, subjectId) {
     if (!user) return this.trackDefaults();
-    return this.ensureTrackProgress(user, trackId || user.trackId);
+    return this.ensureTrackProgress(user, trackId || user.trackId, subjectId);
+  },
+
+  /** All math progress keyed by bare track id (v2 view) — for callers that still think in tracks. */
+  getSubjectTracks(user, subjectId) {
+    const sid = subjectId || DEFAULT_SUBJECT;
+    const out = {};
+    Object.keys((user && user.progress) || {}).forEach(key => {
+      const p = this.parseProgressKey(key);
+      if (p.subject === sid) out[p.trackId] = user.progress[key];
+    });
+    return out;
   },
 
   touchUser(user) {
@@ -231,8 +323,9 @@ const Storage = {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       trackId: tid,
+      trackBySubject: { [DEFAULT_SUBJECT]: tid },
       avatarColor: this.avatarColorFor(name),
-      tracks: { [tid]: this.trackDefaults() }
+      progress: { [this.progressKey(DEFAULT_SUBJECT, tid)]: this.trackDefaults() }
     };
     store.users[id] = user;
     store.activeUserId = id;
@@ -300,18 +393,25 @@ const Storage = {
     const user = store.users[userId];
     if (!user) return null;
     user.trackId = trackId;
+    if (!user.trackBySubject) user.trackBySubject = {};
+    user.trackBySubject[DEFAULT_SUBJECT] = trackId;
     this.ensureTrackProgress(user, trackId);
     this.touchUser(user);
     this.saveStore(store);
     return user;
   },
 
-  saveTrackProgress(store, userId, trackId, trackProgress) {
+  saveTrackProgress(store, userId, trackId, trackProgress, subjectId) {
     const user = store.users[userId];
     if (!user) return;
-    if (!user.tracks) user.tracks = {};
-    user.tracks[trackId] = this.normalizeTrackProgress(trackProgress);
-    user.trackId = trackId;
+    if (user.tracks) this.migrateUserToV3(user);
+    if (!user.progress) user.progress = {};
+    const key = this.progressKey(subjectId || DEFAULT_SUBJECT, trackId);
+    const p = this.parseProgressKey(key);
+    user.progress[key] = this.normalizeTrackProgress(trackProgress);
+    if (!user.trackBySubject) user.trackBySubject = {};
+    user.trackBySubject[p.subject] = p.trackId;
+    if (p.subject === DEFAULT_SUBJECT) user.trackId = p.trackId;
     this.touchUser(user);
     this.saveStore(store);
   },
@@ -576,17 +676,18 @@ const Storage = {
 
   normalizeStoreMeta(store) {
     if (!store || typeof store !== 'object') return this.emptyStore();
-    store.version = 2;
     store.appVersion = store.appVersion || '2.3.0';
     if (!store.prefs || typeof store.prefs !== 'object') {
-      store.prefs = { speechEnabled: false, activeSubject: 'math' };
+      store.prefs = { speechEnabled: false, activeSubject: DEFAULT_SUBJECT };
     } else {
       if (typeof store.prefs.speechEnabled !== 'boolean') {
         store.prefs.speechEnabled = !!store.prefs.speechEnabled;
       }
-      if (!store.prefs.activeSubject) store.prefs.activeSubject = 'math';
+      // stub-v3 could hold any id; only live subjects stay active (math today)
+      store.prefs.activeSubject = this.sanitizeSubject(store.prefs.activeSubject);
     }
     if (!store.users) store.users = {};
+    this.migrateStoreToV3(store);
     return store;
   },
 
@@ -597,12 +698,12 @@ const Storage = {
 
   getActiveSubject(store) {
     store = this.normalizeStoreMeta(store || this.loadStore());
-    return store.prefs.activeSubject || 'math';
+    return store.prefs.activeSubject || DEFAULT_SUBJECT;
   },
 
   setActiveSubject(store, subjectId) {
-    if (!store.prefs) store.prefs = { speechEnabled: false, activeSubject: 'math' };
-    store.prefs.activeSubject = subjectId || 'math';
+    if (!store.prefs) store.prefs = { speechEnabled: false, activeSubject: DEFAULT_SUBJECT };
+    store.prefs.activeSubject = this.sanitizeSubject(subjectId);
     this.saveStore(store);
     return store;
   },
@@ -614,14 +715,14 @@ const Storage = {
     return store.prefs.speechEnabled;
   },
 
-  /** Full v2 snapshot for multi-device handoff (download). */
+  /** Full v3 snapshot for multi-device handoff (download). Imports accept v2 and v3. */
   exportAllProfiles(store) {
     const s = this.normalizeStoreMeta(JSON.parse(JSON.stringify(store || this.loadStore())));
     return {
-      format: 'einstein-math-v2',
+      format: 'einstein-math-v3',
       exportedAt: new Date().toISOString(),
       note: 'Multi-device handoff snapshot (not cloud sync). Import on another device to merge or replace.',
-      version: 2,
+      version: SCHEMA_VERSION,
       appVersion: s.appVersion || '2.3.0',
       activeUserId: s.activeUserId || null,
       prefs: s.prefs || { speechEnabled: false },
@@ -687,14 +788,14 @@ const Storage = {
     return this.normalizeTrackProgress(out);
   },
 
+  /** Merge two users. Either side may be v2 (user.tracks) or v3 (user.progress); result is v3. */
   mergeUser(localU, incomingU) {
     if (!localU) {
-      const u = JSON.parse(JSON.stringify(incomingU));
-      if (!u.tracks) u.tracks = {};
-      Object.keys(u.tracks).forEach(tid => { u.tracks[tid] = this.normalizeTrackProgress(u.tracks[tid]); });
-      return u;
+      return this.migrateUserToV3(JSON.parse(JSON.stringify(incomingU)));
     }
     if (!incomingU) return localU;
+    localU = this.migrateUserToV3(JSON.parse(JSON.stringify(localU)));
+    incomingU = this.migrateUserToV3(JSON.parse(JSON.stringify(incomingU)));
     // If conflict on user-level fields, keep newer updatedAt for displayName/trackId/avatar
     const preferIncoming = this.isNewerISO(incomingU.updatedAt, localU.updatedAt);
     const out = {
@@ -704,28 +805,32 @@ const Storage = {
       updatedAt: preferIncoming ? (incomingU.updatedAt || localU.updatedAt) : (localU.updatedAt || incomingU.updatedAt),
       trackId: preferIncoming ? (incomingU.trackId || localU.trackId) : (localU.trackId || incomingU.trackId),
       avatarColor: preferIncoming ? (incomingU.avatarColor || localU.avatarColor) : (localU.avatarColor || incomingU.avatarColor),
-      tracks: {}
+      trackBySubject: preferIncoming
+        ? { ...(localU.trackBySubject || {}), ...(incomingU.trackBySubject || {}) }
+        : { ...(incomingU.trackBySubject || {}), ...(localU.trackBySubject || {}) },
+      progress: {}
     };
+    if (out.trackId) out.trackBySubject[DEFAULT_SUBJECT] = out.trackId;
     const avSrc = preferIncoming ? (incomingU.avatarImage ? incomingU : localU) : (localU.avatarImage ? localU : incomingU);
     if (avSrc && avSrc.avatarImage) {
       out.avatarImage = avSrc.avatarImage;
       if (avSrc.avatarImage512) out.avatarImage512 = avSrc.avatarImage512;
     }
-    const tids = new Set([
-      ...Object.keys(localU.tracks || {}),
-      ...Object.keys(incomingU.tracks || {})
+    const keys = new Set([
+      ...Object.keys(localU.progress || {}),
+      ...Object.keys(incomingU.progress || {})
     ]);
-    tids.forEach(tid => {
-      out.tracks[tid] = this.mergeTrackProgress(
-        (localU.tracks || {})[tid],
-        (incomingU.tracks || {})[tid]
+    keys.forEach(key => {
+      out.progress[key] = this.mergeTrackProgress(
+        (localU.progress || {})[key],
+        (incomingU.progress || {})[key]
       );
     });
     return out;
   },
 
   /**
-   * Merge imported v2 snapshot into current store.
+   * Merge imported v2 or v3 snapshot into current store.
    * - Users matched by id
    * - Per-user: newer updatedAt wins identity fields
    * - Per-lesson: newer lastAt wins progress
@@ -733,9 +838,9 @@ const Storage = {
    */
   mergeImportedStore(currentStore, incoming) {
     const store = this.normalizeStoreMeta(JSON.parse(JSON.stringify(currentStore || this.emptyStore())));
-    const src = incoming && incoming.users ? incoming : (incoming && incoming.format === 'einstein-math-v2' ? incoming : null);
+    const src = incoming && incoming.users ? incoming : null;
     if (!src || !src.users) {
-      throw new Error('Invalid import: expected einstein-math-v2 JSON with users');
+      throw new Error('Invalid import: expected einstein-math-v2/v3 JSON with users');
     }
     const stats = { added: 0, merged: 0, unchanged: 0 };
     Object.keys(src.users).forEach(id => {
@@ -756,6 +861,7 @@ const Storage = {
       Object.keys(incoming.prefs).forEach(k => {
         if (store.prefs[k] === undefined) store.prefs[k] = incoming.prefs[k];
       });
+      store.prefs.activeSubject = this.sanitizeSubject(store.prefs.activeSubject);
     }
     if (!store.activeUserId || !store.users[store.activeUserId]) {
       store.activeUserId = incoming.activeUserId && store.users[incoming.activeUserId]
@@ -769,14 +875,14 @@ const Storage = {
   /** Replace entire store with imported snapshot (destructive). */
   replaceAllFromImport(incoming) {
     if (!incoming || !incoming.users) {
-      throw new Error('Invalid import: expected einstein-math-v2 JSON with users');
+      throw new Error('Invalid import: expected einstein-math-v2/v3 JSON with users');
     }
     const store = this.normalizeStoreMeta({
-      version: 2,
+      version: SCHEMA_VERSION,
       appVersion: incoming.appVersion || '2.3.0',
       activeUserId: incoming.activeUserId || null,
       prefs: incoming.prefs && typeof incoming.prefs === 'object'
-        ? { speechEnabled: !!incoming.prefs.speechEnabled }
+        ? { speechEnabled: !!incoming.prefs.speechEnabled, activeSubject: incoming.prefs.activeSubject }
         : { speechEnabled: false },
       users: {}
     });
@@ -795,11 +901,12 @@ const Storage = {
   parseImportPayload(raw) {
     const data = typeof raw === 'string' ? JSON.parse(raw) : raw;
     if (!data || typeof data !== 'object') throw new Error('Import is not an object');
-    // Accept full export OR a bare {version:2, users:{...}} store
-    if (data.users && (data.format === 'einstein-math-v2' || data.version === 2 || data.activeUserId !== undefined)) {
+    // Accept full export (v2 or v3) OR a bare {version:2|3, users:{...}} store
+    if (data.users && (data.format === 'einstein-math-v2' || data.format === 'einstein-math-v3' ||
+        data.version === 2 || data.version === SCHEMA_VERSION || data.activeUserId !== undefined)) {
       return data;
     }
-    throw new Error('Unrecognized file — need an Einstein Math profiles export (einstein-math-v2)');
+    throw new Error('Unrecognized file — need an Einstein Math profiles export (einstein-math-v2 or v3)');
   },
 
   /**
@@ -911,13 +1018,16 @@ const Storage = {
     return entry;
   },
 
-    resetTrackProgress(store, userId, trackId) {
+  resetTrackProgress(store, userId, trackId, subjectId) {
     const user = store.users[userId];
     if (!user) return;
-    user.tracks[trackId] = this.trackDefaults();
+    if (user.tracks) this.migrateUserToV3(user);
+    if (!user.progress) user.progress = {};
+    const key = this.progressKey(subjectId || DEFAULT_SUBJECT, trackId);
+    user.progress[key] = this.trackDefaults();
     this.touchUser(user);
     this.saveStore(store);
-    return user.tracks[trackId];
+    return user.progress[key];
   }
 };
 

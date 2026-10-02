@@ -17,13 +17,13 @@ Public interactive math program for **ages 5–10** (US K–5), delivered by **E
 - **PWA / offline** — installable app shell; service worker caches curriculum + panels after first online visit
 - **Einstein read-aloud** — optional Web Speech API narration of speech bubbles (toggle in header)
 - **Local multi-user profiles** — named explorers on one device; progress nested per age track; **rename** anytime (Home cards + Progress)
-- **Comic photo avatar** — two on-device paths: Home card / create-form photo → canvas comicify (v2.4.x), or Progress → **Comic avatar** (W1b MediaPipe segmenters, crop + preview). Both store `avatarImage` on the user (W1b also `avatarImage512`); older `avatarDataUrl` data is read as a fallback and copied into `avatarImage` on load/import; shows on chip, Home cards, Progress, and student portrait; replace/clear supported; included in export/import
+- **Comic photo avatar** — one on-device flow for Home card / create-form photo and Progress → **Comic avatar** (crop + preview): W1b MediaPipe segmenters, with a simple canvas filter only where the model can't run (no wasm SIMD / model failed to load). Stores `avatarImage` + `avatarImage512`; older `avatarDataUrl` data is read as a fallback and copied into `avatarImage` on load/import; shows on chip, Home cards, Progress, and student portrait; replace/clear supported; included in export/import
 - **Remove all explorers** — Progress double-confirm wipe of every profile + `activeUserId` (keeps prefs); distinct from Import → Replace
 - Landing: create profile (name + track) or pick an existing explorer
 - Richer diagnostic (10 items) → suggested unit path (per track)
 - Full playable lessons with Einstein UI (explain → worked example → practice → quick check)
 - Progress checkpointed to `localStorage` after every save (survives refresh on the same device/origin)
-- Extensible `data/curriculum.json` with `tracks` (meta.version **2.3.0**)
+- Lessons in lazy subject packs `data/subjects/<subject>.json` (`meta` + `tracks`; math is the default, physics is a stub) — only the packs in use are fetched; the service worker precaches math and caches other packs on first use
 
 ### Device-local only
 
@@ -33,7 +33,7 @@ No accounts, no passwords, no server sync API. Clearing site data erases progres
 
 1. Serve over **http://** or **https://** (not `file://`) — see Run locally below.
 2. Open the site once **online** so the service worker can cache:
-   - `index.html`, `css/comic.css`, `js/*`, `data/curriculum.json`
+   - `index.html`, `css/comic.css`, `js/*`, `data/subjects/math.json` (other subject packs are cached the first time they are opened)
    - `assets/panels/*` (Einstein), `assets/student/panels/*` (pupil idle/explain/cheer/think), `assets/student/portrait.jpg`
    - `assets/icons/*`, `manifest.webmanifest`
 3. In **Chromium** (Chrome/Edge): address-bar install icon / menu → **Install Einstein Math**. Localhost is allowed for install.
@@ -243,7 +243,8 @@ einstein-math/
   js/storage.js
   js/einstein.js
   js/app.js
-  data/curriculum.json
+  data/subjects/math.json      # math lessons pack (tracks)
+  data/subjects/physics.json   # physics pack (stub until X5)
   assets/panels/*.png          # Einstein idle/explain/cheer/think
   assets/student/portrait.jpg
   assets/student/panels/*.png  # pupil likeness panels (same four states)
@@ -255,7 +256,7 @@ einstein-math/
 
 ## Adding lessons
 
-Edit `data/curriculum.json` under the right track (`tracks["ages-5-6"]`, etc.):
+Edit `data/subjects/math.json` under the right track (`tracks["ages-5-6"]`, etc.):
 
 1. Add a lesson object under that track’s `lessons` with `id`, `unitId`, `title`, `einsteinIntro`, `explain.panels`, `workedExample`, `practice[]`, `quickCheck[]`.
 2. Append the lesson `id` to the matching unit’s `lessons` array.

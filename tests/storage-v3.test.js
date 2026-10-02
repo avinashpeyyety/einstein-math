@@ -10,7 +10,7 @@ const vm = require('vm');
 const assert = require('assert');
 
 const ROOT = path.resolve(__dirname, '..');
-const curriculum = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/curriculum.json'), 'utf8'));
+const curriculum = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/subjects/math.json'), 'utf8'));
 
 function fakeLocalStorage(init) {
   const m = new Map(Object.entries(init || {}));

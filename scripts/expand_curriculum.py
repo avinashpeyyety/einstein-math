@@ -11,7 +11,7 @@ import lessons_56
 import lessons_78
 import lessons_910
 
-CURRICULUM = ROOT / "data" / "curriculum.json"
+CURRICULUM = ROOT / "data" / "subjects" / "math.json"  # X2: math subject pack (was data/curriculum.json)
 
 
 def add_lessons(track, lessons_list, new_units=None):

@@ -48,7 +48,7 @@ Per Avinash (2026-10-01): SQL is for adults and will be a **separate portal**, n
 Effort: S ≤ 1 cycle, M = 2 cycles. Each ticket ends with smoke (0 JS errors, existing math flows pass), SW cache bump if shipped assets change, commit on the Air.
 
 - [x] **X1 (M)** Schema v3 for real + progress key migration `subject:track` (math unchanged for users) — ✅ done 2026-10-01
-- [ ] **X2 (S)** Lazy subject packs `data/subjects/*.json` + SW cache-on-first-use
+- [x] **X2 (S)** Lazy subject packs `data/subjects/*.json` + SW cache-on-first-use — ✅ done 2026-10-01
 - [ ] **X3 (S)** Subject switcher live; Today's path + parent summary subject-aware
 - [ ] **X4 (M)** Physics engine `js/sims/` + first sim (ramp & friction) + lesson type `sim`
 - [ ] **X5 (M)** Physics pilot: ages 7–8 unit "Forces & friction" (4 lessons + check) — Studio: 2 Einstein physics panels
@@ -75,4 +75,5 @@ Blocked on Avinash (do not stall the queue): public GitHub/Pages create for eins
 ## 7. Progress log
 
 - 2026-10-01 · X1 shipped: store schema v3 (`einstein-math-v3`), progress keyed `math:<track>`, v2/stub-v3 migrate on load (v2 key kept), subjects = math (live) + physics (soon); SW v2.3.9
+- 2026-10-01 · X2 shipped: lessons moved to subject packs `data/subjects/math.json` (was `data/curriculum.json`, same shape) + `physics.json` stub; only the packs in use are fetched (`Subjects.loadPack`/`loadCurriculum`); SW precaches math, caches other packs on first use in `einstein-math-packs-v1` (kept across versions, refreshed when online); tests/subject-packs.test.js; SW v2.4.6
 - 2026-10-01 · (side ask) progress safety net: IndexedDB mirror + auto-restore + progress report download / auto-save file / restore from file

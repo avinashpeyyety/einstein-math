@@ -1,7 +1,10 @@
 /* Einstein Math service worker — caches app shell + curriculum + panels for offline play */
-const CACHE = 'einstein-math-v2.4.5';
+const CACHE = 'einstein-math-v2.4.6';
 // W1b: on-device comic-avatar model (~40 MB) is cached on first use only, and kept across app versions
 const MODEL_CACHE = 'einstein-math-models-v1';
+// X2: subject packs (data/subjects/<id>.json). math is precached (default subject, offline after first visit);
+// any other pack is cached here on first use, served cache-first and refreshed in the background when online
+const PACK_CACHE = 'einstein-math-packs-v1';
 const PRECACHE = [
   './',
   './index.html',
@@ -14,7 +17,7 @@ const PRECACHE = [
   './js/einstein.js',
   './js/student.js',
   './js/app.js',
-  './data/curriculum.json',
+  './data/subjects/math.json',
   './assets/einstein.svg',
   './assets/icons/icon-192.png',
   './assets/icons/icon-512.png',
@@ -39,7 +42,7 @@ self.addEventListener('install', (event) => {
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) =>
-      Promise.all(keys.filter((k) => k !== CACHE && k !== MODEL_CACHE).map((k) => caches.delete(k)))
+      Promise.all(keys.filter((k) => k !== CACHE && k !== MODEL_CACHE && k !== PACK_CACHE).map((k) => caches.delete(k)))
     ).then(() => self.clients.claim())
   );
 });
@@ -61,6 +64,27 @@ self.addEventListener('fetch', (event) => {
           return res;
         })
         .catch(() => caches.match('./index.html'))
+    );
+    return;
+  }
+
+  // Subject packs: this version's precache first, then the pack cache; refresh the pack cache when online
+  if (url.pathname.includes('/data/subjects/')) {
+    event.respondWith(
+      caches.open(CACHE).then((c) => c.match(req)).then((pre) => {
+        if (pre) return pre;
+        return caches.open(PACK_CACHE).then((pc) => pc.match(req).then((hit) => {
+          const refresh = fetch(req).then((res) => {
+            if (res && res.ok) pc.put(req, res.clone());
+            return res;
+          });
+          if (hit) {
+            event.waitUntil(refresh.catch(() => {}));
+            return hit;
+          }
+          return refresh;
+        }));
+      })
     );
     return;
   }

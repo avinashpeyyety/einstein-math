@@ -1,4 +1,4 @@
-/* Track P — multi-subject catalog + curriculum normalize (schema v3, X1).
+/* Track P — multi-subject catalog + curriculum normalize (schema v3, X1) + lazy subject packs (X2).
  * Subjects: math (live) + physics (soon). Progress is keyed `subject:track` in js/storage.js. */
 const Subjects = {
   CATALOG: [
@@ -15,6 +15,63 @@ const Subjects = {
   isLive(id) {
     const s = this.CATALOG.find((x) => x.id === id);
     return !!(s && s.status === 'live');
+  },
+
+  /* ---------- X2: lazy subject packs ----------
+   * Each subject's lessons live in data/subjects/<id>.json ({ meta, tracks }). Only the packs a session
+   * needs are fetched (math at boot; another subject when it is opened); the service worker precaches
+   * the math pack and caches any other pack on first use. */
+  packUrl(id) {
+    return 'data/subjects/' + this.get(id).id + '.json';
+  },
+
+  _packs: {},
+
+  /** Fetch a subject pack once per session (memoised); a failed fetch can be retried. */
+  loadPack(id, fetchFn) {
+    const sid = this.get(id).id;
+    if (!this._packs[sid]) {
+      const f = fetchFn || ((u) => fetch(u));
+      this._packs[sid] = Promise.resolve()
+        .then(() => f(this.packUrl(sid)))
+        .then((res) => {
+          if (!res || !res.ok) throw new Error('Could not load the ' + sid + ' lessons (' + (res ? res.status : 'offline') + ')');
+          return res.json();
+        })
+        .then((pack) => {
+          if (!pack || typeof pack !== 'object' || !pack.tracks || typeof pack.tracks !== 'object') throw new Error('The ' + sid + ' lessons file is not valid');
+          return pack;
+        })
+        .catch((err) => {
+          delete this._packs[sid];
+          throw err;
+        });
+    }
+    return this._packs[sid];
+  },
+
+  isPackLoaded(curriculum, id) {
+    const s = curriculum && curriculum.subjects && curriculum.subjects[id];
+    return !!(s && s.packLoaded);
+  },
+
+  /** Put a loaded pack's tracks under subjects[id] and re-point curriculum.tracks at the active subject. */
+  applyPack(curriculum, id, pack, activeSubjectId) {
+    const sid = this.get(id).id;
+    const base = curriculum && curriculum.subjects ? curriculum : this.normalizeCurriculum(curriculum || { tracks: {} }, this.defaultId);
+    const cat = this.get(sid);
+    const prev = base.subjects[sid] || { id: sid, label: cat.label, status: cat.status };
+    const subjects = { ...base.subjects, [sid]: { ...prev, tracks: (pack && pack.tracks) || {}, packLoaded: true, packVersion: (pack && pack.meta && pack.meta.version) || null } };
+    const meta = sid === this.defaultId && pack && pack.meta ? { ...base.meta, ...pack.meta } : base.meta;
+    return this.normalizeCurriculum({ ...base, meta, subjects }, activeSubjectId || base.activeSubjectId || sid);
+  },
+
+  /** Boot / switch helper: the math pack is always the base; the active subject's pack is added on demand. */
+  async loadCurriculum(activeSubjectId, fetchFn) {
+    let cur = this.applyPack(null, this.defaultId, await this.loadPack(this.defaultId, fetchFn), this.defaultId);
+    const sid = this.isLive(activeSubjectId) ? activeSubjectId : this.defaultId;
+    if (sid !== this.defaultId) cur = this.applyPack(cur, sid, await this.loadPack(sid, fetchFn), sid);
+    return cur;
   },
 
   /**

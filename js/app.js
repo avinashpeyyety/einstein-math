@@ -2169,14 +2169,22 @@
       </button>`;
     }).join('');
     $$('[data-subject-id]', list).forEach((btn) => {
-      btn.addEventListener('click', () => {
+      btn.addEventListener('click', async () => {
         const id = btn.dataset.subjectId;
         if (!Subjects.isLive(id)) {
           alert((Subjects.get(id).label || 'That subject') + ' is coming soon — Math stays active for now.');
           return;
         }
+        // X2: fetch the subject's pack on first open (SW caches it for offline); stay put if it can't load
+        try {
+          curriculum = Subjects.isPackLoaded(curriculum, id)
+            ? Subjects.normalizeCurriculum(curriculum, id)
+            : Subjects.applyPack(curriculum, id, await Subjects.loadPack(id), id);
+        } catch (err) {
+          notice(((err && err.message) || 'Could not load that subject.') + ' Staying on ' + Subjects.get(Storage.getActiveSubject(store)).label + '.');
+          return;
+        }
         store = Storage.setActiveSubject(store, id);
-        curriculum = Subjects.normalizeCurriculum(curriculum, id);
         modal.classList.add('hidden');
         updateSubjectChip();
         showScreen('screen-landing');
@@ -2504,20 +2512,15 @@
 
   async function boot() {
     try {
-      const res = await fetch('data/curriculum.json');
-      if (!res.ok) throw new Error('Failed to load curriculum');
-      curriculum = await res.json();
+      // X2: lazy subject packs — only data/subjects/math.json (+ the active subject's pack) is fetched
       store = Storage.loadStore();
-      const sid = Storage.getActiveSubject(store);
-      curriculum = (typeof Subjects !== 'undefined')
-        ? Subjects.normalizeCurriculum(curriculum, sid)
-        : curriculum;
-      if (!curriculum.tracks) throw new Error('Curriculum missing tracks');
+      curriculum = await Subjects.loadCurriculum(Storage.getActiveSubject(store));
+      if (!curriculum.tracks || !Object.keys(curriculum.tracks).length) throw new Error('Curriculum missing tracks');
     } catch (err) {
       document.body.innerHTML = `
         <div class="app"><div class="comic-panel">
           <h1 class="panel-title">Oops!</h1>
-          <p style="font-weight:700;">Could not load curriculum.json. Please serve this site over HTTP
+          <p style="font-weight:700;">Could not load the lessons (data/subjects/). Please serve this site over HTTP
           (not file://). Try: <code>python3 -m http.server 8080</code> from the project folder.</p>
           <p style="margin-top:0.5rem;opacity:0.7">${escapeHtml(String(err))}</p>
         </div></div>`;

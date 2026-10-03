@@ -1,10 +1,10 @@
 /* Track P — multi-subject catalog + curriculum normalize (schema v3, X1) + lazy subject packs (X2).
- * Subjects: math (live) + physics (soon — selectable since X3, shows a coming-soon state until its pack has
- * lessons). Progress is keyed `subject:track` in js/storage.js. No other subjects (Chief: math + physics only). */
+ * Subjects: math (live) + physics (live since X4: sim lessons for ages 7–8 and 9–10; an age track without
+ * physics lessons shows the X3 coming-soon state). Progress is keyed `subject:track` in js/storage.js. No other subjects (Chief: math + physics only). */
 const Subjects = {
   CATALOG: [
     { id: 'math', label: 'Math', status: 'live', blurb: 'Numbers, shapes & cosmic adventures' },
-    { id: 'physics', label: 'Physics', status: 'soon', blurb: 'Pushes, ramps, magnets & light with Einstein — coming soon' },
+    { id: 'physics', label: 'Physics', status: 'live', blurb: "Einstein's ramp & friction lab — more experiments coming" },
   ],
 
   defaultId: 'math',

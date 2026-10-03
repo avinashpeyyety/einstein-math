@@ -39,13 +39,20 @@
     return !!activeTrack();
   }
 
+  /** The warm-up diagnostic is a math thing; physics lessons open straight from the map / Today's path. */
+  function isMathSubject() {
+    return activeSubjectId() === 'math';
+  }
+
   /** Friendly empty state for a subject without lessons yet (physics stub). */
   function comingSoonHtml(compact) {
     const sub = Subjects.get(activeSubjectId());
     return `
       <div class="todays-path-inner todays-path-empty subject-soon">
         <h3 class="todays-path-title">${escapeHtml(sub.label)} with Einstein — coming soon!</h3>
-        <p class="todays-path-lede">Ramps, magnets, light and sinking-or-floating experiments are being built right now.</p>
+        <p class="todays-path-lede">${Object.keys((curriculum && curriculum.subjects && curriculum.subjects[sub.id] && curriculum.subjects[sub.id].tracks) || {}).length
+          ? `Einstein's lab is open for other age groups — ${escapeHtml((ageTracks()[activeTrackId()] || {}).label || 'this age')} experiments are on the way!`
+          : 'Ramps, magnets, light and sinking-or-floating experiments are being built right now.'}</p>
         ${compact ? '' : '<p class="todays-path-empty-copy">Your Math stars and lessons are safe — they stay under Math.</p>'}
         <button type="button" class="btn btn-cyan btn-sm" data-switch-subject="math">Back to Math</button>
       </div>`;
@@ -155,7 +162,7 @@
       wireComingSoon(host);
       return;
     }
-    if (!progress.diagnosticDone && !progress.started) {
+    if (isMathSubject() && !progress.diagnosticDone && !progress.started) {
       host.classList.add('hidden');
       host.innerHTML = '';
       return;
@@ -203,7 +210,7 @@
       renderHub();
       return;
     }
-    if (!progress.diagnosticDone) {
+    if (isMathSubject() && !progress.diagnosticDone) {
       startDiagnostic();
       return;
     }
@@ -1360,8 +1367,8 @@
       }
       updateHeaderUser();
       refreshStudentCast();
-      // New users go to diagnostic for their track (Math, if the active subject has no lessons yet)
-      if (!subjectReady()) await switchSubject('math');
+      // New users go to the (math) warm-up diagnostic for their track
+      if (!isMathSubject() || !subjectReady()) await switchSubject('math');
       startDiagnostic();
     });
 
@@ -1461,7 +1468,7 @@
       return;
     }
     syncProgressFromStore();
-    if (!subjectReady()) {
+    if (!subjectReady() || !isMathSubject()) {
       renderHub();
       return;
     }
@@ -1637,8 +1644,9 @@
                 const strengthen = weakPrereqs.length
                   ? `<span class="strengthen-tag" title="Try prerequisite first">Strengthen first</span>`
                   : '';
+                const labTag = L.type === 'sim' ? '<span class="sim-tag" title="Interactive lab">🔬 Lab</span>' : '';
                 return `<li>
-                  <span>${escapeHtml(L.title)}${strengthen}</span>
+                  <span>${escapeHtml(L.title)}${labTag}${strengthen}</span>
                   <button type="button" class="badge ${cls} btn-lesson" data-lesson="${L.id}" data-status="${st}" ${st === 'locked' ? 'disabled' : ''}>${label}</button>
                 </li>`;
               }).join('')}
@@ -1863,7 +1871,14 @@
     // Build question lists for review / remediation
     let practiceList = lesson.practice || [];
     let checkList = lesson.quickCheck || [];
-    if (mode === 'review') {
+    if (lesson.type === 'sim') {
+      // X4: sim lessons are explored in the lab, then graded by lab checks (review: all; remediate: the missed ones)
+      practiceList = [];
+      const all = lesson.simChecks || [];
+      const missedIds = (saved && saved.missedCheckIds) || [];
+      const weak = all.filter(q => missedIds.includes(q.id));
+      checkList = mode === 'remediate' && weak.length ? weak : all;
+    } else if (mode === 'review') {
       // Shorter mixed set: up to 3 practice + all check (or practice if no check)
       practiceList = (lesson.practice || []).slice(0, 3);
       checkList = (lesson.quickCheck || []).length
@@ -1894,6 +1909,7 @@
       missedCheckIds: [],
       practiceList,
       checkList,
+      simParams: null,
       skipExplain: mode === 'review' || mode === 'remediate'
     };
     Storage.setLessonProgress(progress, lessonId, { status: 'in_progress' });
@@ -1905,8 +1921,9 @@
   function setPips() {
     const L = lessonCtx.lesson;
     const track = activeTrack();
-    const phases = ['intro', 'explain', 'example', 'practice', 'check', 'complete'];
-    const labels = ['Hi', 'Learn', 'Example', 'Practice', 'Check', '★'];
+    const isSim = L.type === 'sim';
+    const phases = isSim ? ['intro', 'explain', 'practice', 'check', 'complete'] : ['intro', 'explain', 'example', 'practice', 'check', 'complete'];
+    const labels = isSim ? ['Hi', 'Learn', 'Lab', 'Check', '★'] : ['Hi', 'Learn', 'Example', 'Practice', 'Check', '★'];
     const cur = phases.indexOf(lessonCtx.phase);
     $('#lesson-pips').innerHTML = labels.map((lab, i) =>
       `<div class="pip ${i < cur ? 'done' : i === cur ? 'current' : ''}" title="${lab}"></div>`
@@ -1917,8 +1934,13 @@
   }
 
   function renderLessonPhase() {
-    setPips();
     const L = lessonCtx.lesson;
+    if (L.type === 'sim' && ['example', 'practice', 'check'].includes(lessonCtx.phase)) {
+      renderSimPhase();
+      return;
+    }
+    destroySimLab();
+    setPips();
     const stage = $('#lesson-einstein');
     const bubble = $('#lesson-speech');
     const body = $('#lesson-body');
@@ -1948,7 +1970,9 @@
         };
       } else {
         Einstein.speak(bubble, L.einsteinIntro);
-        body.innerHTML = `<div class="viz-box">Get ready — comic-panel learning ahead!</div>`;
+        body.innerHTML = L.type === 'sim'
+          ? `<div class="viz-box">🔬 Einstein's lab — experiment, then take the lab check!</div>`
+          : `<div class="viz-box">Get ready — comic-panel learning ahead!</div>`;
         actions.innerHTML = `<button type="button" class="btn btn-primary" id="btn-next">Let's Learn!</button>`;
         $('#btn-next').onclick = () => { lessonCtx.phase = 'explain'; lessonCtx.panelIndex = 0; renderLessonPhase(); };
       }
@@ -1962,7 +1986,7 @@
       const isLast = lessonCtx.panelIndex >= panels.length - 1;
       actions.innerHTML = `
         ${lessonCtx.panelIndex > 0 ? `<button type="button" class="btn btn-ghost" id="btn-back">Back</button>` : ''}
-        <button type="button" class="btn btn-primary" id="btn-next">${isLast ? 'See Example' : 'Next Panel'}</button>`;
+        <button type="button" class="btn btn-primary" id="btn-next">${isLast ? (L.type === 'sim' ? 'Open the Lab!' : 'See Example') : 'Next Panel'}</button>`;
       const back = $('#btn-back');
       if (back) back.onclick = () => { lessonCtx.panelIndex--; renderLessonPhase(); };
       $('#btn-next').onclick = () => {
@@ -2022,6 +2046,7 @@
       } else {
         speech = `Lesson complete! Practice ${pc}/${pt}, Quick Check ${cc}/${ct}. Keep practicing to lock mastery!`;
       }
+      if (L.type === 'sim') speech = speech.replace(/Practice \d+\/\d+, (Quick )?Check/, 'Lab Check');
       Einstein.speak(bubble, speech, needsRemediation ? 'correction' : 'success');
 
       const masteryPct = Math.round((entry.mastery || 0) * 100);
@@ -2048,6 +2073,224 @@
         $('#btn-map').onclick = renderHub;
         $('#btn-progress').onclick = renderProgress;
       }
+    }
+  }
+
+  /* ——— X4: physics sim lessons (lazy-loaded js/sims/*, never fetched by math-only sessions) ——— */
+
+  const SIM_SCRIPTS = ['js/sims/engine.js', 'js/sims/ramp.js', 'js/sims/checks.js'];
+  let simsPromise = null;
+  let simLab = null;
+
+  function loadSims() {
+    if (window.SimEngine && window.SimRamp && window.SimChecks) return Promise.resolve();
+    if (!simsPromise) {
+      simsPromise = SIM_SCRIPTS.reduce((chain, src) => chain.then(() => new Promise((resolve, reject) => {
+        const el = document.createElement('script');
+        el.src = src;
+        el.onload = () => resolve();
+        el.onerror = () => { el.remove(); reject(new Error('could not load ' + src)); };
+        document.head.appendChild(el);
+      })), Promise.resolve()).catch((err) => { simsPromise = null; throw err; });
+    }
+    return simsPromise;
+  }
+
+  function destroySimLab() {
+    if (simLab) { try { simLab.destroy(); } catch (_) {} simLab = null; }
+  }
+
+  function mountSimLab(host, L, params, opts = {}) {
+    destroySimLab();
+    simLab = SimRamp.mount(host, {
+      params,
+      controls: L.sim.controls || [],
+      locked: opts.locked || [],
+      onRun: opts.onRun,
+      onChange: opts.onChange
+    });
+    return simLab;
+  }
+
+  async function renderSimPhase() {
+    const L = lessonCtx.lesson;
+    const ctxToken = lessonCtx;
+    if (lessonCtx.phase === 'example') lessonCtx.phase = 'practice';
+    if (lessonCtx.phase === 'practice' && lessonCtx.mode !== 'lesson') { lessonCtx.phase = 'check'; lessonCtx.checkIndex = 0; }
+    setPips();
+    const stage = $('#lesson-einstein');
+    const bubble = $('#lesson-speech');
+    const body = $('#lesson-body');
+    const actions = $('#lesson-actions');
+    actions.innerHTML = '';
+    if (!(window.SimEngine && window.SimRamp && window.SimChecks)) {
+      body.innerHTML = '<div class="viz-box sim-loading">Setting up Einstein\'s lab…</div>';
+      try {
+        await loadSims();
+      } catch (err) {
+        if (lessonCtx !== ctxToken) return;
+        Einstein.mount(stage, 'think');
+        Einstein.speak(bubble, "Hmm, my lab equipment didn't arrive. Let's try again!", 'correction');
+        body.innerHTML = `<div class="viz-box">Couldn't open the lab — check your connection and try again.</div>`;
+        actions.innerHTML = `<button type="button" class="btn btn-primary" id="btn-sim-retry">Try again</button>
+          <button type="button" class="btn btn-cyan" id="btn-map">Mission Map</button>`;
+        $('#btn-sim-retry').onclick = () => renderSimPhase();
+        $('#btn-map').onclick = renderHub;
+        return;
+      }
+      if (lessonCtx !== ctxToken || !document.querySelector('#screen-lesson.active')) return;
+    }
+    const problems = SimChecks.validateLesson(L);
+    if (problems.length) {
+      console.warn('Sim lesson skipped:', problems);
+      Einstein.mount(stage, 'think');
+      Einstein.speak(bubble, 'This lab is still being built — pick another mission for now!');
+      body.innerHTML = '<div class="viz-box">Lab under construction 🔧</div>';
+      actions.innerHTML = '<button type="button" class="btn btn-cyan" id="btn-map">Mission Map</button>';
+      $('#btn-map').onclick = renderHub;
+      return;
+    }
+    if (lessonCtx.phase === 'practice') renderSimExplore();
+    else renderSimCheck();
+  }
+
+  function renderSimExplore() {
+    const L = lessonCtx.lesson;
+    const body = $('#lesson-body');
+    const actions = $('#lesson-actions');
+    Einstein.mount($('#lesson-einstein'), 'explain');
+    Einstein.speak($('#lesson-speech'), L.sim.explore || 'Move the sliders and press Run it — experiment!');
+    body.innerHTML = '<div class="sim-host" id="sim-host"></div>';
+    mountSimLab($('#sim-host'), L, lessonCtx.simParams || L.sim.params, {
+      onChange: (p) => { lessonCtx.simParams = p; },
+      onRun: (m, p) => {
+        lessonCtx.simParams = p;
+        Einstein.setState($('#lesson-einstein'), m.slides ? 'cheer' : 'think');
+      }
+    });
+    actions.innerHTML = `<button type="button" class="btn btn-primary" id="btn-next">I'm ready for the Lab Check!</button>`;
+    $('#btn-next').onclick = () => { lessonCtx.phase = 'check'; lessonCtx.checkIndex = 0; renderLessonPhase(); };
+  }
+
+  function renderSimCheck() {
+    const L = lessonCtx.lesson;
+    const list = lessonCtx.checkList || L.simChecks || [];
+    const idx = lessonCtx.checkIndex;
+    const q = list[idx];
+    if (!q) {
+      lessonCtx.phase = 'complete';
+      renderLessonPhase();
+      return;
+    }
+    const stage = $('#lesson-einstein');
+    const bubble = $('#lesson-speech');
+    const body = $('#lesson-body');
+    const actions = $('#lesson-actions');
+    const isGoal = q.type === 'goal';
+    Einstein.mount(stage, 'explain');
+    Einstein.speak(bubble, `Lab Check ${idx + 1} of ${list.length} — ${isGoal ? 'set it up, run it, then check!' : 'make your prediction!'}`);
+    body.innerHTML = `
+      <div class="q-card sim-check" data-check="${escapeAttr(q.id)}" data-check-type="${escapeAttr(q.type)}">
+        <div class="q-prompt">${escapeHtml(q.prompt)}</div>
+        ${isGoal ? `<p class="sim-goal">🎯 Goal: ${escapeHtml(SimChecks.describeGoal(q.goal))}</p>` : ''}
+        <div class="sim-host${isGoal ? '' : ' sim-predict'}" id="sim-host"></div>
+        ${isGoal ? '' : `<div class="choices" id="q-choices">${q.choices.map((c, i) =>
+          `<button type="button" class="choice" data-choice="${i}">${escapeHtml(c.label)}</button>`).join('')}</div>`}
+        <div class="hint-line hidden" id="q-hint"></div>
+        <div class="feedback-line" id="q-feedback" aria-live="polite"></div>
+      </div>`;
+    const feedback = $('#q-feedback');
+    const hintEl = $('#q-hint');
+    let answered = false;
+
+    const controlIds = (L.sim.controls || []).map(c => c.param);
+    const startParams = isGoal
+      ? SimChecks.paramsFor(q, lessonCtx.simParams || L.sim.params)
+      : SimChecks.paramsFor(q, L.sim.params);
+    const lab = mountSimLab($('#sim-host'), L, startParams, {
+      locked: isGoal ? (q.lock || []) : controlIds,
+      onChange: (p) => {
+        if (isGoal) lessonCtx.simParams = p;
+        const btn = $('#btn-sim-check');
+        if (btn && !answered) { btn.disabled = true; btn.textContent = 'Run it first ▶'; }
+      },
+      onRun: () => {
+        const btn = $('#btn-sim-check');
+        if (btn && !answered) { btn.disabled = false; btn.textContent = 'Check my setup ✔'; }
+      }
+    });
+    const runRow = $('#sim-host .sim-buttons');
+    if (!isGoal && runRow) runRow.classList.add('hidden');   // predict first, then watch it happen
+
+    function finishAnswer(res) {
+      answered = true;
+      lessonCtx.checkTotal++;
+      if (res.ok) lessonCtx.checkCorrect++;
+      else if (q.id && !lessonCtx.missedCheckIds.includes(q.id)) lessonCtx.missedCheckIds.push(q.id);
+      Storage.setLessonProgress(progress, L.id, {
+        status: 'in_progress',
+        checkCorrect: lessonCtx.checkCorrect,
+        checkTotal: lessonCtx.checkTotal
+      });
+      persistProgress();
+      feedback.classList.add('show', res.ok ? 'ok' : 'bad');
+      if (res.ok) {
+        const msg = q.feedbackCorrect || (isGoal ? 'You nailed it — real scientist work!' : 'Correct! The lab agrees with you!');
+        feedback.textContent = msg;
+        Einstein.setState(stage, 'cheer');
+        Einstein.speak(bubble, msg, 'success');
+        Einstein.pow(stage, 'YES!');
+      } else {
+        let msg = q.feedbackWrong;
+        if (!msg && isGoal) {
+          const a = res.actual;
+          msg = `Not yet — your run gave ${q.goal.metric === 'slides' ? (a ? 'a slide' : 'no slide') : (a === null || a === undefined ? 'no finish' : (Math.round(a * 100) / 100))}. Goal: ${SimChecks.describeGoal(q.goal)}. Experiments teach us!`;
+        }
+        if (!msg) {
+          const right = (q.choices || []).find(c => c.value === res.expected);
+          msg = `Not quite — the lab shows: ${right ? right.label : res.expected}. Watch it happen!`;
+        }
+        feedback.textContent = msg;
+        Einstein.setState(stage, 'think');
+        Einstein.speak(bubble, msg, 'correction');
+        if (q.hint) { hintEl.textContent = 'Hint: ' + q.hint; hintEl.classList.remove('hidden'); }
+      }
+      const isLast = idx >= list.length - 1;
+      actions.innerHTML = `<button type="button" class="btn btn-primary" id="btn-next">${isLast ? 'Finish!' : 'Next'}</button>`;
+      $('#btn-next').onclick = () => {
+        lessonCtx.checkIndex++;
+        if (lessonCtx.checkIndex >= list.length) lessonCtx.phase = 'complete';
+        renderLessonPhase();
+      };
+    }
+
+    if (isGoal) {
+      actions.innerHTML = `<button type="button" class="btn btn-primary" id="btn-sim-check" disabled>Run it first ▶</button>`;
+      $('#btn-sim-check').onclick = () => {
+        if (answered) return;
+        const metrics = lab.lastMetrics();
+        if (!metrics) return;
+        const res = SimChecks.grade(q, { kind: L.sim.kind, params: lab.getParams(), metrics });
+        $('#btn-sim-check').disabled = true;
+        finishAnswer(res);
+      };
+    } else {
+      $$('.choice', body).forEach(btn => {
+        btn.addEventListener('click', () => {
+          if (answered) return;
+          const choice = q.choices[Number(btn.dataset.choice)];
+          const res = SimChecks.grade(q, { kind: L.sim.kind, params: startParams, choice: choice.value });
+          $$('.choice', body).forEach(b => {
+            b.disabled = true;
+            const c = q.choices[Number(b.dataset.choice)];
+            if (c.value === res.expected) b.classList.add('correct');
+            else if (b === btn && !res.ok) b.classList.add('incorrect');
+          });
+          finishAnswer(res);
+          if (runRow) runRow.classList.remove('hidden');
+          if (!q.compare) lab.run();
+        });
+      });
     }
   }
 
@@ -2449,7 +2692,7 @@
     $('#btn-start')?.addEventListener('click', () => {
       requireUserThen(() => {
         syncProgressFromStore();
-        if (!progress.diagnosticDone) startDiagnostic();
+        if (isMathSubject() && !progress.diagnosticDone) startDiagnostic();
         else renderHub();
       });
     });

@@ -33,6 +33,8 @@ function fetchWith(packs) {
   };
 }
 const PACKS = { 'data/subjects/math.json': MATH, 'data/subjects/physics.json': PHYS };
+// The X3-era empty physics pack (coming-soon state); the shipped pack has sim lessons since X4.
+const STUB_PACKS = { ...PACKS, 'data/subjects/physics.json': { meta: { subject: 'physics', status: 'soon' }, tracks: {} } };
 // A hypothetical future physics pack (not shipped) to prove filtering by subject.
 const FUTURE_PHYS = {
   id: 'physics', label: 'Physics',
@@ -100,9 +102,9 @@ async function t(name, fn) {
 
   await t('4. curriculum follows the subject: physics stub has no tracks; switching back restores math', async () => {
     const { Subjects } = load();
-    let cur = await Subjects.loadCurriculum('math', fetchWith(PACKS));
+    let cur = await Subjects.loadCurriculum('math', fetchWith(STUB_PACKS));
     const mathTracks = cur.tracks;
-    cur = Subjects.applyPack(cur, 'physics', await Subjects.loadPack('physics', fetchWith(PACKS)), 'physics');
+    cur = Subjects.applyPack(cur, 'physics', await Subjects.loadPack('physics', fetchWith(STUB_PACKS)), 'physics');
     assert.strictEqual(cur.activeSubjectId, 'physics');
     assert.deepStrictEqual(plain(cur.tracks), {});
     cur = Subjects.normalizeCurriculum(cur, 'math');
@@ -127,7 +129,7 @@ async function t(name, fn) {
   await t('6. parent summary follows the subject (stars, lessons, recent) and never writes empty keys', async () => {
     const { Storage, Subjects } = load();
     const { store, u, firstTwo } = seed(Storage);
-    let cur = await Subjects.loadCurriculum('math', fetchWith(PACKS));
+    let cur = await Subjects.loadCurriculum('math', fetchWith(STUB_PACKS));
     const m = Storage.getParentSummary(store, u.id, cur);
     assert.strictEqual(m.subjectId, 'math');
     assert.strictEqual(m.subjectReady, true);
@@ -135,7 +137,7 @@ async function t(name, fn) {
     assert.strictEqual(m.lessonsDone, 2);
     assert.strictEqual(m.lessonsTotal, Object.keys(MATH.tracks['ages-7-8'].lessons).length);
     assert.deepStrictEqual(plain(m.recentActivity.map(r => r.lessonId).sort()), firstTwo.slice().sort());
-    cur = Subjects.applyPack(cur, 'physics', await Subjects.loadPack('physics', fetchWith(PACKS)), 'physics');
+    cur = Subjects.applyPack(cur, 'physics', await Subjects.loadPack('physics', fetchWith(STUB_PACKS)), 'physics');
     const p = Storage.getParentSummary(store, u.id, cur);
     assert.strictEqual(p.subjectId, 'physics');
     assert.strictEqual(p.subjectLabel, 'Physics');

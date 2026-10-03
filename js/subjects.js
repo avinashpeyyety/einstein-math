@@ -4,7 +4,7 @@
 const Subjects = {
   CATALOG: [
     { id: 'math', label: 'Math', status: 'live', blurb: 'Numbers, shapes & cosmic adventures' },
-    { id: 'physics', label: 'Physics', status: 'live', blurb: "Einstein's ramp & friction lab — more experiments coming" },
+    { id: 'physics', label: 'Physics', status: 'live', blurb: "Einstein's ramp & friction lab + 3D Space Lab (planets, rockets, stars)" },
   ],
 
   defaultId: 'math',

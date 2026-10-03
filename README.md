@@ -2,7 +2,7 @@
 
 Public interactive math program for **ages 5–10** (US K–5), delivered by **Einstein** as an 80s comic-book teacher — big hair, mustache, sweater/lab coat, speech bubbles, bold ink outlines, warm primary colors.
 
-**Continuous sprint plan:** see [`docs/EXPANSION_PLAN.md`](docs/EXPANSION_PLAN.md) (active ticket queue: math depth + physics; SQL on hold as a separate portal) and [`docs/SPRINT_PLAN.md`](docs/SPRINT_PLAN.md) (spine + shipped platform notes). Age tracks 5–6 / 7–8 / 9–10 today; 11–14 queued in the expansion plan.
+**Continuous sprint plan:** see [`docs/EXPANSION_PLAN.md`](docs/EXPANSION_PLAN.md) (active ticket queue: math depth + physics + Space Lab, History plan in docs/HISTORY_PLAN.md; SQL on hold as a separate portal; math coverage audit in docs/MATH_COVERAGE_AUDIT.md) and [`docs/SPRINT_PLAN.md`](docs/SPRINT_PLAN.md) (spine + shipped platform notes). Age tracks 5–6 / 7–8 / 9–10 today; 11–14 queued in the expansion plan.
 
 ## Features
 
@@ -10,6 +10,7 @@ Public interactive math program for **ages 5–10** (US K–5), delivered by **E
   - **Ages 5–6 (K–1)** — counting & teens, compose/decompose, doubles & make-10, length/weight/time/coins, story problems, AB patterns, tally/pictograph, 3D shapes
   - **Ages 7–8 (grades 2–3)** — place value, rounding & estimation, regrouping fluency, mult/div ideas (facts, quotative), fractions of a set, perimeter, elapsed time, bar graphs, multi-step & money WP
   - **Ages 9–10 (grades 4–5)** — multi-digit ops + long mult/div ideas, factors/primes, order of ops, fraction × whole & mixed add/sub (like denoms), decimal add/sub, area/volume, coordinate plane, multi-step WP
+- **🔭 Space Lab (v2.5.0, part of Physics)** — the former Cosmos app, now at `cosmos/`: 3D solar system, launch sites & historic liftoffs, LEO/ISS view, life of a star. Open from the top nav, Home, or the Physics Mission Map. Rocket landings & LEO mission toggles are coming-soon stubs. Three.js r170 vendored in `vendor/three/` (MIT); loaded only when a lab opens.
 - **Mastery + spaced review** (device-local) — check ≥ ~80% → mastered & schedule review; fail &lt; 60% → needs_review + **Retry weak spots**
 - **Today's path** — Mission Map + Home suggest the next 1–3 missions (due reviews → needs_review → diagnostic path → next ready); friendly empty-state when nothing is queued
 - **Parent / Family summary** on the Progress screen — stars, done/mastered, reviews due, unit mastery, weak spots, recent activity; **Print / Save as PDF** + **Download JSON**
@@ -179,7 +180,7 @@ Localhost works for PWA install in Chromium.
 
 ## Smoke demo (2.3 trusted-home sprint)
 
-1. Load once online → DevTools → Application → Service Worker registered; Cache Storage shows `einstein-math-v2.4.8` (or the current `CACHE` in `sw.js`).
+1. Load once online → DevTools → Application → Service Worker registered; Cache Storage shows `einstein-math-v2.5.0` (or the current `CACHE` in `sw.js`).
 2. Go offline (DevTools Network → Offline) → reload → landing / Mission Map still usable.
 3. Create two explorers, earn progress → **Export all profiles** → clear site data → **Import** merge → both kids restored.
 4. Toggle **Read aloud** → Einstein bubbles speak; **Replay** repeats the last line.
@@ -244,7 +245,11 @@ einstein-math/
   js/einstein.js
   js/app.js
   data/subjects/math.json      # math lessons pack (tracks)
-  data/subjects/physics.json   # physics pack (stub until X5)
+  data/subjects/physics.json   # physics pack (sim lessons)
+  js/space.js                  # Space Lab catalog (working sections + coming-soon stubs)
+  cosmos/                      # Space Lab app (former github.com/avinashpeyyety/cosmos); ?mode=solar|earth|leo|stars
+  vendor/three/                # Three.js r170 (MIT), used by cosmos/ only
+  _archive/cosmos-history/     # cosmos git bundle (full history) + old URLs
   assets/panels/*.png          # Einstein idle/explain/cheer/think
   assets/student/portrait.jpg
   assets/student/panels/*.png  # pupil likeness panels (same four states)

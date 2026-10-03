@@ -1,5 +1,5 @@
 /* Einstein Math service worker — caches app shell + curriculum + panels for offline play */
-const CACHE = 'einstein-math-v2.4.8';
+const CACHE = 'einstein-math-v2.5.0';
 // W1b: on-device comic-avatar model (~40 MB) is cached on first use only, and kept across app versions
 const MODEL_CACHE = 'einstein-math-models-v1';
 // X2: subject packs (data/subjects/<id>.json). math is precached (default subject, offline after first visit);
@@ -13,6 +13,7 @@ const PRECACHE = [
   './js/storage.js',
   './js/backup.js',
   './js/subjects.js',
+  './js/space.js',
   './js/comicify.js',
   './js/einstein.js',
   './js/student.js',
@@ -55,15 +56,31 @@ self.addEventListener('fetch', (event) => {
 
   // Network-first for HTML navigations so updates land; fall back to cache offline
   const isNav = req.mode === 'navigate' || (req.headers.get('accept') || '').includes('text/html');
+  // v2.5.0: Space Lab pages (cosmos/) are their own HTML document — cache them under their own path (query
+  // stripped, so ?mode= deep links share one entry) and never let them overwrite the app shell's ./index.html.
+  const isSpace = url.pathname.includes('/cosmos/');
   if (isNav) {
+    const spaceKey = isSpace ? new Request(url.origin + url.pathname) : null;
     event.respondWith(
       fetch(req)
         .then((res) => {
           const copy = res.clone();
-          caches.open(CACHE).then((c) => c.put('./index.html', copy));
+          if (res && res.ok) caches.open(CACHE).then((c) => c.put(isSpace ? spaceKey : './index.html', copy));
           return res;
         })
-        .catch(() => caches.match('./index.html'))
+        .catch(() => (isSpace ? caches.match(spaceKey) : caches.match('./index.html')))
+    );
+    return;
+  }
+
+  // v2.5.0: Space Lab code (cosmos/*) + vendored Three.js (vendor/three/*, ~1.4 MB) are lazy like the sims —
+  // not precached; cache-first in this version's cache on first use, replaced on the next version.
+  if (isSpace || url.pathname.includes('/vendor/three/')) {
+    event.respondWith(
+      caches.open(CACHE).then((c) => c.match(req).then((hit) => hit || fetch(req).then((res) => {
+        if (res && res.ok) c.put(req, res.clone());
+        return res;
+      })))
     );
     return;
   }

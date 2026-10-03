@@ -54,6 +54,7 @@
           <button type="button" class="btn btn-ghost btn-sm" data-nav="landing">Home</button>
           <button type="button" class="btn btn-cyan btn-sm" data-nav="hub">Mission Map</button>
           <button type="button" class="btn btn-pink btn-sm" data-nav="progress">Progress</button>
+          <button type="button" class="btn btn-ghost btn-sm" data-nav="space" title="Space Lab — solar system, launches, stars">🔭 Space</button>
         </nav>
       </div>
     </header>
@@ -98,6 +99,12 @@
         </div>
         <div id="new-explorer-form" class="hidden" style="margin-top:1rem;"></div>
         <p class="privacy-note">Profiles &amp; progress stay on this device only (localStorage) — no accounts, no passwords, no cloud sync. Rename, upload or clear a comic photo, or delete from each Home card; optional photo on Create / + New Explorer (comicified on-device). Use Parent / Progress export &amp; import to hand off between devices. Progress also has <strong>Remove All Explorers</strong> (double confirm).</p>
+      </div>
+
+      <div class="comic-panel space-teaser">
+        <h2 class="panel-title">🔭 Space Lab</h2>
+        <p>Fly through the solar system, launch historic rockets from real launch sites, circle Earth with the ISS, and watch a star live and die — Einstein's 3D space lab.</p>
+        <button type="button" class="btn btn-cyan" id="btn-open-space">Open Space Lab</button>
       </div>
 
       <div class="comic-panel">
@@ -162,6 +169,21 @@
       <h2 class="panel-title">Mission Map <span class="hub-track" id="hub-track-label"></span></h2>
       <div class="comic-panel review-panel hidden" id="review-due-panel"></div>
       <div class="unit-grid" id="unit-grid"></div>
+    </section>
+
+    <!-- SPACE LAB (v2.5.0: the former Cosmos app, now at cosmos/) -->
+    <section id="screen-space" class="screen">
+      <div class="comic-panel">
+        <div class="teacher-row">
+          <div class="cast-duo">
+            <div class="einstein-stage" id="space-einstein" style="width:120px;height:150px;"></div>
+          </div>
+          <div class="speech-wrap"><div class="speech-bubble" id="space-speech"></div></div>
+        </div>
+      </div>
+      <h2 class="panel-title">🔭 Space Lab <span class="hub-track">Physics · 3D labs</span></h2>
+      <div class="unit-grid" id="space-grid"></div>
+      <p class="privacy-note">Space Lab is a 3D view (WebGL). Distances and sizes are squeezed so everything fits on screen — schematic, not to scale. Works offline after you open each lab once.</p>
     </section>
 
     <!-- PROGRESS -->
@@ -299,13 +321,14 @@
     </div>
 
     <footer class="site-footer">
-      Einstein Math · Ages 5–10 · v2.4.8 · Progress stays on your device (no accounts) · Installable / offline after first visit
+      Einstein Math · Ages 5–10 · v2.5.0 · Progress stays on your device (no accounts) · Installable / offline after first visit
     </footer>
   </div>
 
   <script src="js/storage.js"></script>
   <script src="js/backup.js"></script>
   <script src="js/subjects.js"></script>
+  <script src="js/space.js"></script>
   <script src="js/comicify.js"></script>
   <script src="js/einstein.js"></script>
   <script src="js/student.js"></script>

@@ -158,7 +158,7 @@ t('9. lazy: sim code is not in index.html or the SW precache; app loads it on de
     assert.ok(app.includes(`'${f}'`), 'app lazy-loads ' + f);
     assert.ok(fs.existsSync(path.join(ROOT, f)));
   });
-  assert.ok(/einstein-math-v2\.4\.8/.test(sw) && /v2\.4\.8/.test(html), 'SW + footer v2.4.8');
+  { const m = sw.match(/einstein-math-v(\d+\.\d+\.\d+)/); assert.ok(m && html.includes('v' + m[1] + ' ·'), 'SW cache version matches footer'); }
 });
 
 console.log(`\n${pass} passed${fail ? `, ${fail} failed` : ''}`);

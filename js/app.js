@@ -228,6 +228,7 @@
     $$('.screen').forEach(s => s.classList.remove('active'));
     const el = document.getElementById(id);
     if (el) el.classList.add('active');
+    if (id !== 'screen-space' && location.hash === '#space') history.replaceState(null, '', location.pathname + location.search);
     window.scrollTo({ top: 0, behavior: 'smooth' });
     updateHeaderUser();
     updateSubjectChip();
@@ -1579,7 +1580,9 @@
       const rh = $('#review-due-panel');
       if (rh) { rh.classList.add('hidden'); rh.innerHTML = ''; }
       const g = $('#unit-grid');
-      g.innerHTML = `<div class="unit-card subject-soon-card" style="border-top: 8px solid #A78BFA"><div class="unit-icon">⚛️</div><h3>${escapeHtml(sub.label)} units</h3><p>Coming soon: push &amp; pull, ramps &amp; friction, sink or float.</p></div>`;
+      g.innerHTML = `<div class="unit-card subject-soon-card" style="border-top: 8px solid #A78BFA"><div class="unit-icon">⚛️</div><h3>${escapeHtml(sub.label)} units</h3><p>Coming soon: push &amp; pull, ramps &amp; friction, sink or float.</p></div>`
+        + (activeSubjectId() === 'physics' ? spaceUnitCardHtml() : '');
+      wireSpaceUnitCard(g);
       return;
     }
     const due = Storage.getDueReviews(progress);
@@ -1652,7 +1655,8 @@
               }).join('')}
             </ul>` : `<p style="opacity:0.6;font-weight:700;">More lessons coming soon!</p>`}
         </div>`;
-    }).join('');
+    }).join('') + (activeSubjectId() === 'physics' ? spaceUnitCardHtml() : '');
+    wireSpaceUnitCard(grid);
 
     $$('.btn-lesson', grid).forEach(btn => {
       btn.addEventListener('click', (e) => {
@@ -1662,6 +1666,31 @@
         startLesson(btn.dataset.lesson, { mode });
       });
     });
+  }
+
+  /* ——— Space Lab (v2.5.0): former Cosmos app, linked from nav, Home and the Physics Mission Map ——— */
+  function renderSpace() {
+    showScreen('screen-space');
+    if (location.hash !== '#space') history.replaceState(null, '', '#space');
+    Einstein.mount($('#space-einstein'), 'explain');
+    Einstein.speak($('#space-speech'), 'Welcome to my Space Lab! Pick a lab — orbit the planets, launch a rocket, or watch a star grow old. Some labs are still being built in my workshop.');
+    const g = $('#space-grid');
+    if (g && typeof SpaceLab !== 'undefined') g.innerHTML = SpaceLab.cardsHtml();
+  }
+
+  function spaceUnitCardHtml() {
+    if (typeof SpaceLab === 'undefined') return '';
+    return `<div class="unit-card space-unit" style="border-top: 8px solid #7C5CFF" data-unit="space-lab">
+      <div class="unit-icon">🔭</div>
+      <h3>Space Lab</h3>
+      <p>3D labs: planets &amp; orbits, rocket launches, the ISS, and the life of a star.</p>
+      ${SpaceLab.cardsHtml({ compact: true })}
+      <button type="button" class="btn btn-cyan btn-sm btn-space-open">All space labs</button>
+    </div>`;
+  }
+
+  function wireSpaceUnitCard(grid) {
+    $$('.btn-space-open', grid).forEach(b => b.addEventListener('click', () => renderSpace()));
   }
 
   /* ——— Progress / profile manage ——— */
@@ -2704,12 +2733,14 @@
     $('#btn-parent-json')?.addEventListener('click', () => downloadParentJson());
 
     $('#btn-diag-to-hub')?.addEventListener('click', () => requireUserThen(renderHub));
+    $('#btn-open-space')?.addEventListener('click', () => renderSpace());
     $$('[data-nav]').forEach(btn => {
       btn.addEventListener('click', () => {
         const t = btn.dataset.nav;
         if (t === 'landing') { showScreen('screen-landing'); renderLanding(); }
         else if (t === 'hub') requireUserThen(renderHub);
         else if (t === 'progress') requireUserThen(renderProgress);
+        else if (t === 'space') renderSpace();
       });
     });
     $('#btn-reset')?.addEventListener('click', () => {
@@ -2830,6 +2861,7 @@
   }
 
   async function boot() {
+    const wantSpace = location.hash === '#space'; // back link from cosmos/ (read before showScreen clears it)
     try {
       // X2: lazy subject packs — only data/subjects/math.json (+ the active subject's pack) is fetched
       store = Storage.loadStore();
@@ -2853,6 +2885,7 @@
     wireNav();
     renderLanding();
     showScreen('screen-landing');
+    if (wantSpace) renderSpace();
   }
 
   document.addEventListener('DOMContentLoaded', boot);

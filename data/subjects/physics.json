@@ -4,8 +4,8 @@
     "title": "Einstein Physics",
     "status": "live",
     "schemaVersion": 3,
-    "version": "0.1.0",
-    "note": "X4: first sim lessons (ramp & friction lab). Ages 5–6 still coming soon."
+    "version": "0.2.0",
+    "note": "X5: ages 7–8 Forces & Friction unit (4 lab lessons + unit check). Ages 5–6 still coming soon."
   },
   "tracks": {
     "ages-7-8": {
@@ -13,15 +13,15 @@
       "label": "Ages 7–8",
       "ageRange": "7–8",
       "gradeBand": "Grades 2–3",
-      "blurb": "Forces & friction with Einstein's ramp lab.",
+      "blurb": "Forces & friction: slopes, surfaces and mass in Einstein's ramp lab.",
       "units": [
         {
           "id": "unit-forces-friction",
           "title": "Forces & Friction",
           "icon": "🛝",
           "color": "#A78BFA",
-          "description": "Why do things slide — or stick? Tilt the ramp and find out!",
-          "lessons": ["ph-ramp-slide-or-stick"]
+          "description": "Why do things slide or stick? Test slopes, surfaces and heavy blocks in Einstein's ramp lab, then take the unit check!",
+          "lessons": ["ph-ramp-slide-or-stick", "ph-ramp-steeper-faster", "ph-ramp-surfaces", "ph-ramp-heavy-light", "ph-ff-unit-check"]
         }
       ],
       "lessons": {
@@ -38,7 +38,10 @@
             "panels": [
               { "speech": "Gravity always pulls things down. On a ramp, part of that pull drags the block along the slope.", "state": "explain" },
               { "speech": "Friction is grip between the block and the ramp. Grippy surfaces hold on; slippery ones let go.", "state": "think" },
-              { "speech": "Make the ramp steeper and gravity's slope pull gets stronger. When it beats the grip — WHOOSH, the block slides!", "state": "explain" }
+              {
+                "speech": "Make the ramp steeper and gravity's slope pull gets stronger. When it beats the grip — WHOOSH, the block slides!",
+                "state": "explain"
+              }
             ]
           },
           "sim": {
@@ -58,10 +61,7 @@
               "prompt": "The ramp is tilted just 10° and the grip is 0.5. Will the block slide?",
               "setup": { "angleDeg": 10, "muS": 0.5 },
               "metric": "slides",
-              "choices": [
-                { "label": "It slides down 🛝", "value": true },
-                { "label": "It stays put 🧱", "value": false }
-              ],
+              "choices": [{ "label": "It slides down 🛝", "value": true }, { "label": "It stays put 🧱", "value": false }],
               "hint": "A gentle slope only pulls a little — and a grip of 0.5 holds on tight."
             },
             {
@@ -79,11 +79,7 @@
               "prompt": "At 35°, a 1 kg block races to the bottom. Will a 5 kg block get there faster, slower, or at the same time?",
               "setup": { "angleDeg": 35, "mass": 1, "muS": 0.5 },
               "compare": { "alt": { "mass": 5 }, "metric": "t" },
-              "choices": [
-                { "label": "Faster", "value": "less" },
-                { "label": "Same time", "value": "same" },
-                { "label": "Slower", "value": "more" }
-              ],
+              "choices": [{ "label": "Faster", "value": "less" }, { "label": "Same time", "value": "same" }, { "label": "Slower", "value": "more" }],
               "hint": "A heavier block gets a bigger pull AND a bigger grip — they grow together!"
             },
             {
@@ -92,6 +88,267 @@
               "prompt": "Make the block reach the bottom in less than 1.2 seconds. Run it, then press Check.",
               "goal": { "metric": "t", "op": "lt", "value": 1.2 },
               "hint": "Make the ramp steeper, or the surface less grippy."
+            }
+          ]
+        },
+        "ph-ramp-steeper-faster": {
+          "id": "ph-ramp-steeper-faster",
+          "unitId": "unit-forces-friction",
+          "type": "sim",
+          "title": "Steeper Means Faster?",
+          "durationMin": 8,
+          "prerequisites": ["ph-ramp-slide-or-stick"],
+          "skills": ["ramp-angle", "speed-on-ramp"],
+          "einsteinIntro": "Big question, little scientist: does a steeper ramp make the block go faster? Let's race and find out!",
+          "explain": {
+            "panels": [
+              { "speech": "A steeper ramp tips more of gravity's pull along the slope. More pull means the block speeds up faster.", "state": "explain" },
+              { "speech": "But if the ramp is too gentle, the grip wins and the block won't move at all!", "state": "think" },
+              { "speech": "Scientists test one thing at a time. Today we only change the angle and watch the clock.", "state": "cheer" }
+            ]
+          },
+          "sim": {
+            "kind": "ramp",
+            "params": { "angleDeg": 20, "mass": 2, "muS": 0.4, "muK": 0.2, "g": 9.8, "length": 2 },
+            "controls": [{ "param": "angleDeg", "label": "Ramp angle", "min": 0, "max": 60, "step": 1 }],
+            "explore": "Change the ramp angle and press Run it. Watch the timer: which angle wins the race?"
+          },
+          "simChecks": [
+            {
+              "id": "ph-sf-c1",
+              "type": "predict",
+              "prompt": "A block slides down a 30° ramp. If we tilt the ramp to 45°, will it reach the bottom faster, slower, or at the same time?",
+              "setup": { "angleDeg": 30 },
+              "compare": { "alt": { "angleDeg": 45 }, "metric": "t" },
+              "choices": [{ "label": "Faster", "value": "less" }, { "label": "Same time", "value": "same" }, { "label": "Slower", "value": "more" }],
+              "hint": "Steeper ramps pull harder along the slope."
+            },
+            {
+              "id": "ph-sf-c2",
+              "type": "goal",
+              "prompt": "Make the block reach the bottom in less than 1 second. Run it, then press Check.",
+              "goal": { "metric": "t", "op": "lt", "value": 1.0 },
+              "hint": "Go steep! Try more than 45°."
+            },
+            {
+              "id": "ph-sf-c3",
+              "type": "predict",
+              "prompt": "The ramp is tilted 20° and the grip is 0.4. Will the block slide?",
+              "setup": { "angleDeg": 20 },
+              "metric": "slides",
+              "choices": [{ "label": "It slides down 🛝", "value": true }, { "label": "It stays put 🧱", "value": false }],
+              "hint": "A gentle slope only pulls a little. Is it enough to beat a grip of 0.4?"
+            },
+            {
+              "id": "ph-sf-c4",
+              "type": "goal",
+              "prompt": "Make a slow, gentle slide: the block should take between 1 and 1.5 seconds. Run it, then press Check.",
+              "goal": { "metric": "t", "op": "between", "value": [1.0, 1.5] },
+              "hint": "Find the angle where it JUST starts sliding, then nudge it a little steeper."
+            }
+          ]
+        },
+        "ph-ramp-surfaces": {
+          "id": "ph-ramp-surfaces",
+          "unitId": "unit-forces-friction",
+          "type": "sim",
+          "title": "Ice, Wood or Carpet?",
+          "durationMin": 8,
+          "prerequisites": ["ph-ramp-steeper-faster"],
+          "skills": ["friction-grip", "surfaces"],
+          "einsteinIntro": "Ice is slippery, carpet is grippy. Let's see how the surface changes what our block does!",
+          "explain": {
+            "panels": [
+              { "speech": "Friction is the grip between two surfaces. Bumpy, rough surfaces grab on tight.", "state": "explain" },
+              { "speech": "Smooth surfaces like ice barely grip at all, so things slide even on a gentle slope.", "state": "think" },
+              { "speech": "That's why we sprinkle sand on icy roads: more grip, less sliding!", "state": "cheer" }
+            ]
+          },
+          "sim": {
+            "kind": "ramp",
+            "params": { "angleDeg": 30, "mass": 2, "muS": 0.5, "muK": 0.3, "g": 9.8, "length": 2 },
+            "controls": [
+              { "param": "muS", "label": "Grip (sticky-ness)", "min": 0.1, "max": 0.9, "step": 0.05 },
+              { "param": "angleDeg", "label": "Ramp angle", "min": 0, "max": 60, "step": 1 }
+            ],
+            "explore": "Change the grip slider from icy (low) to grippy (high) and press Run it. When does the block stick?"
+          },
+          "simChecks": [
+            {
+              "id": "ph-su-c1",
+              "type": "predict",
+              "prompt": "The ramp is covered in ice (grip 0.1) and tilted only 10°. Will the block slide?",
+              "setup": { "angleDeg": 10, "muS": 0.1, "muK": 0.05 },
+              "metric": "slides",
+              "choices": [{ "label": "It slides down 🛝", "value": true }, { "label": "It stays put 🧱", "value": false }],
+              "hint": "Ice hardly grips at all, so even a tiny slope can win."
+            },
+            {
+              "id": "ph-su-c2",
+              "type": "predict",
+              "prompt": "The ramp is covered in thick carpet (grip 0.9) and tilted 30°. Will the block slide?",
+              "setup": { "angleDeg": 30, "muS": 0.9, "muK": 0.7 },
+              "metric": "slides",
+              "choices": [{ "label": "It slides down 🛝", "value": true }, { "label": "It stays put 🧱", "value": false }],
+              "hint": "Carpet grabs on tight. A 30° slope isn't steep enough to beat it."
+            },
+            {
+              "id": "ph-su-c3",
+              "type": "goal",
+              "prompt": "The ramp is locked at 35°. Change the surface so the block STAYS PUT. Run it, then press Check.",
+              "setup": { "angleDeg": 35 },
+              "lock": ["angleDeg"],
+              "goal": { "metric": "slides", "op": "eq", "value": false },
+              "hint": "Make the surface grippier. Try a grip of 0.75 or more."
+            },
+            {
+              "id": "ph-su-c4",
+              "type": "predict",
+              "prompt": "A block slides down a wooden ramp at 40°. Now we cover the ramp in ice. Will it reach the bottom faster, slower, or at the same time?",
+              "setup": { "angleDeg": 40, "muS": 0.5, "muK": 0.3 },
+              "compare": { "alt": { "muS": 0.2, "muK": 0.1 }, "metric": "t" },
+              "choices": [{ "label": "Faster", "value": "less" }, { "label": "Same time", "value": "same" }, { "label": "Slower", "value": "more" }],
+              "hint": "Less grip means less friction holding the block back."
+            }
+          ]
+        },
+        "ph-ramp-heavy-light": {
+          "id": "ph-ramp-heavy-light",
+          "unitId": "unit-forces-friction",
+          "type": "sim",
+          "title": "Heavy vs Light: The Big Race",
+          "durationMin": 8,
+          "prerequisites": ["ph-ramp-surfaces"],
+          "skills": ["mass-and-sliding", "fair-test"],
+          "einsteinIntro": "Will a heavy block beat a light block down the ramp? Most people guess yes. Let's test it like real scientists!",
+          "explain": {
+            "panels": [
+              { "speech": "A heavier block gets a BIGGER pull from gravity. Sounds like it should win, right?", "state": "think" },
+              { "speech": "But a heavier block also presses harder on the ramp, so friction grips it harder too.", "state": "explain" },
+              { "speech": "The extra pull and the extra grip grow together. Let's see who wins!", "state": "cheer" }
+            ]
+          },
+          "sim": {
+            "kind": "ramp",
+            "params": { "angleDeg": 35, "mass": 2, "muS": 0.5, "muK": 0.3, "g": 9.8, "length": 2 },
+            "controls": [
+              { "param": "mass", "label": "Block mass", "min": 0.5, "max": 10, "step": 0.5 },
+              { "param": "angleDeg", "label": "Ramp angle", "min": 0, "max": 60, "step": 1 }
+            ],
+            "explore": "Change the block mass, press Run it, and compare the times. Does heavy beat light?"
+          },
+          "simChecks": [
+            {
+              "id": "ph-hl-c1",
+              "type": "predict",
+              "prompt": "On a 35° ramp, a 1 kg block races an 8 kg block. Will the heavy block get there faster, slower, or at the same time?",
+              "setup": { "angleDeg": 35, "mass": 1 },
+              "compare": { "alt": { "mass": 8 }, "metric": "t" },
+              "choices": [{ "label": "Faster", "value": "less" }, { "label": "Same time", "value": "same" }, { "label": "Slower", "value": "more" }],
+              "hint": "More mass means more pull AND more grip, and they grow together."
+            },
+            {
+              "id": "ph-hl-c2",
+              "type": "predict",
+              "prompt": "A heavy 10 kg block sits on a 20° ramp with a grip of 0.5. Will it slide?",
+              "setup": { "angleDeg": 20, "mass": 10 },
+              "metric": "slides",
+              "choices": [{ "label": "It slides down 🛝", "value": true }, { "label": "It stays put 🧱", "value": false }],
+              "hint": "Heavy or light, the slope has to beat the grip. Mass doesn't change who wins."
+            },
+            {
+              "id": "ph-hl-c3",
+              "type": "goal",
+              "prompt": "The block is locked at 8 kg. Make it reach the bottom in less than 1 second. Run it, then press Check.",
+              "setup": { "mass": 8 },
+              "lock": ["mass"],
+              "goal": { "metric": "t", "op": "lt", "value": 1.0 },
+              "hint": "You can't change the mass, so what else makes it faster? Try a steeper ramp."
+            },
+            {
+              "id": "ph-hl-c4",
+              "type": "predict",
+              "prompt": "At 40°, a 2 kg block hits the bottom at some speed. Will a 0.5 kg block be faster, slower, or the same speed at the bottom?",
+              "setup": { "angleDeg": 40, "mass": 2 },
+              "compare": { "alt": { "mass": 0.5 }, "metric": "v" },
+              "choices": [{ "label": "Faster", "value": "more" }, { "label": "Same speed", "value": "same" }, { "label": "Slower", "value": "less" }],
+              "hint": "Remember the race: mass cancels out!"
+            }
+          ]
+        },
+        "ph-ff-unit-check": {
+          "id": "ph-ff-unit-check",
+          "unitId": "unit-forces-friction",
+          "type": "sim",
+          "title": "Forces & Friction Check ⭐",
+          "durationMin": 10,
+          "prerequisites": ["ph-ramp-heavy-light"],
+          "skills": ["friction-grip", "ramp-angle", "mass-and-sliding", "surfaces"],
+          "einsteinIntro": "Time to show what you know! Use everything you learned about slopes, grip and mass.",
+          "explain": {
+            "panels": [
+              { "speech": "Remember: the slope's pull has to beat the grip before anything slides.", "state": "think" },
+              { "speech": "Steeper ramps and slippery surfaces make blocks go faster. Mass? It doesn't change the race!", "state": "explain" },
+              { "speech": "Predict first, then test it in the lab. That's how scientists work. You've got this!", "state": "cheer" }
+            ]
+          },
+          "sim": {
+            "kind": "ramp",
+            "params": { "angleDeg": 15, "mass": 2, "muS": 0.5, "muK": 0.3, "g": 9.8, "length": 2 },
+            "controls": [
+              { "param": "angleDeg", "label": "Ramp angle", "min": 0, "max": 60, "step": 1 },
+              { "param": "mass", "label": "Block mass", "min": 0.5, "max": 10, "step": 0.5 },
+              { "param": "muS", "label": "Grip (sticky-ness)", "min": 0.3, "max": 0.9, "step": 0.05 }
+            ],
+            "explore": "Warm up in the lab: try every slider once, then start the check."
+          },
+          "simChecks": [
+            {
+              "id": "ph-fc-c1",
+              "type": "predict",
+              "prompt": "The ramp is tilted 40° and the grip is 0.5. Will the block slide?",
+              "setup": { "angleDeg": 40, "muS": 0.5 },
+              "metric": "slides",
+              "choices": [{ "label": "It slides down 🛝", "value": true }, { "label": "It stays put 🧱", "value": false }],
+              "hint": "40° is pretty steep. Can a grip of 0.5 hold on?"
+            },
+            {
+              "id": "ph-fc-c2",
+              "type": "predict",
+              "prompt": "A block slides down a 30° ramp. We tilt it to 50°. Will it reach the bottom faster, slower, or at the same time?",
+              "setup": { "angleDeg": 30, "muS": 0.4, "muK": 0.2 },
+              "compare": { "alt": { "angleDeg": 50 }, "metric": "t" },
+              "choices": [{ "label": "Faster", "value": "less" }, { "label": "Same time", "value": "same" }, { "label": "Slower", "value": "more" }],
+              "hint": "Steeper ramps pull harder."
+            },
+            {
+              "id": "ph-fc-c3",
+              "type": "predict",
+              "prompt": "On a 40° ramp, will a 6 kg block beat a 2 kg block to the bottom?",
+              "setup": { "angleDeg": 40, "mass": 2 },
+              "compare": { "alt": { "mass": 6 }, "metric": "t" },
+              "choices": [
+                { "label": "Yes, the 6 kg block is faster", "value": "less" },
+                { "label": "No, it's a tie", "value": "same" },
+                { "label": "No, the 6 kg block is slower", "value": "more" }
+              ],
+              "hint": "Think back to the Big Race."
+            },
+            {
+              "id": "ph-fc-c4",
+              "type": "goal",
+              "prompt": "The ramp is locked at 40°. Make the block stay put. Run it, then press Check.",
+              "setup": { "angleDeg": 40 },
+              "lock": ["angleDeg"],
+              "goal": { "metric": "slides", "op": "eq", "value": false },
+              "hint": "Turn the grip way up, past 0.85."
+            },
+            {
+              "id": "ph-fc-c5",
+              "type": "goal",
+              "prompt": "Now make the block reach the bottom in less than 1 second. Run it, then press Check.",
+              "goal": { "metric": "t", "op": "lt", "value": 1.0 },
+              "hint": "Steep ramp, low grip. Go!"
             }
           ]
         }
@@ -149,10 +406,7 @@
               "prompt": "θ = 30°, μs = 0.7, μk = 0.5. Does the block start to slide?",
               "setup": { "angleDeg": 30, "muS": 0.7, "muK": 0.5 },
               "metric": "slides",
-              "choices": [
-                { "label": "Yes, it slides", "value": true },
-                { "label": "No, static friction holds it", "value": false }
-              ],
+              "choices": [{ "label": "Yes, it slides", "value": true }, { "label": "No, static friction holds it", "value": false }],
               "hint": "Compare tan 30° ≈ 0.58 with μs."
             },
             {

@@ -3698,6 +3698,10 @@
             "md-equal-groups",
             "md-arrays-div",
             "md-facts-2-5-10",
+            "md-facts-3-4",
+            "md-facts-6-9",
+            "md-div-unknown-factor",
+            "md-properties",
             "md-quotative",
             "md-multiply-stories"
           ]
@@ -7314,6 +7318,569 @@
               "accept": [
                 "81"
               ]
+            }
+          ]
+        },
+        "md-facts-3-4": {
+          "id": "md-facts-3-4",
+          "unitId": "unit-mult-div",
+          "title": "Facts: 3s & 4s",
+          "durationMin": 8,
+          "prerequisites": [
+            "md-facts-2-5-10"
+          ],
+          "skills": [
+            "mult-facts-3-4"
+          ],
+          "einsteinIntro": "Skip-count by 3s and 4s — and learn the double-double trick for 4s!",
+          "explain": {
+            "panels": [
+              {
+                "speech": "3×6 means 6 jumps of 3: 3, 6, 9, 12, 15, 18!",
+                "visual": "facts-3s",
+                "state": "explain"
+              },
+              {
+                "speech": "4s trick: double, then double again. 4×7 → 14 → 28!",
+                "visual": "double-double",
+                "state": "cheer"
+              }
+            ]
+          },
+          "workedExample": {
+            "title": "Worked Example",
+            "speech": "4 × 6 = ?",
+            "steps": [
+              "2 × 6 = 12",
+              "Double it: 12 + 12 = 24",
+              "4 × 6 = 24"
+            ]
+          },
+          "practice": [
+            {
+              "id": "x20a-p1",
+              "type": "mc",
+              "prompt": "3 × 4 = ?",
+              "choices": [
+                "7",
+                "12",
+                "34",
+                "9"
+              ],
+              "answer": "12",
+              "hint": "4 jumps of 3",
+              "feedbackCorrect": "12!",
+              "feedbackWrong": "3×4=12."
+            },
+            {
+              "id": "x20a-p2",
+              "type": "fill",
+              "prompt": "3 × 7 = ?",
+              "answer": "21",
+              "accept": [
+                "21"
+              ],
+              "hint": "3, 6, 9, 12, 15, 18, 21",
+              "feedbackCorrect": "21!",
+              "feedbackWrong": "3×7=21."
+            },
+            {
+              "id": "x20a-p3",
+              "type": "mc",
+              "prompt": "4 × 8 = ?",
+              "choices": [
+                "12",
+                "24",
+                "32",
+                "48"
+              ],
+              "answer": "32",
+              "hint": "2×8=16, double it",
+              "feedbackCorrect": "32!",
+              "feedbackWrong": "16+16=32."
+            },
+            {
+              "id": "x20a-p4",
+              "type": "mc",
+              "prompt": "Which skip-count shows 3 × 5?",
+              "choices": [
+                "3, 6, 9, 12, 15",
+                "5, 10, 15",
+                "3, 5, 8",
+                "1, 2, 3, 4, 5"
+              ],
+              "answer": "3, 6, 9, 12, 15",
+              "hint": "5 jumps of 3",
+              "feedbackCorrect": "Yes — 15!",
+              "feedbackWrong": "Count by 3s five times."
+            },
+            {
+              "id": "x20a-p5",
+              "type": "fill",
+              "prompt": "4 × 9 = ?",
+              "answer": "36",
+              "accept": [
+                "36"
+              ],
+              "hint": "2×9=18, double it",
+              "feedbackCorrect": "36!",
+              "feedbackWrong": "18+18=36."
+            }
+          ],
+          "quickCheck": [
+            {
+              "id": "x20a-q1",
+              "type": "mc",
+              "prompt": "3 × 8 = ?",
+              "choices": [
+                "11",
+                "24",
+                "21",
+                "27"
+              ],
+              "answer": "24"
+            },
+            {
+              "id": "x20a-q2",
+              "type": "fill",
+              "prompt": "4 × 5 = ?",
+              "answer": "20",
+              "accept": [
+                "20"
+              ]
+            },
+            {
+              "id": "x20a-q3",
+              "type": "fill",
+              "prompt": "3 × 9 = ?",
+              "answer": "27",
+              "accept": [
+                "27"
+              ]
+            }
+          ]
+        },
+        "md-facts-6-9": {
+          "id": "md-facts-6-9",
+          "unitId": "unit-mult-div",
+          "title": "Facts: 6s, 7s, 8s & 9s",
+          "durationMin": 8,
+          "prerequisites": [
+            "md-facts-3-4"
+          ],
+          "skills": [
+            "mult-facts-6-9"
+          ],
+          "einsteinIntro": "The big facts! Use facts you already know to crack 6s, 7s, 8s and 9s.",
+          "explain": {
+            "panels": [
+              {
+                "speech": "6×7? Start with 5×7=35, then add one more 7 → 42!",
+                "visual": "five-plus-one",
+                "state": "explain"
+              },
+              {
+                "speech": "9s trick: 9×6 = 10×6 − 6 = 54. And 5 + 4 = 9!",
+                "visual": "nines-trick",
+                "state": "cheer"
+              }
+            ]
+          },
+          "workedExample": {
+            "title": "Worked Example",
+            "speech": "8 × 7 = ?",
+            "steps": [
+              "Start with 4 × 7 = 28",
+              "Double it: 28 + 28 = 56",
+              "8 × 7 = 56"
+            ]
+          },
+          "practice": [
+            {
+              "id": "x20b-p1",
+              "type": "mc",
+              "prompt": "6 × 6 = ?",
+              "choices": [
+                "12",
+                "36",
+                "30",
+                "42"
+              ],
+              "answer": "36",
+              "hint": "5×6 + 6",
+              "feedbackCorrect": "36!",
+              "feedbackWrong": "30+6=36."
+            },
+            {
+              "id": "x20b-p2",
+              "type": "fill",
+              "prompt": "9 × 4 = ?",
+              "answer": "36",
+              "accept": [
+                "36"
+              ],
+              "hint": "10×4 − 4",
+              "feedbackCorrect": "36!",
+              "feedbackWrong": "40−4=36."
+            },
+            {
+              "id": "x20b-p3",
+              "type": "mc",
+              "prompt": "7 × 8 = ?",
+              "choices": [
+                "54",
+                "56",
+                "48",
+                "63"
+              ],
+              "answer": "56",
+              "hint": "5, 6, 7, 8 → 56 = 7×8",
+              "feedbackCorrect": "56!",
+              "feedbackWrong": "7×8=56."
+            },
+            {
+              "id": "x20b-p4",
+              "type": "mc",
+              "prompt": "9 × 7 = 10 × 7 − ?",
+              "choices": [
+                "7",
+                "9",
+                "1",
+                "70"
+              ],
+              "answer": "7",
+              "hint": "Take away one 7",
+              "feedbackCorrect": "Yes! 70−7=63.",
+              "feedbackWrong": "10 sevens minus 1 seven."
+            },
+            {
+              "id": "x20b-p5",
+              "type": "fill",
+              "prompt": "6 × 8 = ?",
+              "answer": "48",
+              "accept": [
+                "48"
+              ],
+              "hint": "5×8 + 8",
+              "feedbackCorrect": "48!",
+              "feedbackWrong": "40+8=48."
+            }
+          ],
+          "quickCheck": [
+            {
+              "id": "x20b-q1",
+              "type": "mc",
+              "prompt": "7 × 7 = ?",
+              "choices": [
+                "14",
+                "49",
+                "42",
+                "56"
+              ],
+              "answer": "49"
+            },
+            {
+              "id": "x20b-q2",
+              "type": "fill",
+              "prompt": "9 × 9 = ?",
+              "answer": "81",
+              "accept": [
+                "81"
+              ]
+            },
+            {
+              "id": "x20b-q3",
+              "type": "mc",
+              "prompt": "8 × 6 = ?",
+              "choices": [
+                "48",
+                "42",
+                "54",
+                "14"
+              ],
+              "answer": "48"
+            }
+          ]
+        },
+        "md-div-unknown-factor": {
+          "id": "md-div-unknown-factor",
+          "unitId": "unit-mult-div",
+          "title": "Division = Missing Factor",
+          "durationMin": 8,
+          "prerequisites": [
+            "md-facts-3-4",
+            "md-arrays-div"
+          ],
+          "skills": [
+            "div-unknown-factor"
+          ],
+          "einsteinIntro": "Every division hides a multiplication — find the missing factor!",
+          "explain": {
+            "panels": [
+              {
+                "speech": "24 ÷ 6 = ? really asks: 6 times WHAT makes 24?",
+                "visual": "missing-factor",
+                "state": "explain"
+              },
+              {
+                "speech": "6 × 4 = 24, so 24 ÷ 6 = 4. Multiplication unlocks division!",
+                "visual": "fact-family-24",
+                "state": "cheer"
+              }
+            ]
+          },
+          "workedExample": {
+            "title": "Worked Example",
+            "speech": "35 ÷ 5 = ?",
+            "steps": [
+              "Think: 5 × ? = 35",
+              "5 × 7 = 35",
+              "So 35 ÷ 5 = 7"
+            ]
+          },
+          "practice": [
+            {
+              "id": "x20c-p1",
+              "type": "mc",
+              "prompt": "18 ÷ 3 = ?  (Think: 3 × ? = 18)",
+              "choices": [
+                "5",
+                "6",
+                "15",
+                "21"
+              ],
+              "answer": "6",
+              "hint": "3, 6, 9, 12, 15, 18",
+              "feedbackCorrect": "6!",
+              "feedbackWrong": "3×6=18."
+            },
+            {
+              "id": "x20c-p2",
+              "type": "fill",
+              "prompt": "4 × ? = 28",
+              "answer": "7",
+              "accept": [
+                "7"
+              ],
+              "hint": "Count by 4s to 28",
+              "feedbackCorrect": "7!",
+              "feedbackWrong": "4×7=28."
+            },
+            {
+              "id": "x20c-p3",
+              "type": "mc",
+              "prompt": "Which fact helps solve 42 ÷ 7?",
+              "choices": [
+                "7 × 6 = 42",
+                "7 + 35 = 42",
+                "42 − 7 = 35",
+                "4 × 2 = 8"
+              ],
+              "answer": "7 × 6 = 42",
+              "hint": "Look for a × fact",
+              "feedbackCorrect": "Yes — so 42÷7=6!",
+              "feedbackWrong": "Division pairs with multiplication."
+            },
+            {
+              "id": "x20c-p4",
+              "type": "fill",
+              "prompt": "56 ÷ 8 = ?",
+              "answer": "7",
+              "accept": [
+                "7"
+              ],
+              "hint": "8 × ? = 56",
+              "feedbackCorrect": "7!",
+              "feedbackWrong": "8×7=56."
+            },
+            {
+              "id": "x20c-p5",
+              "type": "mc",
+              "prompt": "? × 9 = 45",
+              "choices": [
+                "5",
+                "4",
+                "36",
+                "54"
+              ],
+              "answer": "5",
+              "hint": "Count by 9s",
+              "feedbackCorrect": "5!",
+              "feedbackWrong": "5×9=45."
+            }
+          ],
+          "quickCheck": [
+            {
+              "id": "x20c-q1",
+              "type": "fill",
+              "prompt": "32 ÷ 4 = ?",
+              "answer": "8",
+              "accept": [
+                "8"
+              ]
+            },
+            {
+              "id": "x20c-q2",
+              "type": "mc",
+              "prompt": "6 × ? = 54",
+              "choices": [
+                "8",
+                "9",
+                "7",
+                "48"
+              ],
+              "answer": "9"
+            },
+            {
+              "id": "x20c-q3",
+              "type": "fill",
+              "prompt": "63 ÷ 9 = ?",
+              "answer": "7",
+              "accept": [
+                "7"
+              ]
+            }
+          ]
+        },
+        "md-properties": {
+          "id": "md-properties",
+          "unitId": "unit-mult-div",
+          "title": "Turn-Around & Break-Apart",
+          "durationMin": 8,
+          "prerequisites": [
+            "md-facts-6-9"
+          ],
+          "skills": [
+            "mult-properties"
+          ],
+          "einsteinIntro": "Two multiplication superpowers: turn facts around, or break them apart!",
+          "explain": {
+            "panels": [
+              {
+                "speech": "Turn-around: 3 × 8 = 8 × 3. Turn the array — still 24 stars!",
+                "visual": "turn-around",
+                "state": "explain"
+              },
+              {
+                "speech": "Break-apart: 7 × 6 = 5×6 + 2×6 = 30 + 12 = 42!",
+                "visual": "break-apart",
+                "state": "cheer"
+              }
+            ]
+          },
+          "workedExample": {
+            "title": "Worked Example",
+            "speech": "Break apart 8 × 7",
+            "steps": [
+              "Split 8 into 5 + 3",
+              "5 × 7 = 35 and 3 × 7 = 21",
+              "35 + 21 = 56"
+            ]
+          },
+          "practice": [
+            {
+              "id": "x20d-p1",
+              "type": "mc",
+              "prompt": "6 × 9 = 9 × ?",
+              "choices": [
+                "6",
+                "9",
+                "15",
+                "54"
+              ],
+              "answer": "6",
+              "hint": "Turn it around",
+              "feedbackCorrect": "6!",
+              "feedbackWrong": "Order can swap."
+            },
+            {
+              "id": "x20d-p2",
+              "type": "fill",
+              "prompt": "If 7 × 4 = 28, then 4 × 7 = ?",
+              "answer": "28",
+              "accept": [
+                "28"
+              ],
+              "hint": "Turn-around fact",
+              "feedbackCorrect": "28!",
+              "feedbackWrong": "Same product."
+            },
+            {
+              "id": "x20d-p3",
+              "type": "mc",
+              "prompt": "Which one equals 6 × 8?",
+              "choices": [
+                "5×8 + 1×8",
+                "5×8 + 1",
+                "6 + 8",
+                "6×5 + 8"
+              ],
+              "answer": "5×8 + 1×8",
+              "hint": "6 eights = 5 eights + 1 eight",
+              "feedbackCorrect": "Yes — 40+8=48!",
+              "feedbackWrong": "Break 6 into 5+1, keep the 8s."
+            },
+            {
+              "id": "x20d-p4",
+              "type": "mc",
+              "prompt": "4 × (5 + 2) = 4×5 + 4×?",
+              "choices": [
+                "2",
+                "5",
+                "4",
+                "7"
+              ],
+              "answer": "2",
+              "hint": "Multiply each part",
+              "feedbackCorrect": "2!",
+              "feedbackWrong": "4×5 + 4×2 = 28."
+            },
+            {
+              "id": "x20d-p5",
+              "type": "fill",
+              "prompt": "9 × 6 = 5×6 + 4×6 = 30 + 24 = ?",
+              "answer": "54",
+              "accept": [
+                "54"
+              ],
+              "hint": "Add the parts",
+              "feedbackCorrect": "54!",
+              "feedbackWrong": "30+24=54."
+            }
+          ],
+          "quickCheck": [
+            {
+              "id": "x20d-q1",
+              "type": "mc",
+              "prompt": "Turn-around fact for 5 × 9?",
+              "choices": [
+                "9 × 5",
+                "5 + 9",
+                "9 − 5",
+                "59"
+              ],
+              "answer": "9 × 5"
+            },
+            {
+              "id": "x20d-q2",
+              "type": "fill",
+              "prompt": "8 × 6 = 8×5 + 8×1 = 40 + ?",
+              "answer": "8",
+              "accept": [
+                "8"
+              ]
+            },
+            {
+              "id": "x20d-q3",
+              "type": "mc",
+              "prompt": "3 × 12 = 3×10 + 3×2 = ?",
+              "choices": [
+                "32",
+                "36",
+                "15",
+                "312"
+              ],
+              "answer": "36"
             }
           ]
         }

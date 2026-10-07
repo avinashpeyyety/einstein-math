@@ -1177,6 +1177,47 @@
           <div style="font-size:1.8rem;">⚪ ⬛ ⚪ ⬛ ⚪ <span style="color:#FF6B35;">?</span></div>
           <div style="font-family:Comic Neue,cursive;">Circle, square… next is circle!</div>
         </div>`,
+      // X20 — ages 7–8 facts, missing factor, properties
+      'facts-3s': `
+        <div class="viz-box" style="font-family:Bangers,Impact,sans-serif;font-size:1.3rem;">
+          3, 6, 9, 12, 15, 18 → 3×6=18
+          <div style="font-family:Comic Neue,cursive;font-size:1rem;">6 jumps of 3!</div>
+        </div>`,
+      'double-double': `
+        <div class="viz-box" style="font-family:Bangers,Impact,sans-serif;font-size:1.3rem;">
+          4×7: 7 → 14 → 28
+          <div style="font-family:Comic Neue,cursive;font-size:1rem;">Double, then double again!</div>
+        </div>`,
+      'five-plus-one': `
+        <div class="viz-box" style="font-family:Bangers,Impact,sans-serif;font-size:1.3rem;">
+          6×7 = 5×7 + 7 = 35 + 7 = 42
+          <div style="font-family:Comic Neue,cursive;font-size:1rem;">Know 5s? Add one more group!</div>
+        </div>`,
+      'nines-trick': `
+        <div class="viz-box" style="font-family:Bangers,Impact,sans-serif;font-size:1.3rem;">
+          9×6 = 10×6 − 6 = 54
+          <div style="font-family:Comic Neue,cursive;font-size:1rem;">Ten groups, take one away. 5+4 = 9!</div>
+        </div>`,
+      'missing-factor': `
+        <div class="viz-box" style="font-family:Bangers,Impact,sans-serif;font-size:1.4rem;">
+          24 ÷ 6 = ? &nbsp;⟷&nbsp; 6 × <span style="color:#FF6B35;">?</span> = 24
+          <div style="font-family:Comic Neue,cursive;font-size:1rem;">Division hides a missing factor!</div>
+        </div>`,
+      'fact-family-24': `
+        <div class="viz-box" style="font-family:Bangers,Impact,sans-serif;font-size:1.15rem;line-height:1.5;">
+          6×4=24 · 4×6=24<br>24÷6=4 · 24÷4=6
+          <div style="font-family:Comic Neue,cursive;font-size:1rem;">One fact family, four facts!</div>
+        </div>`,
+      'turn-around': `
+        <div class="viz-box" style="font-size:0.8rem;">
+          <div style="display:inline-grid;grid-template-columns:repeat(4,1.1em);gap:2px;margin:0 0.6rem;vertical-align:middle;"><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span></div><span style="font-family:Bangers,Impact,sans-serif;font-size:1.3rem;">=</span><div style="display:inline-grid;grid-template-columns:repeat(2,1.1em);gap:2px;margin:0 0.6rem;vertical-align:middle;"><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span></div>
+          <div style="font-family:Comic Neue,cursive;font-size:1rem;">2×4 = 4×2 = 8. Turn it — same stars!</div>
+        </div>`,
+      'break-apart': `
+        <div class="viz-box" style="font-family:Bangers,Impact,sans-serif;font-size:1.25rem;">
+          7×6 = <span style="color:#4ECDC4;">5×6</span> + <span style="color:#FF6B35;">2×6</span> = 30 + 12 = 42
+          <div style="font-family:Comic Neue,cursive;font-size:1rem;">Break a big fact into easy pieces!</div>
+        </div>`,
       'skip-mult': `
         <div class="viz-box" style="font-family:Bangers,Impact,sans-serif;font-size:1.3rem;">
           5, 10, 15, 20 → 5×4=20

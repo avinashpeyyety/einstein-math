@@ -1621,7 +1621,7 @@
       const rh = $('#review-due-panel');
       if (rh) { rh.classList.add('hidden'); rh.innerHTML = ''; }
       const g = $('#unit-grid');
-      g.innerHTML = `<div class="unit-card subject-soon-card" style="border-top: 8px solid #A78BFA"><div class="unit-icon">⚛️</div><h3>${escapeHtml(sub.label)} units</h3><p>Coming soon: push &amp; pull, ramps &amp; friction, sink or float.</p></div>`
+      g.innerHTML = `<div class="unit-card subject-soon-card" style="border-top: 8px solid #A78BFA"><div class="unit-icon">⚛️</div><h3>${escapeHtml(sub.label)} units</h3><p>Coming soon: new experiments for this age group are being built in Einstein's lab.</p></div>`
         + (activeSubjectId() === 'physics' ? spaceUnitCardHtml() : '');
       wireSpaceUnitCard(g);
       return;
@@ -2148,22 +2148,45 @@
 
   /* ——— X4: physics sim lessons (lazy-loaded js/sims/*, never fetched by math-only sessions) ——— */
 
-  const SIM_SCRIPTS = ['js/sims/engine.js', 'js/sims/ramp.js', 'js/sims/checks.js'];
-  let simsPromise = null;
+  // X6: each sim kind lazy-loads only its own view module (engine + checks are shared).
+  const SIM_CORE = ['js/sims/engine.js', 'js/sims/checks.js'];
+  const SIM_KINDS = {
+    ramp: { global: 'SimRamp', scripts: ['js/sims/ramp.js'] },
+    push: { global: 'SimPush', scripts: ['js/sims/kit.js', 'js/sims/push.js'] },
+    float: { global: 'SimFloat', scripts: ['js/sims/kit.js', 'js/sims/float.js'] }
+  };
+  const simScriptPromises = {};
   let simLab = null;
 
-  function loadSims() {
-    if (window.SimEngine && window.SimRamp && window.SimChecks) return Promise.resolve();
-    if (!simsPromise) {
-      simsPromise = SIM_SCRIPTS.reduce((chain, src) => chain.then(() => new Promise((resolve, reject) => {
+  function loadScriptOnce(src) {
+    if (!simScriptPromises[src]) {
+      simScriptPromises[src] = new Promise((resolve, reject) => {
         const el = document.createElement('script');
         el.src = src;
         el.onload = () => resolve();
-        el.onerror = () => { el.remove(); reject(new Error('could not load ' + src)); };
+        el.onerror = () => { el.remove(); delete simScriptPromises[src]; reject(new Error('could not load ' + src)); };
         document.head.appendChild(el);
-      })), Promise.resolve()).catch((err) => { simsPromise = null; throw err; });
+      });
     }
-    return simsPromise;
+    return simScriptPromises[src];
+  }
+
+  function simModule(kind) {
+    const k = SIM_KINDS[kind];
+    return k ? window[k.global] : null;
+  }
+
+  function simsReady(kind) {
+    return !!(window.SimEngine && window.SimChecks && simModule(kind));
+  }
+
+  /** Engine first, then the kind's view module(s) (they register their model), then checks. */
+  function loadSims(kind) {
+    if (simsReady(kind)) return Promise.resolve();
+    const k = SIM_KINDS[kind];
+    if (!k) return Promise.reject(new Error('Unknown sim kind: ' + kind));
+    const order = [SIM_CORE[0], ...k.scripts, SIM_CORE[1]];
+    return order.reduce((chain, src) => chain.then(() => loadScriptOnce(src)), Promise.resolve());
   }
 
   function destroySimLab() {
@@ -2172,7 +2195,7 @@
 
   function mountSimLab(host, L, params, opts = {}) {
     destroySimLab();
-    simLab = SimRamp.mount(host, {
+    simLab = simModule(L.sim.kind).mount(host, {
       params,
       controls: L.sim.controls || [],
       locked: opts.locked || [],
@@ -2193,10 +2216,11 @@
     const body = $('#lesson-body');
     const actions = $('#lesson-actions');
     actions.innerHTML = '';
-    if (!(window.SimEngine && window.SimRamp && window.SimChecks)) {
+    const kind = L.sim && L.sim.kind;
+    if (!simsReady(kind)) {
       body.innerHTML = '<div class="viz-box sim-loading">Setting up Einstein\'s lab…</div>';
       try {
-        await loadSims();
+        await loadSims(kind);
       } catch (err) {
         if (lessonCtx !== ctxToken) return;
         Einstein.mount(stage, 'think');
@@ -2235,7 +2259,7 @@
       onChange: (p) => { lessonCtx.simParams = p; },
       onRun: (m, p) => {
         lessonCtx.simParams = p;
-        Einstein.setState($('#lesson-einstein'), m.slides ? 'cheer' : 'think');
+        Einstein.setState($('#lesson-einstein'), (m.cheer !== undefined ? m.cheer : m.slides) ? 'cheer' : 'think');
       }
     });
     actions.innerHTML = `<button type="button" class="btn btn-primary" id="btn-next">I'm ready for the Lab Check!</button>`;
@@ -2314,7 +2338,7 @@
         let msg = q.feedbackWrong;
         if (!msg && isGoal) {
           const a = res.actual;
-          msg = `Not yet — your run gave ${q.goal.metric === 'slides' ? (a ? 'a slide' : 'no slide') : (a === null || a === undefined ? 'no finish' : (Math.round(a * 100) / 100))}. Goal: ${SimChecks.describeGoal(q.goal)}. Experiments teach us!`;
+          msg = `Not yet — your run gave ${SimChecks.describeValue(q.goal.metric, a)}. Goal: ${SimChecks.describeGoal(q.goal)}. Experiments teach us!`;
         }
         if (!msg) {
           const right = (q.choices || []).find(c => c.value === res.expected);

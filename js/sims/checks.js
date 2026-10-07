@@ -73,11 +73,24 @@
     return { ok: ctx.choice === expected, expected, actual: ctx.choice };
   }
 
-  const METRIC_WORDS = { slides: 'slides', a: 'acceleration', t: 'time to the bottom', v: 'speed', distance: 'distance' };
+  const METRIC_WORDS = { slides: 'slides', a: 'acceleration', t: 'time to the bottom', v: 'speed', distance: 'distance', speed: 'top speed', under: 'part under water' };
+  const UNITS = { t: ' s', a: ' m/s²', v: ' m/s', speed: ' m/s', distance: ' m', under: '' };
+  // X6: yes/no metrics of the ages 5–6 labs (push, float) — [goal text when true, when false]
+  const BOOL_GOALS = {
+    slides: ['the block slides', 'the block stays put'],
+    moved: ['it moves', 'it stays put'],
+    floats: ['it floats', 'it sinks'],
+    sinks: ['it sinks', 'it floats'],
+    bonk: ['it reaches the end', 'it stops before the end']
+  };
+  const WORD_VALUES = { away: 'it slides away from Einstein', closer: 'it comes toward Einstein', still: 'it stays put' };
+
   function describeGoal(goal) {
+    if (goal.label) return goal.label;
     const w = METRIC_WORDS[goal.metric] || goal.metric;
-    if (goal.metric === 'slides') return goal.value ? 'the block slides' : 'the block stays put';
-    const u = goal.metric === 't' ? ' s' : goal.metric === 'a' ? ' m/s²' : goal.metric === 'v' ? ' m/s' : ' m';
+    if (BOOL_GOALS[goal.metric]) return BOOL_GOALS[goal.metric][goal.value ? 0 : 1];
+    if (typeof goal.value === 'string') return WORD_VALUES[goal.value] || `${w} = ${goal.value}`;
+    const u = goal.metric in UNITS ? UNITS[goal.metric] : ' m';
     switch (goal.op) {
       case 'lt': case 'lte': return `${w} under ${goal.value}${u}`;
       case 'gt': case 'gte': return `${w} over ${goal.value}${u}`;
@@ -85,6 +98,16 @@
       case 'between': return `${w} between ${goal.value[0]} and ${goal.value[1]}${u}`;
       default: return `${w} = ${goal.value}${u}`;
     }
+  }
+
+  /** Kid-friendly words for what a run gave (feedback after a missed goal). */
+  function describeValue(metric, v) {
+    if (metric === 'slides') return v ? 'a slide' : 'no slide';
+    if (BOOL_GOALS[metric]) return BOOL_GOALS[metric][v ? 0 : 1];
+    if (v === null || v === undefined) return 'no finish';
+    if (typeof v === 'string') return WORD_VALUES[v] || v;
+    if (typeof v === 'number') return (Math.round(v * 100) / 100) + (metric in UNITS ? UNITS[metric] : '');
+    return String(v);
   }
 
   /** Grid search over the unlocked controls: a setting that passes the goal (proves a goal is reachable). */
@@ -155,5 +178,5 @@
     return errs;
   }
 
-  return { OPS, evaluateGoal, paramsFor, expectedValue, grade, describeGoal, findSolution, validateLesson };
+  return { OPS, evaluateGoal, paramsFor, expectedValue, grade, describeGoal, describeValue, findSolution, validateLesson };
 });

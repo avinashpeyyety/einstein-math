@@ -4,10 +4,232 @@
     "title": "Einstein Physics",
     "status": "live",
     "schemaVersion": 3,
-    "version": "0.2.0",
-    "note": "X5: ages 7–8 Forces & Friction unit (4 lab lessons + unit check). Ages 5–6 still coming soon."
+    "version": "0.3.0",
+    "note": "X6: ages 5–6 Push, Pull, Sink & Float unit (3 lab lessons). X5: ages 7–8 Forces & Friction unit (4 lab lessons + unit check). Ages 9–10: Ramp Racer."
   },
   "tracks": {
+    "ages-5-6": {
+      "id": "ages-5-6",
+      "label": "Ages 5–6",
+      "ageRange": "5–6",
+      "gradeBand": "K–1",
+      "blurb": "Push, pull, sink or float — first experiments in Einstein's lab.",
+      "units": [
+        {
+          "id": "unit-push-pull-float",
+          "title": "Push, Pull, Sink & Float",
+          "icon": "🛒",
+          "color": "#34D399",
+          "description": "Push a box, pull it back, shove heavy boxes, and drop toys in the water tank. What will happen? Let's find out!",
+          "lessons": ["ph-push-or-pull", "ph-big-small-push", "ph-sink-or-float"]
+        }
+      ],
+      "lessons": {
+        "ph-push-or-pull": {
+          "id": "ph-push-or-pull",
+          "unitId": "unit-push-pull-float",
+          "type": "sim",
+          "title": "Push or Pull?",
+          "durationMin": 6,
+          "prerequisites": [],
+          "skills": ["push-and-pull", "force-direction", "force-strength"],
+          "einsteinIntro": "Hello, little scientist! Today we move a toy box with pushes and pulls. A push and a pull are both called a FORCE!",
+          "explain": {
+            "panels": [
+              { "speech": "A push moves something AWAY from you. Push a swing and — whoosh — away it goes!", "state": "explain" },
+              { "speech": "A pull brings something TOWARD you, like pulling a wagon by its handle.", "state": "think" },
+              { "speech": "A gentle push makes a little slide. A BIG push makes a big slide! Let's try it.", "state": "cheer" }
+            ]
+          },
+          "sim": {
+            "kind": "push",
+            "params": { "force": 10, "dir": 1, "mass": 2, "mu": 0.25, "pushTime": 0.5, "g": 9.8, "wall": 5 },
+            "controls": [
+              { "param": "dir", "label": "Push or pull?", "min": -1, "max": 1, "step": 2 },
+              { "param": "force", "label": "How hard?", "min": 0, "max": 30, "step": 1 }
+            ],
+            "explore": "Pick Push or Pull, choose how hard, then press Run it. Where does the box go?"
+          },
+          "simChecks": [
+            {
+              "id": "ph-pp-c1",
+              "type": "predict",
+              "prompt": "Einstein gives the box a PUSH. Which way will it slide?",
+              "setup": { "dir": 1, "force": 12 },
+              "metric": "way",
+              "choices": [{ "label": "Away from Einstein 👉", "value": "away" }, { "label": "Toward Einstein 👈", "value": "closer" }],
+              "hint": "A push sends things away from you."
+            },
+            {
+              "id": "ph-pp-c2",
+              "type": "goal",
+              "prompt": "Make the box come TOWARD Einstein. Run it, then press Check.",
+              "setup": { "dir": 1, "force": 10 },
+              "goal": { "metric": "way", "op": "eq", "value": "closer", "label": "the box comes toward Einstein" },
+              "hint": "Pushing sends it away. Try a pull!"
+            },
+            {
+              "id": "ph-pp-c3",
+              "type": "predict",
+              "prompt": "First a gentle push (8). Then a BIG push (20). Will the big push send the box farther?",
+              "setup": { "dir": 1, "force": 8 },
+              "compare": { "alt": { "force": 20 }, "metric": "distance" },
+              "choices": [
+                { "label": "Farther 🚀", "value": "more" },
+                { "label": "The same", "value": "same" },
+                { "label": "Not as far 🐢", "value": "less" }
+              ],
+              "hint": "A bigger push gives a bigger slide."
+            },
+            {
+              "id": "ph-pp-c4",
+              "type": "goal",
+              "prompt": "Push the box past the red flag (2 m)! Run it, then press Check.",
+              "setup": { "dir": 1, "force": 10 },
+              "lock": ["dir"],
+              "goal": { "metric": "distance", "op": "gt", "value": 2, "label": "the box slides past the red flag (2 m)" },
+              "hint": "Push harder! Slide How hard? way up."
+            }
+          ]
+        },
+        "ph-big-small-push": {
+          "id": "ph-big-small-push",
+          "unitId": "unit-push-pull-float",
+          "type": "sim",
+          "title": "Big Push, Small Push",
+          "durationMin": 7,
+          "prerequisites": ["ph-push-or-pull"],
+          "skills": ["force-strength", "heavy-and-light", "friction-grip"],
+          "einsteinIntro": "Some boxes are light like a pillow. Some are heavy like a pile of books. Which one is harder to push? Let's test!",
+          "explain": {
+            "panels": [
+              { "speech": "The floor grips the box a little. A teeny push can't beat the grip, so the box stays put.", "state": "think" },
+              { "speech": "A heavy box needs a BIGGER push to move. A light box zooms with just a small push.", "state": "explain" },
+              { "speech": "Push hard for far, gentle for near. You're the boss of the box!", "state": "cheer" }
+            ]
+          },
+          "sim": {
+            "kind": "push",
+            "params": { "force": 10, "dir": 1, "mass": 2, "mu": 0.25, "pushTime": 0.5, "g": 9.8, "wall": 5 },
+            "controls": [
+              { "param": "force", "label": "How hard?", "min": 0, "max": 30, "step": 1 },
+              { "param": "mass", "label": "Box weight", "min": 1, "max": 5, "step": 1 }
+            ],
+            "explore": "Try a light box and a heavy box. How hard do you need to push each one?"
+          },
+          "simChecks": [
+            {
+              "id": "ph-bs-c1",
+              "type": "predict",
+              "prompt": "Einstein gives a box a teeny-tiny push (just 3). Will the box move?",
+              "setup": { "force": 3, "mass": 2 },
+              "metric": "moved",
+              "choices": [{ "label": "Yes, it slides 👉", "value": true }, { "label": "No, it stays put 🧱", "value": false }],
+              "hint": "A tiny push can't beat the floor's grip."
+            },
+            {
+              "id": "ph-bs-c2",
+              "type": "predict",
+              "prompt": "Einstein pushes a LIGHT box (1 kg). Then he pushes a HEAVY box (4 kg) just as hard. Will the heavy box go farther?",
+              "setup": { "force": 10, "mass": 1 },
+              "compare": { "alt": { "mass": 4 }, "metric": "distance" },
+              "choices": [
+                { "label": "Farther 🚀", "value": "more" },
+                { "label": "The same", "value": "same" },
+                { "label": "Not as far 🐢", "value": "less" }
+              ],
+              "hint": "Heavy things are harder to get moving."
+            },
+            {
+              "id": "ph-bs-c3",
+              "type": "goal",
+              "prompt": "This box is HEAVY (4 kg). Push it past the blue flag (1 m)! Run it, then press Check.",
+              "setup": { "mass": 4, "force": 10 },
+              "lock": ["mass"],
+              "goal": { "metric": "distance", "op": "gt", "value": 1, "label": "the heavy box slides past the blue flag (1 m)" },
+              "hint": "A heavy box needs a really BIG push. Try more than 22."
+            },
+            {
+              "id": "ph-bs-c4",
+              "type": "goal",
+              "prompt": "Now a LIGHT box (1 kg). Give it a gentle push so it stops in the green zone, between the blue and red flags. Run it, then press Check.",
+              "setup": { "mass": 1, "force": 20 },
+              "lock": ["mass"],
+              "goal": { "metric": "distance", "op": "between", "value": [1, 2], "label": "the box stops in the green zone (1 m to 2 m)" },
+              "hint": "Too far? Push more gently. Try about 6 or 7."
+            }
+          ]
+        },
+        "ph-sink-or-float": {
+          "id": "ph-sink-or-float",
+          "unitId": "unit-push-pull-float",
+          "type": "sim",
+          "title": "Sink or Float?",
+          "durationMin": 7,
+          "prerequisites": ["ph-big-small-push"],
+          "skills": ["sink-and-float", "predict-and-test"],
+          "einsteinIntro": "Splash time! We drop things into my water tank. Will they float on top or sink to the bottom? Guess first, then test!",
+          "explain": {
+            "panels": [
+              { "speech": "Water pushes UP on everything you put in it. That push helps things float.", "state": "explain" },
+              { "speech": "Wood, apples and rubber ducks float. Rocks, coins and keys sink to the bottom.", "state": "think" },
+              { "speech": "Here's a surprise: big doesn't mean sink! A huge log floats, but a tiny coin sinks.", "state": "cheer" }
+            ]
+          },
+          "sim": {
+            "kind": "float",
+            "params": { "object": 1, "rhoWater": 1000, "depth": 0.6, "drop": 0.15, "drag": 1, "g": 9.8 },
+            "controls": [{ "param": "object", "label": "Pick something to drop", "min": 0, "max": 6, "step": 1 }],
+            "explore": "Pick something, press Run it, and watch: does it float or sink? Try them all!"
+          },
+          "simChecks": [
+            {
+              "id": "ph-sf-c1",
+              "type": "predict",
+              "prompt": "Plop! Einstein drops a ROCK into the water. Will it float or sink?",
+              "setup": { "object": 1 },
+              "metric": "floats",
+              "choices": [{ "label": "It floats 🛟", "value": true }, { "label": "It sinks ⬇️", "value": false }],
+              "hint": "Rocks are heavy for their size."
+            },
+            {
+              "id": "ph-sf-c2",
+              "type": "predict",
+              "prompt": "Now an APPLE. Will it float or sink?",
+              "setup": { "object": 2 },
+              "metric": "floats",
+              "choices": [{ "label": "It floats 🛟", "value": true }, { "label": "It sinks ⬇️", "value": false }],
+              "hint": "Apples have lots of air inside them."
+            },
+            {
+              "id": "ph-sf-c3",
+              "type": "goal",
+              "prompt": "Pick something that FLOATS, drop it in, then press Check.",
+              "setup": { "object": 1 },
+              "goal": { "metric": "floats", "op": "eq", "value": true, "label": "it floats on the water" },
+              "hint": "Try the wooden block or the rubber duck."
+            },
+            {
+              "id": "ph-sf-c4",
+              "type": "predict",
+              "prompt": "This log is BIG and heavy. Will it float or sink?",
+              "setup": { "object": 6 },
+              "metric": "floats",
+              "choices": [{ "label": "It floats 🛟", "value": true }, { "label": "It sinks ⬇️", "value": false }],
+              "hint": "Big doesn't mean sink. Logs are made of wood!"
+            },
+            {
+              "id": "ph-sf-c5",
+              "type": "goal",
+              "prompt": "The duck floats. Now find something SMALL that SINKS! Drop it in, then press Check.",
+              "setup": { "object": 4 },
+              "goal": { "metric": "floats", "op": "eq", "value": false, "label": "it sinks to the bottom" },
+              "hint": "Try the coin or the key."
+            }
+          ]
+        }
+      }
+    },
     "ages-7-8": {
       "id": "ages-7-8",
       "label": "Ages 7–8",

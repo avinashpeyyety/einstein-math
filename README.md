@@ -10,6 +10,7 @@ Public interactive math program for **ages 5–10** (US K–5), delivered by **E
   - **Ages 5–6 (K–1)** — counting & teens, compose/decompose, doubles & make-10, length/weight/time/coins, story problems, AB patterns, tally/pictograph, 3D shapes
   - **Ages 7–8 (grades 2–3)** — place value, rounding & estimation, regrouping fluency, mult/div ideas (facts, quotative), fractions of a set, perimeter, elapsed time, bar graphs, multi-step & money WP
   - **Ages 9–10 (grades 4–5)** — multi-digit ops + long mult/div ideas, factors/primes, order of ops, fraction × whole & mixed add/sub (like denoms), decimal add/sub, area/volume, coordinate plane, multi-step WP
+- **⚛️ Physics labs** — Einstein's interactive canvas sims (`js/sims/`, lazy-loaded on the first lab): ages 5–6 *Push, Pull, Sink & Float* (push/pull cart, heavy vs light boxes, sink-or-float tank — v2.5.3), ages 7–8 *Forces & Friction* ramp labs + unit check, ages 9–10 *Ramp Racer*. Every lab check is graded from the kid's own run or computed by the sim.
 - **🔭 Space Lab (v2.5.0, part of Physics)** — the former Cosmos app, now at `cosmos/`: 3D solar system, launch sites & historic liftoffs, LEO/ISS view, life of a star. Open from the top nav, Home, or the Physics Mission Map. Rocket landings & LEO mission toggles are coming-soon stubs. Three.js r170 vendored in `vendor/three/` (MIT); loaded only when a lab opens.
 - **Mastery + spaced review** (device-local) — check ≥ ~80% → mastered & schedule review; fail &lt; 60% → needs_review + **Retry weak spots**
 - **Today's path** — Mission Map + Home suggest the next 1–3 missions (due reviews → needs_review → diagnostic path → next ready); friendly empty-state when nothing is queued
@@ -24,7 +25,7 @@ Public interactive math program for **ages 5–10** (US K–5), delivered by **E
 - Richer diagnostic (10 items) → suggested unit path (per track)
 - Full playable lessons with Einstein UI (explain → worked example → practice → quick check)
 - Progress checkpointed to `localStorage` after every save (survives refresh on the same device/origin)
-- Lessons in lazy subject packs `data/subjects/<subject>.json` (`meta` + `tracks`; math is the default, physics is a stub) — only the packs in use are fetched; the service worker precaches math and caches other packs on first use
+- Lessons in lazy subject packs `data/subjects/<subject>.json` (`meta` + `tracks`; math is the default, physics has sim-lab tracks for ages 5–6, 7–8 and 9–10) — only the packs in use are fetched; the service worker precaches math and caches other packs on first use
 
 ### Device-local only
 
@@ -155,7 +156,7 @@ Helper: `Storage.getParentSummary(store, userId, curriculum)`.
 }
 ```
 
-Progress is keyed **`subject:track`** (`math:ages-7-8`; physics later as `physics:<track>`). Subjects in schema v3: `math` (live) and `physics` (soon).
+Progress is keyed **`subject:track`** (`math:ages-7-8`, `physics:ages-5-6`). Subjects in schema v3: `math` (live) and `physics` (live: sim labs, progress under `physics:<track>`).
 
 **v2 → v3 migration (X1):** on load, a v2 or stub-v3 store (key `einstein-math-v2`, `user.tracks` keyed by bare track id) is copied to `einstein-math-v3` with each `tracks[<id>]` moved to `progress["math:<id>"]` — same lessons, stars, streaks and review dates, so Today's path is unchanged. It is idempotent (re-running is a no-op; a key on both sides is merged, newer lesson wins) and non-destructive (the `einstein-math-v2` key is left in place as a rollback copy). Storage APIs still take a bare track id and default to math (`getTrackProgress(user, 'ages-7-8')`). Export writes `format: "einstein-math-v3"`; import/merge accepts both v2 and v3 files.
 
@@ -180,7 +181,7 @@ Localhost works for PWA install in Chromium.
 
 ## Smoke demo (2.3 trusted-home sprint)
 
-1. Load once online → DevTools → Application → Service Worker registered; Cache Storage shows `einstein-math-v2.5.2` (or the current `CACHE` in `sw.js`).
+1. Load once online → DevTools → Application → Service Worker registered; Cache Storage shows `einstein-math-v2.5.3` (or the current `CACHE` in `sw.js`).
 2. Go offline (DevTools Network → Offline) → reload → landing / Mission Map still usable.
 3. Create two explorers, earn progress → **Export all profiles** → clear site data → **Import** merge → both kids restored.
 4. Toggle **Read aloud** → Einstein bubbles speak; **Replay** repeats the last line.
@@ -246,6 +247,7 @@ einstein-math/
   js/app.js
   data/subjects/math.json      # math lessons pack (tracks)
   data/subjects/physics.json   # physics pack (sim lessons)
+  js/sims/                     # physics lab sims, lazy-loaded: engine, checks, ramp, kit + push + float (ages 5–6)
   js/space.js                  # Space Lab catalog (working sections + coming-soon stubs)
   cosmos/                      # Space Lab app (former github.com/avinashpeyyety/cosmos); ?mode=solar|earth|leo|stars
   vendor/three/                # Three.js r170 (MIT), used by cosmos/ only

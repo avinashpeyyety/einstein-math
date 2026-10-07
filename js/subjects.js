@@ -1,10 +1,10 @@
 /* Track P — multi-subject catalog + curriculum normalize (schema v3, X1) + lazy subject packs (X2).
- * Subjects: math (live) + physics (live since X4: sim lessons for ages 7–8 and 9–10; an age track without
- * physics lessons shows the X3 coming-soon state). Progress is keyed `subject:track` in js/storage.js. No other subjects (Chief: math + physics only). */
+ * Subjects: math (live) + physics (live since X4: sim lessons for ages 5–6 (X6), 7–8 and 9–10; an age track
+ * without physics lessons shows the X3 coming-soon state). Progress is keyed `subject:track` in js/storage.js. No other subjects (Chief: math + physics only). */
 const Subjects = {
   CATALOG: [
     { id: 'math', label: 'Math', status: 'live', blurb: 'Numbers, shapes & cosmic adventures' },
-    { id: 'physics', label: 'Physics', status: 'live', blurb: "Einstein's ramp & friction lab + 3D Space Lab (planets, rockets, stars)" },
+    { id: 'physics', label: 'Physics', status: 'live', blurb: "Einstein's push, float & ramp labs + 3D Space Lab (planets, rockets, stars)" },
   ],
 
   defaultId: 'math',

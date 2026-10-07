@@ -12,6 +12,8 @@ const ROOT = path.resolve(__dirname, '..');
 const read = f => fs.readFileSync(path.join(ROOT, f), 'utf8');
 const Engine = require('../js/sims/engine.js');
 const Ramp = require('../js/sims/ramp.js');
+require('../js/sims/push.js');   // X6: ages 5–6 labs live in the same pack
+require('../js/sims/float.js');
 const Checks = require('../js/sims/checks.js');
 const PHYS = JSON.parse(read('data/subjects/physics.json'));
 const simLessons = Object.values(PHYS.tracks).flatMap(tr => Object.values(tr.lessons).filter(L => L.type === 'sim'));
@@ -137,7 +139,7 @@ t('7. physics.json sim lessons are valid; goals need slider changes and are reac
 });
 
 t('8. validation catches broken sim lessons', () => {
-  const base = JSON.parse(JSON.stringify(simLessons[0]));
+  const base = JSON.parse(JSON.stringify(simLessons.find(L => L.sim.kind === 'ramp')));
   const v = mut => Checks.validateLesson(Object.assign(JSON.parse(JSON.stringify(base)), mut));
   assert.ok(v({ sim: { ...base.sim, kind: 'pendulum' } }).some(e => /Unknown sim kind/.test(e)));
   assert.ok(v({ sim: { ...base.sim, params: { ...base.sim.params, muK: 0.9, muS: 0.4 } } }).some(e => /muK/.test(e)));

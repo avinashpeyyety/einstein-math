@@ -1211,6 +1211,11 @@ h1, h2, h3, .logo, .burst-text {
 .sim-buttons { display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; }
 .sim-goal { font-weight: 700; margin: 0.25rem 0 0.5rem; }
 .sim-check .sim-host { margin: 0.5rem 0; }
+.sim-choice { grid-column: 1 / -1; }
+.sim-choice-row { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.sim-choice-btn { min-height: 40px; }
+.sim-choice-btn[aria-pressed="true"] { box-shadow: 0 0 0 3px #1F1F1F inset; }
+.sim-choice-btn:focus-visible { outline: 3px solid #1F1F1F; outline-offset: 2px; }
 .sim-tag { display: inline-block; margin-left: 0.4rem; padding: 0 0.4rem; border: 2px solid #1F1F1F; border-radius: 8px; background: #EDE9FE; font-size: 0.75rem; font-weight: 700; }
 @media (prefers-reduced-motion: reduce) {
   .sim-canvas { transition: none; }

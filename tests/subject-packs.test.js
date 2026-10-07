@@ -29,7 +29,7 @@ async function t(name, fn) {
 }
 
 (async () => {
-  await t('1. packs exist: math has the 3 tracks (93 lessons), physics has X4 sim lessons (ages 7–8, 9–10); no data/curriculum.json', () => {
+  await t('1. packs exist: math has the 3 tracks (93 lessons), physics has sim lessons (ages 5–6 since X6, 7–8, 9–10); no data/curriculum.json', () => {
     const m = packFiles['data/subjects/math.json'];
     assert.deepStrictEqual(Object.keys(m.tracks).sort(), ['ages-5-6', 'ages-7-8', 'ages-9-10']);
     const n = Object.values(m.tracks).reduce((a, tr) => a + Object.keys(tr.lessons).length, 0);
@@ -37,7 +37,7 @@ async function t(name, fn) {
     for (const tr of Object.values(m.tracks)) for (const u of tr.units) for (const id of u.lessons) assert.ok(tr.lessons[id], 'unit lesson ' + id);
     const p = packFiles['data/subjects/physics.json'];
     assert.strictEqual(p.meta.subject, 'physics');
-    assert.deepStrictEqual(Object.keys(p.tracks).sort(), ['ages-7-8', 'ages-9-10']);
+    assert.deepStrictEqual(Object.keys(p.tracks).sort(), ['ages-5-6', 'ages-7-8', 'ages-9-10']);
     for (const tr of Object.values(p.tracks)) {
       for (const u of tr.units) for (const id of u.lessons) assert.ok(tr.lessons[id], 'physics unit lesson ' + id);
       for (const L of Object.values(tr.lessons)) assert.strictEqual(L.type, 'sim', L.id + ' is a sim lesson');
@@ -61,7 +61,7 @@ async function t(name, fn) {
     const cur = await S.loadCurriculum('physics', fakeFetch(log));
     assert.deepStrictEqual(log, ['data/subjects/math.json', 'data/subjects/physics.json']);
     assert.strictEqual(cur.activeSubjectId, 'physics');
-    assert.deepStrictEqual(Object.keys(cur.tracks).sort(), ['ages-7-8', 'ages-9-10'], 'physics shows its own tracks');
+    assert.deepStrictEqual(Object.keys(cur.tracks).sort(), ['ages-5-6', 'ages-7-8', 'ages-9-10'], 'physics shows its own tracks');
     const mathIds = new Set(Object.values(cur.subjects.math.tracks).flatMap(tr => Object.keys(tr.lessons)));
     Object.values(cur.tracks).forEach(tr => Object.keys(tr.lessons).forEach(id => assert.ok(!mathIds.has(id), 'no math lesson under physics: ' + id)));
     const stub = S.applyPack(cur, 'physics', { meta: { subject: 'physics' }, tracks: {} }, 'physics');

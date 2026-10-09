@@ -48,6 +48,18 @@
           ]
         },
         {
+          "id": "k-tens-ones",
+          "title": "Tens & Ones",
+          "icon": "🧱",
+          "color": "#F59E0B",
+          "description": "Build numbers with tens and ones — compare them, jump by 10, and add!",
+          "lessons": [
+            "k-compare-2digit",
+            "k-ten-more-less",
+            "k-add-2digit-1digit"
+          ]
+        },
+        {
           "id": "k-measurement",
           "title": "Measure & Time",
           "icon": "📏",
@@ -3647,6 +3659,455 @@
               "answer": "18",
               "accept": [
                 "18"
+              ]
+            }
+          ]
+        },
+        "k-compare-2digit": {
+          "id": "k-compare-2digit",
+          "unitId": "k-tens-ones",
+          "title": "Compare with <, >, =",
+          "durationMin": 8,
+          "prerequisites": [
+            "k-count-to-100-tens",
+            "k-compare-teens"
+          ],
+          "skills": [
+            "place-value-tens-ones",
+            "compare-2-digit"
+          ],
+          "einsteinIntro": "Big numbers are made of TENS and ONES. Let's find out which number is bigger — the alligator always eats the bigger one!",
+          "explain": {
+            "panels": [
+              {
+                "speech": "34 is 3 TENS and 4 ONES. Three sticks of ten, four little cubes!",
+                "visual": "tens-ones-34",
+                "state": "explain"
+              },
+              {
+                "speech": "To compare, look at the TENS first. 52 has 5 tens, 25 has only 2 — so 52 > 25. Same tens? Then check the ones!",
+                "visual": "compare-alligator",
+                "state": "cheer"
+              }
+            ]
+          },
+          "workedExample": {
+            "title": "Worked Example",
+            "speech": "Compare 47 and 43.",
+            "steps": [
+              "Tens: 4 and 4 — the same!",
+              "Ones: 7 and 3 — 7 is more",
+              "So 47 > 43 (the mouth opens to 47)"
+            ]
+          },
+          "practice": [
+            {
+              "id": "x23a-p1",
+              "type": "mc",
+              "prompt": "How many tens are in 34?",
+              "choices": [
+                "3",
+                "4",
+                "34",
+                "7"
+              ],
+              "answer": "3",
+              "hint": "The first digit tells the tens.",
+              "feedbackCorrect": "Yes — 3 tens (30)!",
+              "feedbackWrong": "34 = 3 tens and 4 ones."
+            },
+            {
+              "id": "x23a-p2",
+              "type": "fill",
+              "prompt": "6 tens and 2 ones = ?",
+              "answer": "62",
+              "accept": [
+                "62"
+              ],
+              "hint": "60 and 2 more.",
+              "feedbackCorrect": "62!",
+              "feedbackWrong": "6 tens = 60, plus 2 ones = 62."
+            },
+            {
+              "id": "x23a-p3",
+              "type": "mc",
+              "prompt": "Which is bigger: 52 or 25?",
+              "choices": [
+                "52",
+                "25",
+                "They are equal"
+              ],
+              "answer": "52",
+              "hint": "Compare the tens: 5 tens or 2 tens?",
+              "feedbackCorrect": "Yes — 52 > 25!",
+              "feedbackWrong": "52 has 5 tens; 25 has only 2."
+            },
+            {
+              "id": "x23a-p4",
+              "type": "mc",
+              "prompt": "47 ? 43 — pick the sign.",
+              "choices": [
+                "<",
+                ">",
+                "="
+              ],
+              "answer": ">",
+              "hint": "Same tens — look at the ones.",
+              "feedbackCorrect": "47 > 43 — 7 ones beat 3!",
+              "feedbackWrong": "Tens tie, 7 > 3, so 47 > 43."
+            },
+            {
+              "id": "x23a-p5",
+              "type": "mc",
+              "prompt": "29 ? 31 — pick the sign.",
+              "choices": [
+                "<",
+                ">",
+                "="
+              ],
+              "answer": "<",
+              "hint": "Tens first: 2 tens or 3 tens?",
+              "feedbackCorrect": "29 < 31!",
+              "feedbackWrong": "2 tens < 3 tens, so 29 < 31."
+            },
+            {
+              "id": "x23a-p6",
+              "type": "mc",
+              "prompt": "5 tens and 0 ones ? 50 — pick the sign.",
+              "choices": [
+                "<",
+                ">",
+                "="
+              ],
+              "answer": "=",
+              "hint": "5 tens is 50.",
+              "feedbackCorrect": "Equal — 50 = 50!",
+              "feedbackWrong": "5 tens and 0 ones is exactly 50."
+            }
+          ],
+          "quickCheck": [
+            {
+              "id": "x23a-q1",
+              "type": "mc",
+              "prompt": "68 ? 86 — pick the sign.",
+              "choices": [
+                "<",
+                ">",
+                "="
+              ],
+              "answer": "<"
+            },
+            {
+              "id": "x23a-q2",
+              "type": "fill",
+              "prompt": "How many ones are in 75?",
+              "answer": "5",
+              "accept": [
+                "5"
+              ]
+            },
+            {
+              "id": "x23a-q3",
+              "type": "mc",
+              "prompt": "4 tens and 0 ones ? 40 — pick the sign.",
+              "choices": [
+                "<",
+                ">",
+                "="
+              ],
+              "answer": "="
+            }
+          ]
+        },
+        "k-ten-more-less": {
+          "id": "k-ten-more-less",
+          "unitId": "k-tens-ones",
+          "title": "10 More, 10 Less",
+          "durationMin": 8,
+          "prerequisites": [
+            "k-compare-2digit"
+          ],
+          "skills": [
+            "ten-more-ten-less"
+          ],
+          "einsteinIntro": "Jump by TENS like a rocket! Add a ten or take a ten away — watch which digit changes.",
+          "explain": {
+            "panels": [
+              {
+                "speech": "10 more = one more TEN. 34 → 44. The ones stay the same!",
+                "visual": "ten-more-34",
+                "state": "explain"
+              },
+              {
+                "speech": "10 less = take one TEN away. 34 → 24. Only the tens digit moves!",
+                "visual": "ten-less-34",
+                "state": "think"
+              }
+            ]
+          },
+          "workedExample": {
+            "title": "Worked Example",
+            "speech": "What is 10 more than 57?",
+            "steps": [
+              "57 = 5 tens and 7 ones",
+              "Add one ten: 6 tens and 7 ones",
+              "10 more than 57 is 67"
+            ]
+          },
+          "practice": [
+            {
+              "id": "x23b-p1",
+              "type": "mc",
+              "prompt": "10 more than 23 = ?",
+              "choices": [
+                "24",
+                "33",
+                "13",
+                "123"
+              ],
+              "answer": "33",
+              "hint": "Add one ten: 2 tens → 3 tens.",
+              "feedbackCorrect": "33!",
+              "feedbackWrong": "23 + 10 = 33 — only the tens changed."
+            },
+            {
+              "id": "x23b-p2",
+              "type": "fill",
+              "prompt": "10 less than 48 = ?",
+              "answer": "38",
+              "accept": [
+                "38"
+              ],
+              "hint": "Take one ten away: 4 tens → 3 tens.",
+              "feedbackCorrect": "38!",
+              "feedbackWrong": "48 − 10 = 38."
+            },
+            {
+              "id": "x23b-p3",
+              "type": "mc",
+              "prompt": "10 more than 60 = ?",
+              "choices": [
+                "61",
+                "70",
+                "50",
+                "600"
+              ],
+              "answer": "70",
+              "hint": "6 tens → 7 tens.",
+              "feedbackCorrect": "70!",
+              "feedbackWrong": "60 + 10 = 70."
+            },
+            {
+              "id": "x23b-p4",
+              "type": "fill",
+              "prompt": "45 + 10 = ?",
+              "answer": "55",
+              "accept": [
+                "55"
+              ],
+              "hint": "Tens go up by one, ones stay 5.",
+              "feedbackCorrect": "55!",
+              "feedbackWrong": "45 + 10 = 55."
+            },
+            {
+              "id": "x23b-p5",
+              "type": "mc",
+              "prompt": "72 − 10 = ?",
+              "choices": [
+                "62",
+                "71",
+                "82",
+                "70"
+              ],
+              "answer": "62",
+              "hint": "Tens go down by one, ones stay 2.",
+              "feedbackCorrect": "62!",
+              "feedbackWrong": "72 − 10 = 62."
+            },
+            {
+              "id": "x23b-p6",
+              "type": "mc",
+              "prompt": "10 less than 19 = ?",
+              "choices": [
+                "9",
+                "18",
+                "29",
+                "10"
+              ],
+              "answer": "9",
+              "hint": "19 is 1 ten and 9 ones. Take the ten away!",
+              "feedbackCorrect": "9!",
+              "feedbackWrong": "19 − 10 = 9."
+            }
+          ],
+          "quickCheck": [
+            {
+              "id": "x23b-q1",
+              "type": "fill",
+              "prompt": "10 more than 86 = ?",
+              "answer": "96",
+              "accept": [
+                "96"
+              ]
+            },
+            {
+              "id": "x23b-q2",
+              "type": "mc",
+              "prompt": "10 less than 50 = ?",
+              "choices": [
+                "40",
+                "49",
+                "60",
+                "5"
+              ],
+              "answer": "40"
+            },
+            {
+              "id": "x23b-q3",
+              "type": "fill",
+              "prompt": "34 − 10 = ?",
+              "answer": "24",
+              "accept": [
+                "24"
+              ]
+            }
+          ]
+        },
+        "k-add-2digit-1digit": {
+          "id": "k-add-2digit-1digit",
+          "unitId": "k-tens-ones",
+          "title": "Add Tens & Ones",
+          "durationMin": 8,
+          "prerequisites": [
+            "k-ten-more-less",
+            "k-add-within-20"
+          ],
+          "skills": [
+            "add-2-digit-1-digit"
+          ],
+          "einsteinIntro": "Let's add a small number to a big one. Ones join the ones — the tens wait patiently!",
+          "explain": {
+            "panels": [
+              {
+                "speech": "23 + 4: add ones to ones! 3 + 4 = 7, so 23 + 4 = 27. The 2 tens stay put.",
+                "visual": "add-ones-23-4",
+                "state": "explain"
+              },
+              {
+                "speech": "Stretch! 28 + 5: the ones make a NEW ten. 28 + 2 = 30, then 3 more = 33!",
+                "visual": "make-new-ten",
+                "state": "cheer"
+              }
+            ]
+          },
+          "workedExample": {
+            "title": "Worked Example",
+            "speech": "What is 42 + 5?",
+            "steps": [
+              "42 = 4 tens and 2 ones",
+              "Add the ones: 2 + 5 = 7",
+              "4 tens and 7 ones = 47"
+            ]
+          },
+          "practice": [
+            {
+              "id": "x23c-p1",
+              "type": "fill",
+              "prompt": "31 + 6 = ?",
+              "answer": "37",
+              "accept": [
+                "37"
+              ],
+              "hint": "Add the ones: 1 + 6.",
+              "feedbackCorrect": "37!",
+              "feedbackWrong": "1 + 6 = 7 ones, 3 tens stay: 37."
+            },
+            {
+              "id": "x23c-p2",
+              "type": "mc",
+              "prompt": "54 + 3 = ?",
+              "choices": [
+                "57",
+                "84",
+                "51",
+                "27"
+              ],
+              "answer": "57",
+              "hint": "4 ones + 3 ones.",
+              "feedbackCorrect": "57!",
+              "feedbackWrong": "4 + 3 = 7, so 54 + 3 = 57."
+            },
+            {
+              "id": "x23c-p3",
+              "type": "mc",
+              "prompt": "In 62 + 5, what do we add first?",
+              "choices": [
+                "The ones: 2 + 5",
+                "The tens: 6 + 5",
+                "6 + 2"
+              ],
+              "answer": "The ones: 2 + 5",
+              "hint": "The 5 is ones — add it to the ones.",
+              "feedbackCorrect": "Yes — ones with ones!",
+              "feedbackWrong": "5 is a ones number, so add it to the 2 ones."
+            },
+            {
+              "id": "x23c-p4",
+              "type": "fill",
+              "prompt": "4 + 73 = ?",
+              "answer": "77",
+              "accept": [
+                "77"
+              ],
+              "hint": "Turn it around: 73 + 4.",
+              "feedbackCorrect": "77!",
+              "feedbackWrong": "3 + 4 = 7 ones, so 77."
+            },
+            {
+              "id": "x23c-p5",
+              "type": "mc",
+              "prompt": "Stretch! 28 + 5 = ?",
+              "choices": [
+                "33",
+                "23",
+                "78",
+                "313"
+              ],
+              "answer": "33",
+              "hint": "Make a new ten: 28 + 2 = 30, then 3 more.",
+              "feedbackCorrect": "33 — you made a new ten!",
+              "feedbackWrong": "28 + 2 = 30, 30 + 3 = 33."
+            }
+          ],
+          "quickCheck": [
+            {
+              "id": "x23c-q1",
+              "type": "fill",
+              "prompt": "43 + 5 = ?",
+              "answer": "48",
+              "accept": [
+                "48"
+              ]
+            },
+            {
+              "id": "x23c-q2",
+              "type": "mc",
+              "prompt": "21 + 7 = ?",
+              "choices": [
+                "28",
+                "91",
+                "27",
+                "38"
+              ],
+              "answer": "28"
+            },
+            {
+              "id": "x23c-q3",
+              "type": "fill",
+              "prompt": "6 + 52 = ?",
+              "answer": "58",
+              "accept": [
+                "58"
               ]
             }
           ]

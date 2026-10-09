@@ -29,11 +29,11 @@ async function t(name, fn) {
 }
 
 (async () => {
-  await t('1. packs exist: math has the 3 tracks (93 lessons), physics has sim lessons (ages 5–6 since X6, 7–8, 9–10); no data/curriculum.json', () => {
+  await t('1. packs exist: math has the 3 tracks (96 lessons), physics has sim lessons (ages 5–6 since X6, 7–8, 9–10); no data/curriculum.json', () => {
     const m = packFiles['data/subjects/math.json'];
     assert.deepStrictEqual(Object.keys(m.tracks).sort(), ['ages-5-6', 'ages-7-8', 'ages-9-10']);
     const n = Object.values(m.tracks).reduce((a, tr) => a + Object.keys(tr.lessons).length, 0);
-    assert.strictEqual(n, 93);
+    assert.strictEqual(n, 96);
     for (const tr of Object.values(m.tracks)) for (const u of tr.units) for (const id of u.lessons) assert.ok(tr.lessons[id], 'unit lesson ' + id);
     const p = packFiles['data/subjects/physics.json'];
     assert.strictEqual(p.meta.subject, 'physics');

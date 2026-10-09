@@ -1218,6 +1218,39 @@
           7×6 = <span style="color:#4ECDC4;">5×6</span> + <span style="color:#FF6B35;">2×6</span> = 30 + 12 = 42
           <div style="font-family:Comic Neue,cursive;font-size:1rem;">Break a big fact into easy pieces!</div>
         </div>`,
+      // X23 — ages 5–6 tens & ones (1.NBT)
+      'tens-ones-34': `
+        <div class="viz-box">
+          <div class="place-blocks"><div class="place-block tens" style="min-width:1.6rem;">10</div><div class="place-block tens" style="min-width:1.6rem;">10</div><div class="place-block tens" style="min-width:1.6rem;">10</div><div class="place-block ones">● ● ● ●</div></div>
+          <div style="font-family:Bangers,Impact,sans-serif;font-size:1.3rem;">3 tens + 4 ones = 34</div>
+        </div>`,
+      'compare-alligator': `
+        <div class="viz-box" style="font-family:Bangers,Impact,sans-serif;font-size:1.5rem;">
+          52 <span style="color:#2ecc71;">&gt;</span> 25 &nbsp;·&nbsp; 25 <span style="color:#2ecc71;">&lt;</span> 52 &nbsp;·&nbsp; 40 = 40
+          <div style="font-family:Comic Neue,cursive;font-size:1rem;">🐊 The mouth opens to the bigger number. Tens first, then ones!</div>
+        </div>`,
+      'ten-more-34': `
+        <div class="viz-box">
+          <div class="place-blocks"><div class="place-block tens" style="min-width:1.6rem;">10</div><div class="place-block tens" style="min-width:1.6rem;">10</div><div class="place-block tens" style="min-width:1.6rem;">10</div><div class="place-block ones">● ● ● ●</div></div>
+          <div style="font-family:Bangers,Impact,sans-serif;font-size:1.3rem;">34 + one ten → <span style="color:#FF6B35;">4</span>4</div>
+          <div style="font-family:Comic Neue,cursive;font-size:1rem;">10 more: tens go up, ones stay!</div>
+        </div>`,
+      'ten-less-34': `
+        <div class="viz-box">
+          <div class="place-blocks"><div class="place-block tens" style="min-width:1.6rem;">10</div><div class="place-block tens" style="min-width:1.6rem;">10</div><div class="place-block ones">● ● ● ●</div></div>
+          <div style="font-family:Bangers,Impact,sans-serif;font-size:1.3rem;">34 − one ten → <span style="color:#FF6B35;">2</span>4</div>
+          <div style="font-family:Comic Neue,cursive;font-size:1rem;">10 less: tens go down, ones stay!</div>
+        </div>`,
+      'add-ones-23-4': `
+        <div class="viz-box">
+          <div class="place-blocks"><div class="place-block tens" style="min-width:1.6rem;">10</div><div class="place-block tens" style="min-width:1.6rem;">10</div><div class="place-block ones">● ● ● ● ● ● ●</div></div>
+          <div style="font-family:Bangers,Impact,sans-serif;font-size:1.3rem;">23 + 4: 3 + 4 = 7 ones → 27</div>
+        </div>`,
+      'make-new-ten': `
+        <div class="viz-box" style="font-family:Bangers,Impact,sans-serif;font-size:1.3rem;">
+          28 + 5 = 28 + <span style="color:#4ECDC4;">2</span> + <span style="color:#FF6B35;">3</span> = 30 + 3 = 33
+          <div style="font-family:Comic Neue,cursive;font-size:1rem;">10 ones make a NEW ten!</div>
+        </div>`,
       'skip-mult': `
         <div class="viz-box" style="font-family:Bangers,Impact,sans-serif;font-size:1.3rem;">
           5, 10, 15, 20 → 5×4=20

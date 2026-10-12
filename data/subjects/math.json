@@ -8834,7 +8834,10 @@
             "g4-frac-times-whole",
             "g4-mixed-add",
             "g4-frac-sub-same",
-            "g4-mixed-sub"
+            "g4-mixed-sub",
+            "g5-frac-common-den",
+            "g5-frac-unlike-addsub",
+            "g5-frac-unlike-wp"
           ]
         },
         {
@@ -12526,6 +12529,439 @@
               "accept": [
                 "3"
               ]
+            }
+          ]
+        },
+        "g5-frac-common-den": {
+          "id": "g5-frac-common-den",
+          "unitId": "u4-fractions",
+          "title": "Common Denominators",
+          "durationMin": 9,
+          "prerequisites": [
+            "g4-frac-sub-same"
+          ],
+          "skills": [
+            "frac-common-denominator"
+          ],
+          "einsteinIntro": "Halves and thirds are different-size pieces. Cut them into the SAME size pieces first — that's a common denominator!",
+          "explain": {
+            "panels": [
+              {
+                "speech": "1/2 and 1/3 don't match. Cut both into sixths: 1/2 = 3/6 and 1/3 = 2/6. Now the pieces are the same size!",
+                "visual": "frac-cd-bars",
+                "state": "explain"
+              },
+              {
+                "speech": "Find a common denominator: list multiples. 4 → 4, 8, 12… and 6 → 6, 12… The first match, 12, is the LEAST common denominator!",
+                "visual": "frac-cd-multiples",
+                "state": "think"
+              }
+            ]
+          },
+          "workedExample": {
+            "title": "Worked Example",
+            "speech": "Rewrite 3/4 and 1/6 with a common denominator.",
+            "steps": [
+              "Multiples of 4: 4, 8, 12 · multiples of 6: 6, 12 → use 12",
+              "3/4 = 9/12 (×3 top and bottom)",
+              "1/6 = 2/12 (×2 top and bottom)"
+            ]
+          },
+          "practice": [
+            {
+              "id": "x22a-p1",
+              "type": "mc",
+              "prompt": "Which is a common denominator for 1/2 and 1/3?",
+              "choices": [
+                "6",
+                "5",
+                "3",
+                "2"
+              ],
+              "answer": "6",
+              "hint": "It must be a multiple of BOTH 2 and 3.",
+              "feedbackCorrect": "6 — both 2 and 3 go into 6!",
+              "feedbackWrong": "5 = 2 + 3 doesn't work; you need a multiple of both, like 6."
+            },
+            {
+              "id": "x22a-p2",
+              "type": "fill",
+              "prompt": "1/3 = ?/6",
+              "answer": "2",
+              "accept": [
+                "2"
+              ],
+              "hint": "3 × 2 = 6, so multiply the top by 2 too.",
+              "feedbackCorrect": "2/6!",
+              "feedbackWrong": "1 × 2 = 2, so 1/3 = 2/6."
+            },
+            {
+              "id": "x22a-p3",
+              "type": "fill",
+              "prompt": "3/4 = ?/12",
+              "answer": "9",
+              "accept": [
+                "9"
+              ],
+              "hint": "4 × 3 = 12, so multiply the top by 3.",
+              "feedbackCorrect": "9/12!",
+              "feedbackWrong": "3 × 3 = 9, so 3/4 = 9/12."
+            },
+            {
+              "id": "x22a-p4",
+              "type": "mc",
+              "prompt": "Least common denominator of 1/4 and 1/6?",
+              "choices": [
+                "12",
+                "24",
+                "10",
+                "6"
+              ],
+              "answer": "12",
+              "hint": "List multiples of 6 until one is also a multiple of 4.",
+              "feedbackCorrect": "12 — the smallest one that works!",
+              "feedbackWrong": "24 works too, but 12 is the LEAST common denominator."
+            },
+            {
+              "id": "x22a-p5",
+              "type": "mc",
+              "prompt": "Rewrite 1/2 and 2/5 with denominator 10:",
+              "choices": [
+                "5/10 and 4/10",
+                "1/10 and 2/10",
+                "5/10 and 2/10",
+                "2/10 and 5/10"
+              ],
+              "answer": "5/10 and 4/10",
+              "hint": "Multiply top AND bottom by the same number.",
+              "feedbackCorrect": "5/10 and 4/10!",
+              "feedbackWrong": "1/2 = 5/10 (×5) and 2/5 = 4/10 (×2) — change the top too."
+            }
+          ],
+          "quickCheck": [
+            {
+              "id": "x22a-q1",
+              "type": "fill",
+              "prompt": "2/3 = ?/9",
+              "answer": "6",
+              "accept": [
+                "6"
+              ]
+            },
+            {
+              "id": "x22a-q2",
+              "type": "mc",
+              "prompt": "Least common denominator of 1/3 and 1/4?",
+              "choices": [
+                "12",
+                "7",
+                "24",
+                "4"
+              ],
+              "answer": "12"
+            },
+            {
+              "id": "x22a-q3",
+              "type": "mc",
+              "prompt": "Rewrite 1/3 and 1/6 with denominator 6:",
+              "choices": [
+                "2/6 and 1/6",
+                "1/6 and 1/6",
+                "3/6 and 1/6",
+                "2/6 and 2/6"
+              ],
+              "answer": "2/6 and 1/6"
+            }
+          ]
+        },
+        "g5-frac-unlike-addsub": {
+          "id": "g5-frac-unlike-addsub",
+          "unitId": "u4-fractions",
+          "title": "Add & Subtract Unlike Fractions",
+          "durationMin": 10,
+          "prerequisites": [
+            "g5-frac-common-den"
+          ],
+          "skills": [
+            "frac-add-unlike",
+            "frac-sub-unlike"
+          ],
+          "einsteinIntro": "Different denominators? Make the pieces the same size, THEN add or subtract the tops — just like before!",
+          "explain": {
+            "panels": [
+              {
+                "speech": "1/2 + 1/3 → 3/6 + 2/6 = 5/6. Never add the bottoms — 2/5 would be smaller than 1/2!",
+                "visual": "frac-unlike-add",
+                "state": "explain"
+              },
+              {
+                "speech": "3/4 − 1/6 → 9/12 − 2/12 = 7/12. Same-size pieces, then take away!",
+                "visual": "frac-unlike-sub",
+                "state": "think"
+              }
+            ]
+          },
+          "workedExample": {
+            "title": "Worked Example",
+            "speech": "1/4 + 2/3",
+            "steps": [
+              "Common denominator 12: 1/4 = 3/12 and 2/3 = 8/12",
+              "Add the tops: 3 + 8 = 11",
+              "1/4 + 2/3 = 11/12"
+            ]
+          },
+          "practice": [
+            {
+              "id": "x22b-p1",
+              "type": "mc",
+              "prompt": "1/2 + 1/3 = ?",
+              "choices": [
+                "5/6",
+                "2/5",
+                "2/6",
+                "1/5"
+              ],
+              "answer": "5/6",
+              "hint": "Sixths: 3/6 + 2/6.",
+              "feedbackCorrect": "5/6!",
+              "feedbackWrong": "2/5 adds the bottoms — make sixths first: 3/6 + 2/6 = 5/6."
+            },
+            {
+              "id": "x22b-p2",
+              "type": "fill",
+              "prompt": "1/4 + 1/6 = ?",
+              "answer": "5/12",
+              "accept": [
+                "5/12",
+                "10/24"
+              ],
+              "hint": "Twelfths: 3/12 + 2/12.",
+              "feedbackCorrect": "5/12!",
+              "feedbackWrong": "1/4 = 3/12 and 1/6 = 2/12, so 5/12."
+            },
+            {
+              "id": "x22b-p3",
+              "type": "mc",
+              "prompt": "3/4 − 1/6 = ?",
+              "choices": [
+                "7/12",
+                "2/10",
+                "1/2",
+                "5/12"
+              ],
+              "answer": "7/12",
+              "hint": "Twelfths: 9/12 − 2/12.",
+              "feedbackCorrect": "7/12!",
+              "feedbackWrong": "3/4 = 9/12 and 1/6 = 2/12, so 9/12 − 2/12 = 7/12."
+            },
+            {
+              "id": "x22b-p4",
+              "type": "fill",
+              "prompt": "1 1/2 + 1/4 = ?",
+              "answer": "1 3/4",
+              "accept": [
+                "1 3/4",
+                "7/4",
+                "1 6/8",
+                "14/8"
+              ],
+              "hint": "Keep the 1. Then 1/2 + 1/4 = 2/4 + 1/4.",
+              "feedbackCorrect": "1 3/4!",
+              "feedbackWrong": "1/2 = 2/4, so 2/4 + 1/4 = 3/4 → 1 3/4."
+            },
+            {
+              "id": "x22b-p5",
+              "type": "mc",
+              "prompt": "Why isn't 1/2 + 1/3 equal to 2/5?",
+              "choices": [
+                "the pieces are different sizes — make them the same first",
+                "because 5 is odd",
+                "you should multiply instead",
+                "it is — 2/5 is right"
+              ],
+              "answer": "the pieces are different sizes — make them the same first",
+              "hint": "Is 2/5 even bigger than 1/2?",
+              "feedbackCorrect": "Right — same-size pieces first!",
+              "feedbackWrong": "2/5 is less than 1/2, so it can't be 1/2 plus more. Make sixths first."
+            }
+          ],
+          "quickCheck": [
+            {
+              "id": "x22b-q1",
+              "type": "mc",
+              "prompt": "1/2 + 1/5 = ?",
+              "choices": [
+                "7/10",
+                "2/7",
+                "2/10",
+                "6/10"
+              ],
+              "answer": "7/10"
+            },
+            {
+              "id": "x22b-q2",
+              "type": "fill",
+              "prompt": "2/3 − 1/4 = ?",
+              "answer": "5/12",
+              "accept": [
+                "5/12"
+              ]
+            },
+            {
+              "id": "x22b-q3",
+              "type": "fill",
+              "prompt": "1/3 + 1/6 = ?",
+              "answer": "1/2",
+              "accept": [
+                "1/2",
+                "3/6",
+                "9/18"
+              ]
+            }
+          ]
+        },
+        "g5-frac-unlike-wp": {
+          "id": "g5-frac-unlike-wp",
+          "unitId": "u4-fractions",
+          "title": "Fraction Stories & Estimates",
+          "durationMin": 10,
+          "prerequisites": [
+            "g5-frac-unlike-addsub"
+          ],
+          "skills": [
+            "frac-unlike-word-problems",
+            "frac-benchmark-estimate"
+          ],
+          "einsteinIntro": "Real problems mix fraction sizes. Solve them — then check with benchmarks like 1/2 and 1. Does the answer make sense?",
+          "explain": {
+            "panels": [
+              {
+                "speech": "Maya eats 1/2 of a pizza, Leo eats 1/3. Together: 3/6 + 2/6 = 5/6 of the pizza!",
+                "visual": "frac-unlike-story",
+                "state": "explain"
+              },
+              {
+                "speech": "Benchmark check: 2/5 is a bit less than 1/2. So 2/5 + 1/2 is a bit less than 1. The exact answer 9/10 fits!",
+                "visual": "frac-benchmark",
+                "state": "think"
+              }
+            ]
+          },
+          "workedExample": {
+            "title": "Worked Example",
+            "speech": "A ribbon is 3/4 m. You cut off 1/3 m. How much is left?",
+            "steps": [
+              "Common denominator 12: 3/4 = 9/12 and 1/3 = 4/12",
+              "9/12 − 4/12 = 5/12",
+              "Check: 3/4 minus about 1/3 leaves a bit less than 1/2 — 5/12 fits!"
+            ]
+          },
+          "practice": [
+            {
+              "id": "x22c-p1",
+              "type": "mc",
+              "prompt": "Maya ate 1/2 of a pizza and Leo ate 1/3 of the same pizza. How much did they eat together?",
+              "choices": [
+                "5/6",
+                "2/5",
+                "1/6",
+                "2/6"
+              ],
+              "answer": "5/6",
+              "hint": "Sixths: 3/6 + 2/6.",
+              "feedbackCorrect": "5/6 of the pizza!",
+              "feedbackWrong": "Together means add: 3/6 + 2/6 = 5/6."
+            },
+            {
+              "id": "x22c-p2",
+              "type": "mc",
+              "prompt": "Estimate: is 2/5 + 1/2 more or less than 1?",
+              "choices": [
+                "less than 1",
+                "more than 1",
+                "exactly 1"
+              ],
+              "answer": "less than 1",
+              "hint": "2/5 is a bit less than 1/2.",
+              "feedbackCorrect": "Less — it's 9/10!",
+              "feedbackWrong": "1/2 + 1/2 = 1, and 2/5 is less than 1/2, so the sum is less than 1."
+            },
+            {
+              "id": "x22c-p3",
+              "type": "fill",
+              "prompt": "A ribbon is 3/4 m long. You cut off 1/3 m. How many meters are left?",
+              "answer": "5/12",
+              "accept": [
+                "5/12"
+              ],
+              "hint": "Twelfths: 9/12 − 4/12.",
+              "feedbackCorrect": "5/12 m left!",
+              "feedbackWrong": "3/4 = 9/12 and 1/3 = 4/12, so 9/12 − 4/12 = 5/12."
+            },
+            {
+              "id": "x22c-p4",
+              "type": "mc",
+              "prompt": "Sam says 1/2 + 1/3 = 2/5. The sum must be MORE than 1/2, but 2/5 is…",
+              "choices": [
+                "less than 1/2 — so Sam is wrong",
+                "more than 1 — so Sam is right",
+                "exactly 1/2",
+                "equal to 1/3"
+              ],
+              "answer": "less than 1/2 — so Sam is wrong",
+              "hint": "Compare 2/5 with 1/2 (= 2.5/5).",
+              "feedbackCorrect": "Benchmark detective! Sam added the bottoms.",
+              "feedbackWrong": "2/5 is less than 1/2, so it can't be 1/2 plus more. The real answer is 5/6."
+            },
+            {
+              "id": "x22c-p5",
+              "type": "mc",
+              "prompt": "Estimate: is 3/4 + 3/8 more or less than 1?",
+              "choices": [
+                "more than 1",
+                "less than 1",
+                "exactly 1"
+              ],
+              "answer": "more than 1",
+              "hint": "3/4 needs only 1/4 (= 2/8) more to make 1.",
+              "feedbackCorrect": "More — it's 9/8!",
+              "feedbackWrong": "3/8 is more than the 2/8 needed to reach 1, so the sum is more than 1."
+            }
+          ],
+          "quickCheck": [
+            {
+              "id": "x22c-q1",
+              "type": "fill",
+              "prompt": "Jo walked 2/3 mile, then 1/6 mile more. How far in all?",
+              "answer": "5/6",
+              "accept": [
+                "5/6",
+                "10/12",
+                "15/18"
+              ]
+            },
+            {
+              "id": "x22c-q2",
+              "type": "mc",
+              "prompt": "Estimate: is 1/3 + 1/4 more or less than 1/2?",
+              "choices": [
+                "more than 1/2",
+                "less than 1/2",
+                "exactly 1/2"
+              ],
+              "answer": "more than 1/2"
+            },
+            {
+              "id": "x22c-q3",
+              "type": "mc",
+              "prompt": "A jug holds 7/8 L of juice. You pour out 1/2 L. How much is left?",
+              "choices": [
+                "3/8",
+                "6/6",
+                "1/4",
+                "6/8"
+              ],
+              "answer": "3/8"
             }
           ]
         }

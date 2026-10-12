@@ -598,6 +598,59 @@
         </div>`;
   }
 
+  /** X22 — fraction-bar visual (5.NF). Pure SVG: one bar per row, d equal parts, first n shaded;
+   *  `take` marks the last k shaded parts as taken away (subtraction). */
+  function fractionBars(opts) {
+    const o = Object.assign({ bars: [], width: 200, h: 22, gap: 10, labelW: 64, caption: '', aria: '' }, opts || {});
+    const pad = 8;
+    let y = pad;
+    let out = '';
+    o.bars.forEach((b) => {
+      const d = Math.max(1, b.d | 0);
+      const n = Math.max(0, Math.min(d, b.n | 0));
+      const take = Math.max(0, Math.min(n, b.take | 0));
+      const w = o.width / d;
+      out += `<text x="${pad + o.labelW - 6}" y="${y + o.h / 2 + 5}" text-anchor="end" font-size="13" font-family="Bangers,Impact,sans-serif">${b.label || (n + '/' + d)}</text>`;
+      for (let i = 0; i < d; i++) {
+        const x = pad + o.labelW + i * w;
+        const fill = i < n - take ? (b.color || '#4ECDC4') : (i < n ? '#FFD3C2' : '#FFFFFF');
+        const dash = i >= n - take && i < n ? ' stroke-dasharray="4 2"' : '';
+        out += `<rect x="${x.toFixed(2)}" y="${y}" width="${w.toFixed(2)}" height="${o.h}" fill="${fill}" stroke="#1a1a1a" stroke-width="1.5"${dash}/>`;
+      }
+      y += o.h + o.gap;
+    });
+    const vbW = pad * 2 + o.labelW + o.width;
+    const vbH = y - o.gap + pad;
+    const aria = o.aria || o.caption || 'fraction bars';
+    const cap = o.caption ? `<div style="font-family:Comic Neue,cursive;font-size:0.95rem;margin-top:0.25rem;">${o.caption}</div>` : '';
+    return `<div class="viz-box" role="img" aria-label="${aria}">
+          <svg viewBox="0 0 ${vbW} ${vbH}" width="${Math.min(280, vbW)}" height="${Math.min(200, vbH)}" aria-hidden="true">${out}</svg>
+          ${cap}
+        </div>`;
+  }
+
+  /** X22 — 0-to-1 number line with benchmark ticks (0, 1/2, 1) and labelled points. */
+  function fractionNumberLine(opts) {
+    const o = Object.assign({ points: [], caption: '', aria: '' }, opts || {});
+    const x0 = 20, x1 = 260, y = 34;
+    const X = (v) => (x0 + (x1 - x0) * v).toFixed(1);
+    let out = `<line x1="${x0}" y1="${y}" x2="${x1}" y2="${y}" stroke="#1a1a1a" stroke-width="2"/>`;
+    [[0, '0'], [0.5, '1/2'], [1, '1']].forEach(([v, t]) => {
+      out += `<line x1="${X(v)}" y1="${y - 7}" x2="${X(v)}" y2="${y + 7}" stroke="#1a1a1a" stroke-width="2"/>`;
+      out += `<text x="${X(v)}" y="${y + 22}" text-anchor="middle" font-size="12" font-family="Bangers,Impact,sans-serif">${t}</text>`;
+    });
+    o.points.forEach((pt) => {
+      out += `<circle cx="${X(pt.v)}" cy="${y}" r="5" fill="${pt.color || '#FF6B35'}" stroke="#1a1a1a" stroke-width="1.5"/>`;
+      out += `<text x="${X(pt.v)}" y="${y - 11}" text-anchor="middle" font-size="12" font-family="Bangers,Impact,sans-serif" fill="${pt.color || '#FF6B35'}">${pt.label}</text>`;
+    });
+    const aria = o.aria || o.caption || 'number line from 0 to 1';
+    const cap = o.caption ? `<div style="font-family:Comic Neue,cursive;font-size:0.95rem;margin-top:0.25rem;">${o.caption}</div>` : '';
+    return `<div class="viz-box" role="img" aria-label="${aria}">
+          <svg viewBox="0 0 280 66" width="280" height="66" aria-hidden="true">${out}</svg>
+          ${cap}
+        </div>`;
+  }
+
   function renderVisual(key) {
     const map = {
       'place-value-247': `
@@ -1350,6 +1403,40 @@
         rows: 3, cols: 5, perimeter: true,
         caption: '<span style="font-family:Bangers,Impact,sans-serif;">Area 15</span> inside · <span style="color:#FF6B35;font-family:Bangers,Impact,sans-serif;">Perimeter 16</span> around',
         aria: 'A 3 by 5 rectangle showing area 15 inside and perimeter 16 around'
+      }),
+      // X22 — ages 9–10 unlike-denominator fractions (5.NF.1–2)
+      'frac-cd-bars': fractionBars({
+        bars: [{ d: 2, n: 1, label: '1/2' }, { d: 6, n: 3, label: '= 3/6' }, { d: 3, n: 1, label: '1/3', color: '#FFE66D' }, { d: 6, n: 2, label: '= 2/6', color: '#FFE66D' }],
+        caption: 'Cut both into <strong>sixths</strong> → same-size pieces!',
+        aria: 'Fraction bars: one half equals three sixths, one third equals two sixths'
+      }),
+      'frac-cd-multiples': `
+        <div class="viz-box" style="font-family:Bangers,Impact,sans-serif;font-size:1.2rem;line-height:1.6;">
+          4 → 4, 8, <span style="color:#FF6B35;">12</span>, 16…<br/>6 → 6, <span style="color:#FF6B35;">12</span>, 18…
+          <div style="font-family:Comic Neue,cursive;font-size:1rem;">First match = least common denominator: <strong>12</strong></div>
+        </div>`,
+      'frac-unlike-add': fractionBars({
+        bars: [{ d: 6, n: 3, label: '1/2 = 3/6' }, { d: 6, n: 2, label: '1/3 = 2/6', color: '#FFE66D' }, { d: 6, n: 5, label: '= 5/6', color: '#7C5CFF' }],
+        labelW: 86,
+        caption: '3/6 + 2/6 = <strong>5/6</strong> · not 2/5!',
+        aria: 'Fraction bars: three sixths plus two sixths equals five sixths'
+      }),
+      'frac-unlike-sub': fractionBars({
+        bars: [{ d: 12, n: 9, take: 2, label: '9/12 − 2/12' }, { d: 12, n: 7, label: '= 7/12', color: '#7C5CFF' }],
+        labelW: 92,
+        caption: '3/4 = 9/12 · 1/6 = 2/12 · take away 2 → <strong>7/12</strong>',
+        aria: 'Fraction bars: nine twelfths with two twelfths taken away leaves seven twelfths'
+      }),
+      'frac-unlike-story': fractionBars({
+        bars: [{ d: 6, n: 3, label: 'Maya 3/6' }, { d: 6, n: 2, label: 'Leo 2/6', color: '#FFE66D' }, { d: 6, n: 5, label: 'Both 5/6', color: '#7C5CFF' }],
+        labelW: 86,
+        caption: '1/2 + 1/3 of one pizza = <strong>5/6</strong> of the pizza',
+        aria: 'Story bars: Maya three sixths plus Leo two sixths equals five sixths of a pizza'
+      }),
+      'frac-benchmark': fractionNumberLine({
+        points: [{ v: 0.4, label: '2/5' }, { v: 0.9, label: '9/10', color: '#7C5CFF' }],
+        caption: '2/5 is a bit less than 1/2 → 2/5 + 1/2 is a bit less than 1 (9/10)',
+        aria: 'Number line from 0 to 1 with two fifths just below one half and nine tenths just below one'
       }),
       'skip-mult': `
         <div class="viz-box" style="font-family:Bangers,Impact,sans-serif;font-size:1.3rem;">

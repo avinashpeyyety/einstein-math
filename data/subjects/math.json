@@ -4168,6 +4168,18 @@
           ]
         },
         {
+          "id": "unit-area",
+          "title": "Area Adventures",
+          "icon": "▦",
+          "color": "#7C5CFF",
+          "description": "Cover shapes with unit squares — count them, multiply rows × columns, and tell area from perimeter!",
+          "lessons": [
+            "ar-unit-squares",
+            "ar-rows-columns",
+            "ar-area-vs-perimeter"
+          ]
+        },
+        {
           "id": "unit-fractions",
           "title": "Early Fractions",
           "icon": "🍕",
@@ -8342,6 +8354,430 @@
                 "312"
               ],
               "answer": "36"
+            }
+          ]
+        },
+        "ar-unit-squares": {
+          "id": "ar-unit-squares",
+          "unitId": "unit-area",
+          "title": "Area with Unit Squares",
+          "durationMin": 8,
+          "prerequisites": [
+            "md-arrays-div"
+          ],
+          "skills": [
+            "area-unit-squares"
+          ],
+          "einsteinIntro": "Area is how much SPACE a flat shape covers. We tile it with little unit squares — no gaps, no overlaps — and count them!",
+          "explain": {
+            "panels": [
+              {
+                "speech": "Each little square is 1 square unit. This 3-by-4 rectangle holds 12 unit squares — so the area is 12!",
+                "visual": "area-grid-3x4",
+                "state": "explain"
+              },
+              {
+                "speech": "Tile the floor! Count every square once. Gaps or overlaps? Start over — fair tiling only!",
+                "visual": "area-grid-tile",
+                "state": "cheer"
+              }
+            ]
+          },
+          "workedExample": {
+            "title": "Worked Example",
+            "speech": "A rectangle is tiled with 2 rows of 3 unit squares. What is its area?",
+            "steps": [
+              "Count the unit squares: row 1 has 3, row 2 has 3",
+              "3 + 3 = 6 unit squares",
+              "Area = 6 square units"
+            ]
+          },
+          "practice": [
+            {
+              "id": "x21a-p1",
+              "type": "mc",
+              "prompt": "Area means…",
+              "choices": [
+                "how much space a shape covers",
+                "how far around a shape",
+                "how tall a shape is",
+                "how heavy a shape is"
+              ],
+              "answer": "how much space a shape covers",
+              "hint": "Think: covering the inside like a floor.",
+              "feedbackCorrect": "Yes — area covers the inside!",
+              "feedbackWrong": "Area is the space inside, not the fence around."
+            },
+            {
+              "id": "x21a-p2",
+              "type": "fill",
+              "prompt": "A 2×3 grid of unit squares has area ?",
+              "answer": "6",
+              "accept": [
+                "6"
+              ],
+              "hint": "Count every square: 2 rows of 3.",
+              "feedbackCorrect": "6 square units!",
+              "feedbackWrong": "2 × 3 = 6 unit squares."
+            },
+            {
+              "id": "x21a-p3",
+              "type": "mc",
+              "prompt": "How many unit squares are in a 4×5 rectangle?",
+              "choices": [
+                "9",
+                "20",
+                "45",
+                "15"
+              ],
+              "answer": "20",
+              "hint": "4 rows of 5 squares each.",
+              "feedbackCorrect": "20!",
+              "feedbackWrong": "4 × 5 = 20 unit squares."
+            },
+            {
+              "id": "x21a-p4",
+              "type": "mc",
+              "prompt": "Which tiling shows area correctly?",
+              "choices": [
+                "unit squares with no gaps and no overlaps",
+                "squares with big gaps",
+                "squares stacked on top of each other",
+                "only the outline drawn"
+              ],
+              "answer": "unit squares with no gaps and no overlaps",
+              "hint": "Fair tiling: cover every bit once.",
+              "feedbackCorrect": "Perfect tiling!",
+              "feedbackWrong": "Gaps skip space; overlaps double-count."
+            },
+            {
+              "id": "x21a-p5",
+              "type": "fill",
+              "prompt": "A 3×3 square of unit squares has area ?",
+              "answer": "9",
+              "accept": [
+                "9"
+              ],
+              "hint": "3 rows of 3.",
+              "feedbackCorrect": "9!",
+              "feedbackWrong": "3 × 3 = 9 square units."
+            }
+          ],
+          "quickCheck": [
+            {
+              "id": "x21a-q1",
+              "type": "mc",
+              "prompt": "Area of a 1×6 strip of unit squares?",
+              "choices": [
+                "6",
+                "7",
+                "16",
+                "1"
+              ],
+              "answer": "6"
+            },
+            {
+              "id": "x21a-q2",
+              "type": "fill",
+              "prompt": "A 5×2 grid of unit squares has area ?",
+              "answer": "10",
+              "accept": [
+                "10"
+              ]
+            },
+            {
+              "id": "x21a-q3",
+              "type": "mc",
+              "prompt": "One unit square has area…",
+              "choices": [
+                "1 square unit",
+                "1 unit around",
+                "0",
+                "2 square units"
+              ],
+              "answer": "1 square unit"
+            }
+          ]
+        },
+        "ar-rows-columns": {
+          "id": "ar-rows-columns",
+          "unitId": "unit-area",
+          "title": "Rows × Columns",
+          "durationMin": 8,
+          "prerequisites": [
+            "ar-unit-squares"
+          ],
+          "skills": [
+            "area-rows-columns"
+          ],
+          "einsteinIntro": "Counting one-by-one is slow. Multiply rows × columns — that's the same as the area of a rectangle!",
+          "explain": {
+            "panels": [
+              {
+                "speech": "Label it! 3 rows and 4 columns → area = 3 × 4 = 12 square units. Same as an array!",
+                "visual": "area-grid-rows-cols",
+                "state": "explain"
+              },
+              {
+                "speech": "Rows × columns IS multiplication. A 2-by-5 rectangle has area 2 × 5 = 10 — just like 2 groups of 5!",
+                "visual": "area-grid-mult",
+                "state": "cheer"
+              }
+            ]
+          },
+          "workedExample": {
+            "title": "Worked Example",
+            "speech": "A garden is 4 rows by 6 columns of unit squares. Area?",
+            "steps": [
+              "Area = rows × columns",
+              "4 × 6 = 24",
+              "Area = 24 square units"
+            ]
+          },
+          "practice": [
+            {
+              "id": "x21b-p1",
+              "type": "mc",
+              "prompt": "Area of a rectangle with 3 rows and 5 columns?",
+              "choices": [
+                "8",
+                "15",
+                "35",
+                "2"
+              ],
+              "answer": "15",
+              "hint": "Multiply rows × columns.",
+              "feedbackCorrect": "15!",
+              "feedbackWrong": "3 × 5 = 15."
+            },
+            {
+              "id": "x21b-p2",
+              "type": "fill",
+              "prompt": "2 rows × 8 columns = area ?",
+              "answer": "16",
+              "accept": [
+                "16"
+              ],
+              "hint": "2 × 8.",
+              "feedbackCorrect": "16!",
+              "feedbackWrong": "2 × 8 = 16 square units."
+            },
+            {
+              "id": "x21b-p3",
+              "type": "mc",
+              "prompt": "Which equation finds the area of a 4-by-7 rectangle?",
+              "choices": [
+                "4 × 7",
+                "4 + 7",
+                "4 + 7 + 4 + 7",
+                "47"
+              ],
+              "answer": "4 × 7",
+              "hint": "Area uses multiplication of sides (in unit squares).",
+              "feedbackCorrect": "Yes — 4 × 7!",
+              "feedbackWrong": "Adding all four sides is perimeter, not area."
+            },
+            {
+              "id": "x21b-p4",
+              "type": "fill",
+              "prompt": "5 × 6 rectangle area ?",
+              "answer": "30",
+              "accept": [
+                "30"
+              ],
+              "hint": "Rows × columns.",
+              "feedbackCorrect": "30!",
+              "feedbackWrong": "5 × 6 = 30."
+            },
+            {
+              "id": "x21b-p5",
+              "type": "mc",
+              "prompt": "A 3×4 array of stars has the same area idea as…",
+              "choices": [
+                "a 3-by-4 rectangle of unit squares",
+                "a perimeter of 3+4",
+                "3 + 4 stars",
+                "only 3 stars"
+              ],
+              "answer": "a 3-by-4 rectangle of unit squares",
+              "hint": "Arrays and area grids are both rows × columns.",
+              "feedbackCorrect": "Same idea — 12!",
+              "feedbackWrong": "Arrays and area both use rows × columns."
+            }
+          ],
+          "quickCheck": [
+            {
+              "id": "x21b-q1",
+              "type": "fill",
+              "prompt": "3 rows × 7 columns = area ?",
+              "answer": "21",
+              "accept": [
+                "21"
+              ]
+            },
+            {
+              "id": "x21b-q2",
+              "type": "mc",
+              "prompt": "Area of a 6-by-4 rectangle?",
+              "choices": [
+                "10",
+                "24",
+                "20",
+                "64"
+              ],
+              "answer": "24"
+            },
+            {
+              "id": "x21b-q3",
+              "type": "fill",
+              "prompt": "1 × 9 rectangle area ?",
+              "answer": "9",
+              "accept": [
+                "9"
+              ]
+            }
+          ]
+        },
+        "ar-area-vs-perimeter": {
+          "id": "ar-area-vs-perimeter",
+          "unitId": "unit-area",
+          "title": "Area vs Perimeter",
+          "durationMin": 8,
+          "prerequisites": [
+            "ar-rows-columns"
+          ],
+          "skills": [
+            "area-additive",
+            "area-vs-perimeter"
+          ],
+          "einsteinIntro": "Area is INSIDE (covering). Perimeter is AROUND (the fence). Weird L-shapes? Split into rectangles and ADD the areas!",
+          "explain": {
+            "panels": [
+              {
+                "speech": "L-shape trick: split into two rectangles. 3×2 = 6 and 2×2 = 4. Add: area = 10 square units!",
+                "visual": "area-l-shape",
+                "state": "explain"
+              },
+              {
+                "speech": "Same rectangle: area = 3 × 5 = 15 inside. Perimeter = 3+5+3+5 = 16 around. Inside ≠ around!",
+                "visual": "area-vs-perim-grid",
+                "state": "think"
+              }
+            ]
+          },
+          "workedExample": {
+            "title": "Worked Example",
+            "speech": "An L-shape is a 3×4 rectangle plus a 2×2 square stuck on. Total area?",
+            "steps": [
+              "First rectangle: 3 × 4 = 12",
+              "Second rectangle: 2 × 2 = 4",
+              "Add: 12 + 4 = 16 square units"
+            ]
+          },
+          "practice": [
+            {
+              "id": "x21c-p1",
+              "type": "mc",
+              "prompt": "Area is ___ ; perimeter is ___.",
+              "choices": [
+                "inside ; around",
+                "around ; inside",
+                "taller ; wider",
+                "heavier ; lighter"
+              ],
+              "answer": "inside ; around",
+              "hint": "Floor vs fence.",
+              "feedbackCorrect": "Inside = area, around = perimeter!",
+              "feedbackWrong": "Don't swap them — area covers, perimeter fences."
+            },
+            {
+              "id": "x21c-p2",
+              "type": "fill",
+              "prompt": "L-shape: 2×4 rectangle + 3×2 rectangle. Total area ?",
+              "answer": "14",
+              "accept": [
+                "14"
+              ],
+              "hint": "Add the two areas: 8 + 6.",
+              "feedbackCorrect": "14!",
+              "feedbackWrong": "2×4=8, 3×2=6, 8+6=14."
+            },
+            {
+              "id": "x21c-p3",
+              "type": "mc",
+              "prompt": "Rectangle 3 by 5. Which is the AREA?",
+              "choices": [
+                "15",
+                "16",
+                "8",
+                "30"
+              ],
+              "answer": "15",
+              "hint": "Area = 3 × 5. Perimeter = 3+5+3+5.",
+              "feedbackCorrect": "15 — that's inside!",
+              "feedbackWrong": "16 would be the perimeter (3+5+3+5)."
+            },
+            {
+              "id": "x21c-p4",
+              "type": "mc",
+              "prompt": "Rectangle 3 by 5. Which is the PERIMETER?",
+              "choices": [
+                "16",
+                "15",
+                "8",
+                "35"
+              ],
+              "answer": "16",
+              "hint": "Add the four sides: 3+5+3+5.",
+              "feedbackCorrect": "16 around!",
+              "feedbackWrong": "15 is the area (3×5), not the fence."
+            },
+            {
+              "id": "x21c-p5",
+              "type": "fill",
+              "prompt": "L-shape split: 4×3 + 2×2. Total area ?",
+              "answer": "16",
+              "accept": [
+                "16"
+              ],
+              "hint": "12 + 4.",
+              "feedbackCorrect": "16!",
+              "feedbackWrong": "4×3=12, 2×2=4, total 16."
+            }
+          ],
+          "quickCheck": [
+            {
+              "id": "x21c-q1",
+              "type": "mc",
+              "prompt": "To find an L-shape's area, you can…",
+              "choices": [
+                "split into rectangles and add",
+                "only measure the longest side",
+                "count the perimeter twice",
+                "subtract the perimeter"
+              ],
+              "answer": "split into rectangles and add"
+            },
+            {
+              "id": "x21c-q2",
+              "type": "fill",
+              "prompt": "Rectangle 2×6: area ?",
+              "answer": "12",
+              "accept": [
+                "12"
+              ]
+            },
+            {
+              "id": "x21c-q3",
+              "type": "mc",
+              "prompt": "Rectangle 2×6: perimeter?",
+              "choices": [
+                "16",
+                "12",
+                "8",
+                "26"
+              ],
+              "answer": "16"
             }
           ]
         }

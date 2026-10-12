@@ -6,7 +6,7 @@ Public interactive math program for **ages 5–10** (US K–5), delivered by **E
 
 ## Features
 
-- **Age tracks** (distinct curricula, **32 / 34 / 30 playable lessons** for ages 5–6 / 7–8 / 9–10; 96 math total):
+- **Age tracks** (distinct curricula, **32 / 37 / 30 playable lessons** for ages 5–6 / 7–8 / 9–10; 99 math total):
   - **Ages 5–6 (K–1)** — counting & teens, tens & ones (compare with <, >, =, 10 more/less, 2-digit + 1-digit), compose/decompose, doubles & make-10, length/weight/time/coins, story problems, AB patterns, tally/pictograph, 3D shapes
   - **Ages 7–8 (grades 2–3)** — place value, rounding & estimation, regrouping fluency, mult/div ideas (facts, quotative), fractions of a set, perimeter, elapsed time, bar graphs, multi-step & money WP
   - **Ages 9–10 (grades 4–5)** — multi-digit ops + long mult/div ideas, factors/primes, order of ops, fraction × whole & mixed add/sub (like denoms), decimal add/sub, area/volume, coordinate plane, multi-step WP
@@ -181,7 +181,7 @@ Localhost works for PWA install in Chromium.
 
 ## Smoke demo (2.3 trusted-home sprint)
 
-1. Load once online → DevTools → Application → Service Worker registered; Cache Storage shows `einstein-math-v2.5.4` (or the current `CACHE` in `sw.js`).
+1. Load once online → DevTools → Application → Service Worker registered; Cache Storage shows `einstein-math-v2.5.5` (or the current `CACHE` in `sw.js`).
 2. Go offline (DevTools Network → Offline) → reload → landing / Mission Map still usable.
 3. Create two explorers, earn progress → **Export all profiles** → clear site data → **Import** merge → both kids restored.
 4. Toggle **Read aloud** → Einstein bubbles speak; **Replay** repeats the last line.
@@ -216,7 +216,7 @@ Curriculum generators (optional): `scripts/expand_curriculum.py` + `scripts/less
 
 | Done (2.3) | Still missing |
 |------------|----------------|
-| 32 / 34 / 30 real lessons / track (96 math); balanced strands | Real cloud sync / accounts |
+| 32 / 37 / 30 real lessons / track (99 math); balanced strands | Real cloud sync / accounts |
 | Parent / family overview + print + JSON export | Printable worksheets; standards tagging UI |
 | Mastery + spaced review + remediation retry | Richer Imagine panels per new lesson |
 | PWA install + offline shell | Push notifications / remote review reminders |

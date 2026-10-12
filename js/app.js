@@ -530,6 +530,74 @@
     }).join('');
   }
 
+
+  /** X21 — unit-square grid visual (3.MD). Pure SVG; optional labels / L-cut / split / perimeter. */
+  function unitSquareGrid(opts) {
+    const o = Object.assign({
+      rows: 3, cols: 4, cell: 22, gap: 2, pad: 14,
+      labels: false, lCut: null, splitAtCol: null, splitAtRow: null,
+      perimeter: false, caption: '', aria: ''
+    }, opts || {});
+    const { rows, cols, cell, gap, pad } = o;
+    const labelPad = o.labels ? 18 : 0;
+    const gw = cols * cell + (cols - 1) * gap;
+    const gh = rows * cell + (rows - 1) * gap;
+    const ox = pad + labelPad;
+    const oy = pad;
+    const vbW = ox + gw + pad + (o.labels ? 8 : 0);
+    const vbH = oy + gh + pad + (o.labels ? 16 : 0) + (o.caption ? 0 : 0);
+    const cut = o.lCut; // { rows, cols } missing from bottom-right
+    const cells = [];
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const inCut = cut && r >= rows - cut.rows && c >= cols - cut.cols;
+        if (inCut) continue;
+        const x = ox + c * (cell + gap);
+        const y = oy + r * (cell + gap);
+        cells.push(`<rect x="${x}" y="${y}" width="${cell}" height="${cell}" fill="#FFE66D" stroke="#1a1a1a" stroke-width="2"/>`);
+      }
+    }
+    let extras = '';
+    if (o.splitAtCol != null) {
+      const x = ox + o.splitAtCol * (cell + gap) - gap / 2;
+      extras += `<line x1="${x}" y1="${oy - 2}" x2="${x}" y2="${oy + gh + 2}" stroke="#FF6B35" stroke-width="3" stroke-dasharray="5 3"/>`;
+    }
+    if (o.splitAtRow != null) {
+      const y = oy + o.splitAtRow * (cell + gap) - gap / 2;
+      extras += `<line x1="${ox - 2}" y1="${y}" x2="${ox + gw + 2}" y2="${y}" stroke="#FF6B35" stroke-width="3" stroke-dasharray="5 3"/>`;
+    }
+    if (o.perimeter) {
+      extras += `<rect x="${ox - 2}" y="${oy - 2}" width="${gw + 4}" height="${gh + 4}" fill="none" stroke="#FF6B35" stroke-width="3" stroke-dasharray="6 3"/>`;
+    }
+    let labels = '';
+    if (o.labels) {
+      for (let r = 0; r < rows; r++) {
+        const y = oy + r * (cell + gap) + cell / 2 + 4;
+        labels += `<text x="${pad + 4}" y="${y}" text-anchor="middle" font-size="11" font-family="Bangers,Impact,sans-serif">${r + 1}</text>`;
+      }
+      for (let c = 0; c < cols; c++) {
+        const x = ox + c * (cell + gap) + cell / 2;
+        labels += `<text x="${x}" y="${oy + gh + 14}" text-anchor="middle" font-size="11" font-family="Bangers,Impact,sans-serif">${c + 1}</text>`;
+      }
+      labels += `<text x="${pad + 4}" y="${oy - 4}" text-anchor="middle" font-size="9" font-family="Comic Neue,cursive">rows</text>`;
+      labels += `<text x="${ox + gw / 2}" y="${oy + gh + 26}" text-anchor="middle" font-size="9" font-family="Comic Neue,cursive">columns</text>`;
+    }
+    const aria = o.aria || o.caption || `${rows} by ${cols} unit square grid`;
+    const cap = o.caption
+      ? `<div style="font-family:Comic Neue,cursive;font-size:0.95rem;margin-top:0.25rem;">${o.caption}</div>`
+      : '';
+    // bump viewBox if column labels need space
+    const vbH2 = o.labels ? oy + gh + pad + 28 : oy + gh + pad;
+    return `<div class="viz-box" role="img" aria-label="${aria}">
+          <svg viewBox="0 0 ${vbW} ${vbH2}" width="${Math.min(240, vbW)}" height="${Math.min(180, vbH2)}" aria-hidden="true">
+            ${cells.join('')}
+            ${extras}
+            ${labels}
+          </svg>
+          ${cap}
+        </div>`;
+  }
+
   function renderVisual(key) {
     const map = {
       'place-value-247': `
@@ -1251,6 +1319,38 @@
           28 + 5 = 28 + <span style="color:#4ECDC4;">2</span> + <span style="color:#FF6B35;">3</span> = 30 + 3 = 33
           <div style="font-family:Comic Neue,cursive;font-size:1rem;">10 ones make a NEW ten!</div>
         </div>`,
+
+      // X21 — ages 7–8 area (3.MD) unit-square grids
+      'area-grid-3x4': unitSquareGrid({
+        rows: 3, cols: 4,
+        caption: '3 × 4 = <strong>12</strong> square units',
+        aria: 'A 3 by 4 grid of 12 unit squares'
+      }),
+      'area-grid-tile': unitSquareGrid({
+        rows: 2, cols: 5,
+        caption: 'Tile with unit squares — no gaps, no overlaps!',
+        aria: 'A 2 by 5 tiled grid of 10 unit squares'
+      }),
+      'area-grid-rows-cols': unitSquareGrid({
+        rows: 3, cols: 4, labels: true,
+        caption: '<span style="font-family:Bangers,Impact,sans-serif;font-size:1.2rem;">3 rows × 4 columns = 12</span>',
+        aria: 'Grid with 3 rows and 4 columns labeled, area 12'
+      }),
+      'area-grid-mult': unitSquareGrid({
+        rows: 2, cols: 5, labels: true,
+        caption: 'Rows × columns = area · same as multiplication!',
+        aria: 'A 2 by 5 grid showing rows times columns equals area'
+      }),
+      'area-l-shape': unitSquareGrid({
+        rows: 3, cols: 4, lCut: { rows: 1, cols: 2 }, splitAtCol: 2,
+        caption: 'Split: 3×2 = 6 &nbsp;+&nbsp; 2×2 = 4 &nbsp;→&nbsp; area <strong>10</strong>',
+        aria: 'L-shaped figure split into a 3 by 2 rectangle and a 2 by 2 square, total area 10'
+      }),
+      'area-vs-perim-grid': unitSquareGrid({
+        rows: 3, cols: 5, perimeter: true,
+        caption: '<span style="font-family:Bangers,Impact,sans-serif;">Area 15</span> inside · <span style="color:#FF6B35;font-family:Bangers,Impact,sans-serif;">Perimeter 16</span> around',
+        aria: 'A 3 by 5 rectangle showing area 15 inside and perimeter 16 around'
+      }),
       'skip-mult': `
         <div class="viz-box" style="font-family:Bangers,Impact,sans-serif;font-size:1.3rem;">
           5, 10, 15, 20 → 5×4=20

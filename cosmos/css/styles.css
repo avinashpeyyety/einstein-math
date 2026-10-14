@@ -848,7 +848,63 @@ kbd {
 }
 
 @media (max-width: 560px) {
+  /* C4: compact, swipeable body picker instead of hiding it */
   .hud-left {
+    left: 12px;
+    right: 12px;
+    width: auto;
+    top: auto;
+    bottom: calc(172px + var(--safe-b));
+    max-height: none;
+    padding: 6px;
+    overflow: hidden;
+    border-radius: 18px;
+  }
+
+  .hud-left .panel-head,
+  .hud-left .panel-section,
+  .hud-left .body-list-heading {
+    display: none;
+  }
+
+  .hud-left .body-list {
+    flex-direction: row;
+    gap: 6px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+    touch-action: pan-x;
+  }
+
+  .hud-left .body-list::-webkit-scrollbar {
+    display: none;
+  }
+
+  .hud-left .body-item {
+    width: auto;
+    min-height: 44px;
+    flex-shrink: 0;
+    white-space: nowrap;
+    padding: 8px 14px;
+    scroll-snap-align: start;
+    border-color: var(--panel-border);
+  }
+
+  .hud-left .body-item .name {
+    font-size: 0.95rem;
+  }
+
+  .hud-left .body-item .period {
+    display: none;
+  }
+
+  /* Earth/LEO/Stars: picker is inert there; hide it so it never sits under the Earth/LEO bar */
+  body.earth-mode .hud-left,
+  body.leo-mode .hud-left,
+  body.stars-mode .hud-left {
     display: none;
   }
 

@@ -76,7 +76,7 @@ Effort: XS ≈ ½ cycle, S ≤ 1 cycle, M = 2 cycles. Each ticket ends with smok
 - [x] **X23 (S)** Math 5–6: tens & ones, compare 2-digit with <, >, =, 10 more/10 less, 2-digit + 1-digit (3 lessons) — *1.NBT* — ✅ done 2026-10-08 (`04e785f` on Air)
 - [x] **X21 (S)** Math 7–8: Area — unit squares, rows × columns, additive area, area vs perimeter (3 lessons) + unit-square grid visual — *3.MD* — ✅ shipped 2026-10-12 (`9cd93d7`)
 - [x] **X22 (S)** Math 9–10: add/subtract fractions with unlike denominators (3 lessons) — *5.NF* — ✅ shipped 2026-10-12 (`9228a6d`)
-- [ ] **C4 (XS)** Space Lab: mobile body picker <560px + Earth/LEO bar no longer overlaps the body list (Cosmos Cycle 3 carry-over)
+- [x] **C4 (XS)** Space Lab: mobile body picker <560px + Earth/LEO bar no longer overlaps the body list (Cosmos Cycle 3 carry-over) — done 2026-10-06: below 560px the body list is a full-width, horizontally swipeable strip of ≥44px chips above the bottom bar (solar mode); in Earth/LEO/Stars it is hidden because the picker is inert there and the Earth/LEO bar used to cover it. Desktop layout unchanged. `cosmos/css/styles.css`; SW v2.5.7.
 - [ ] **X9 (M)** Math: procedural generators for top 10 practiced skills (seeded, difficulty dial) — include X20–X22 skills
 - [ ] **X12 (M)** Physics ages 9–10: speed, gravity, circuits sim (5 lessons)
 - [ ] **X25 (S)** Math 7–8: fractions on a number line, simple equivalence, compare same numerator/denominator (3 lessons) + number-line visual — *3.NF*
@@ -126,6 +126,7 @@ Comprehensive World + American + Indian history, age-banded, with timelines, map
 
 ## 7. Progress log
 
+- 2026-10-06 · C4 shipped: Space Lab body picker usable below 560px (full-width swipeable strip, chips ≥44px tall, solar mode); hidden in Earth/LEO/Stars modes where the picker is inert, so the Earth/LEO bar no longer covers the body list. Desktop layout unchanged. SW v2.5.7.
 - 2026-10-01 · X1 shipped: store schema v3 (`einstein-math-v3`), progress keyed `math:<track>`, v2/stub-v3 migrate on load (v2 key kept), subjects = math (live) + physics (soon); SW v2.3.9
 - 2026-10-01 · X2 shipped: lessons moved to subject packs `data/subjects/math.json` (was `data/curriculum.json`, same shape) + `physics.json` stub; only the packs in use are fetched (`Subjects.loadPack`/`loadCurriculum`); SW precaches math, caches other packs on first use in `einstein-math-packs-v1` (kept across versions, refreshed when online); tests/subject-packs.test.js; SW v2.4.6
 - 2026-10-01 · (side ask) progress safety net: IndexedDB mirror + auto-restore + progress report download / auto-save file / restore from file

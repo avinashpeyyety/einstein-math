@@ -1,5 +1,5 @@
 /* Einstein Math service worker — caches app shell + curriculum + panels for offline play */
-const CACHE = 'einstein-math-v2.5.8';
+const CACHE = 'einstein-math-v2.5.9';
 // W1b: on-device comic-avatar model (~40 MB) is cached on first use only, and kept across app versions
 const MODEL_CACHE = 'einstein-math-models-v1';
 // X2: subject packs (data/subjects/<id>.json). math is precached (default subject, offline after first visit);
@@ -17,6 +17,7 @@ const PRECACHE = [
   './js/comicify.js',
   './js/einstein.js',
   './js/student.js',
+  './js/generators.js',
   './js/app.js',
   './data/subjects/math.json',
   './assets/einstein.svg',

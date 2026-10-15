@@ -2208,6 +2208,64 @@
     renderLessonPhase();
   }
 
+  /* ——— X9: "More practice" — fresh seeded sets from js/generators.js on mapped math lessons.
+   * Extra sets never touch stars, mastery or lesson status (no Storage writes in mode 'more'). ——— */
+  const MORE_PRACTICE_COUNT = 5;
+  let morePracticeLevel = 1; // 1 Easy · 2 Medium · 3 Hard (remembered for this session)
+
+  function morePracticeSkill(L) {
+    if (!L || L.type === 'sim' || !window.Generators) return null;
+    return window.Generators.skillForLesson(L.id);
+  }
+
+  function morePracticeControls(L) {
+    if (!morePracticeSkill(L)) return '';
+    return `<div class="more-practice" role="group" aria-label="More practice difficulty" style="display:flex;flex-wrap:wrap;gap:.4rem;justify-content:center;align-items:center;margin-top:.8rem;">
+      <span style="font-weight:700;">More practice:</span>
+      ${window.Generators.LEVELS.map(l => `<button type="button" class="btn btn-sm ${l.id === morePracticeLevel ? 'btn-primary' : 'btn-ghost'}" data-more-level="${l.id}" aria-pressed="${l.id === morePracticeLevel}">${escapeHtml(l.label)}</button>`).join('')}
+      <button type="button" class="btn btn-cyan btn-sm" id="btn-more-practice">🎲 More practice</button>
+    </div>`;
+  }
+
+  function wireMorePractice(L) {
+    const btns = $$('[data-more-level]');
+    btns.forEach(b => {
+      b.onclick = () => {
+        morePracticeLevel = Number(b.dataset.moreLevel) || 1;
+        btns.forEach(x => {
+          const on = Number(x.dataset.moreLevel) === morePracticeLevel;
+          x.classList.toggle('btn-primary', on);
+          x.classList.toggle('btn-ghost', !on);
+          x.setAttribute('aria-pressed', String(on));
+        });
+      };
+    });
+    const go = $('#btn-more-practice');
+    if (go) go.onclick = () => startMorePractice(L.id, morePracticeLevel);
+  }
+
+  function startMorePractice(lessonId, level) {
+    const track = activeTrack();
+    if (!track) return;
+    const lesson = track.lessons[lessonId];
+    const skill = morePracticeSkill(lesson);
+    if (!skill) return;
+    morePracticeLevel = Math.min(3, Math.max(1, Math.round(Number(level) || 1)));
+    const practiceList = window.Generators.generate(skill, {
+      seed: window.Generators.newSeed(), level: morePracticeLevel, count: MORE_PRACTICE_COUNT
+    });
+    destroySimLab();
+    lessonCtx = {
+      lesson, mode: 'more', phase: 'practice',
+      panelIndex: 0, practiceIndex: 0, checkIndex: 0,
+      practiceCorrect: 0, practiceTotal: 0, checkCorrect: 0, checkTotal: 0,
+      missedCheckIds: [], practiceList, checkList: [], simParams: null, skipExplain: true,
+      moreSkill: skill, moreLevel: morePracticeLevel
+    };
+    showScreen('screen-lesson');
+    renderLessonPhase();
+  }
+
   function setPips() {
     const L = lessonCtx.lesson;
     const track = activeTrack();
@@ -2299,6 +2357,24 @@
     } else if (lessonCtx.phase === 'complete') {
       const pc = lessonCtx.practiceCorrect;
       const pt = lessonCtx.practiceTotal;
+      if (lessonCtx.mode === 'more') {
+        const lvl = ((window.Generators?.LEVELS || []).find(l => l.id === lessonCtx.moreLevel) || {}).label || '';
+        const strong = pt > 0 && pc / pt >= 0.6;
+        Einstein.mount(stage, strong ? 'cheer' : 'think');
+        if (pt > 0 && pc === pt) Einstein.pow(stage, 'WOW!');
+        Einstein.speak(bubble, strong
+          ? `More practice (${lvl}) done: ${pc}/${pt}! Fresh numbers every set — go again or turn up the dial!`
+          : `More practice (${lvl}) done: ${pc}/${pt}. Every set is new numbers — try another one, maybe a notch easier!`,
+          strong ? 'success' : 'correction');
+        body.innerHTML = `
+          <div class="viz-box" style="font-family:Bangers,Impact,sans-serif;font-size:1.6rem;">🎲 ${pc} / ${pt} RIGHT</div>
+          <p class="muted" style="text-align:center;">Extra practice doesn't change stars or mastery.</p>
+          ${morePracticeControls(L)}`;
+        actions.innerHTML = `<button type="button" class="btn btn-cyan" id="btn-map">Mission Map</button>`;
+        $('#btn-map').onclick = renderHub;
+        wireMorePractice(L);
+        return;
+      }
       const cc = lessonCtx.checkCorrect;
       const ct = lessonCtx.checkTotal;
       const checkPct = ct > 0 ? cc / ct : 0;
@@ -2346,7 +2422,8 @@
         </div>
         <p style="font-weight:700;text-align:center;">Mastery: ${masteryPct}% · ${escapeHtml((entry.masteryLevel || '').replace('_', ' '))}</p>
         ${entry.nextReviewAt ? `<p class="muted" style="text-align:center;">Next review: ${escapeHtml(new Date(entry.nextReviewAt).toLocaleString())}</p>` : ''}
-        <p style="font-weight:700;text-align:center;">Mistakes are just plot twists — you finished the issue!</p>`;
+        <p style="font-weight:700;text-align:center;">Mistakes are just plot twists — you finished the issue!</p>
+        ${morePracticeControls(L)}`;
 
       if (needsRemediation) {
         actions.innerHTML = `
@@ -2363,6 +2440,7 @@
         $('#btn-map').onclick = renderHub;
         $('#btn-progress').onclick = renderProgress;
       }
+      wireMorePractice(L);
     }
   }
 
@@ -2634,7 +2712,9 @@
 
     Einstein.mount(stage, 'explain');
     Einstein.speak(bubble,
-      mode === 'practice'
+      lessonCtx.mode === 'more'
+        ? `More practice ${idx + 1} of ${list.length} — fresh numbers!`
+        : mode === 'practice'
         ? `Practice ${idx + 1} of ${list.length} — give it a shot!`
         : `Quick Check ${idx + 1} of ${list.length} — show what you know!`
     );
@@ -2680,14 +2760,17 @@
       }
 
       // Checkpoint mid-lesson so refresh doesn't lose attempt counts entirely
-      Storage.setLessonProgress(progress, L.id, {
-        status: 'in_progress',
-        practiceCorrect: lessonCtx.practiceCorrect,
-        practiceTotal: lessonCtx.practiceTotal,
-        checkCorrect: lessonCtx.checkCorrect,
-        checkTotal: lessonCtx.checkTotal
-      });
-      persistProgress();
+      // (X9: extra "More practice" sets never write lesson progress)
+      if (lessonCtx.mode !== 'more') {
+        Storage.setLessonProgress(progress, L.id, {
+          status: 'in_progress',
+          practiceCorrect: lessonCtx.practiceCorrect,
+          practiceTotal: lessonCtx.practiceTotal,
+          checkCorrect: lessonCtx.checkCorrect,
+          checkTotal: lessonCtx.checkTotal
+        });
+        persistProgress();
+      }
 
       if (q.type === 'mc') {
         $$('.choice', body).forEach(b => {
@@ -2722,7 +2805,7 @@
       }
 
       const nextLabel = idx >= list.length - 1
-        ? (mode === 'practice' ? 'Quick Check' : 'Finish!')
+        ? (mode === 'practice' && lessonCtx.mode !== 'more' ? 'Quick Check' : 'Finish!')
         : 'Next';
       actions.innerHTML = `<button type="button" class="btn btn-primary" id="btn-next">${nextLabel}</button>`;
       $('#btn-next').onclick = () => {

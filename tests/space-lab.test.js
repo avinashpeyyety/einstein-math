@@ -53,10 +53,13 @@ t('cosmos page uses vendored Three.js (no CDN code) and every import resolves', 
   assert.ok(/href="\.\.\/#space"/.test(html), 'back link to the hub');
 });
 
-t('recovery sims are stubbed: stub missions exist in the mission list', () => {
+t('C1: Falcon 9 recovery is live; only the Starship tower catch stays stubbed', () => {
   const earth = read('cosmos/js/earth.js');
-  assert.ok(/export const RECOVERY_STUBBED = true/.test(earth));
-  for (const id of ['f9-rtls', 'starship-ift5']) assert.ok(earth.includes(`id: "${id}"`) && earth.includes(`"${id}":`), id);
+  assert.ok(/export const RECOVERY_STUBBED = false/.test(earth));
+  const stubBlock = earth.slice(earth.indexOf('export const STUB_MISSIONS'), earth.indexOf('export const LAUNCH_MISSIONS'));
+  assert.ok(!stubBlock.includes('"f9-rtls"'), 'f9-rtls is playable');
+  assert.ok(earth.includes('id: "f9-rtls"') && /recovery: "lz"/.test(earth));
+  assert.ok(earth.includes('id: "starship-ift5"') && stubBlock.includes('"starship-ift5":'), 'tower catch still stubbed (C2)');
   const main = read('cosmos/js/main.js');
   assert.ok(/STUB_MISSIONS\[missionId\]\) return/.test(main), 'stub missions cannot start');
   assert.ok(/function applyUrlParams/.test(main));

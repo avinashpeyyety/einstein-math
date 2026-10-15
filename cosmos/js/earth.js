@@ -7,6 +7,7 @@
  *   leo      — clean LEO orbital theater (stations, shells)
  */
 import * as THREE from "three";
+import { boosterRecovery, DRONESHIP_DOWNRANGE } from "./recovery.js";
 
 export const EARTH_R = 12;
 const KM = EARTH_R / 6371;
@@ -81,11 +82,11 @@ export const LAUNCH_SITES = [
  * Missions playable at a site.
  * phases: timeline of named beats (t 0–1 of the whole flight).
  */
-/** Einstein Math Space Lab (v2.5.0): booster recovery (RTLS landing, tower catch) is stubbed until rebuilt (C1/C2). */
-export const RECOVERY_STUBBED = true;
+/** Einstein Math Space Lab: Falcon 9 booster recovery was rebuilt in C1 (v2.5.8: boostback → entry → landing burn,
+ * see recovery.js). The Starship tower catch is still stubbed until C2 (STUB_MISSIONS). */
+export const RECOVERY_STUBBED = false;
 /** Missions shown as visible "coming soon" chips instead of playable sequences (recovery sims not working well yet). */
 export const STUB_MISSIONS = {
-  "f9-rtls": "Booster landing (RTLS) sim is being rebuilt — the booster currently drifts to an off-pad point instead of a real boostback + landing burn.",
   "starship-ift5": "Tower catch sim is being rebuilt — the tower is hidden by the time Super Heavy returns, so the catch can't be seen.",
 };
 
@@ -131,8 +132,9 @@ export const LAUNCH_MISSIONS = [
     vehicle: "falcon9",
     beyond: false,
     durationSec: 40,
-    blurb: "Orbcomm-2 — first orbital-class booster landing.",
+    blurb: "Orbcomm-2 — first orbital-class booster landing: boostback, entry and landing burns back to Landing Zone 1.",
     color: 0x38bdf8,
+    recovery: "lz",
   },
   {
     id: "f9-starlink",
@@ -142,8 +144,9 @@ export const LAUNCH_MISSIONS = [
     vehicle: "falcon9",
     beyond: false,
     durationSec: 36,
-    blurb: "Modern cadence — fairing, stage sep, LEO insertion.",
+    blurb: "Modern cadence — fairing, stage sep, LEO insertion; the booster lands on a droneship.",
     color: 0x60a5fa,
+    recovery: "droneship",
   },
   {
     id: "f9-vandy",
@@ -747,6 +750,60 @@ function makeFalcon9() {
   return root;
 }
 
+/** C1: Landing Zone 1 — a flat concrete pad with a big circle + X so kids can see where the booster lands. */
+function makeLandingZone() {
+  const g = new THREE.Group();
+  const flat = (geo, color, y) => {
+    const m = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ color, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: -1 - y * 100 }));
+    m.rotation.x = -Math.PI / 2;
+    m.position.y = y;
+    return m;
+  };
+  g.add(flat(new THREE.CircleGeometry(0.62, 40), 0x4b5563, 0.004));
+  g.add(flat(new THREE.RingGeometry(0.44, 0.5, 40), 0xfacc15, 0.008));
+  for (const a of [Math.PI / 4, -Math.PI / 4]) {
+    const bar = flat(new THREE.PlaneGeometry(0.72, 0.07), 0xf8fafc, 0.01);
+    bar.rotation.z = a;
+    g.add(bar);
+  }
+  // glowing corner lights
+  for (let i = 0; i < 4; i++) {
+    const a = (i / 4) * Math.PI * 2 + Math.PI / 4;
+    const lamp = new THREE.Mesh(new THREE.SphereGeometry(0.035, 10, 8), new THREE.MeshBasicMaterial({ color: 0x38bdf8 }));
+    lamp.position.set(Math.cos(a) * 0.66, 0.04, Math.sin(a) * 0.66);
+    g.add(lamp);
+  }
+  g.userData.kind = "lz";
+  return g;
+}
+
+/** C1: autonomous droneship — a flat barge with side walls and the landing X on deck. */
+function makeDroneship() {
+  const g = new THREE.Group();
+  const hull = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.12, 0.95), mat(0x64748b, { metalness: 0.3, roughness: 0.6 }));
+  hull.position.y = -0.06;
+  g.add(hull);
+  for (const z of [-0.5, 0.5]) {
+    const wall = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.12, 0.06), mat(0x94a3b8));
+    wall.position.set(0, 0.04, z);
+    g.add(wall);
+  }
+  const deck = (geo, color, y) => {
+    const m = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ color, side: THREE.DoubleSide }));
+    m.rotation.x = -Math.PI / 2;
+    m.position.y = y;
+    return m;
+  };
+  g.add(deck(new THREE.RingGeometry(0.34, 0.39, 36), 0xf8fafc, 0.004));
+  for (const a of [Math.PI / 4, -Math.PI / 4]) {
+    const bar = deck(new THREE.PlaneGeometry(0.6, 0.06), 0xf8fafc, 0.006);
+    bar.rotation.z = a;
+    g.add(bar);
+  }
+  g.userData.kind = "droneship";
+  return g;
+}
+
 function makeStarship() {
   const root = new THREE.Group();
   const steel = mat(0xc8c8c4, { metalness: 0.82, roughness: 0.22 });
@@ -1153,6 +1210,14 @@ export function createEarthTheater() {
     v.visible = false;
     siteStage.add(v);
   }
+  // C1: booster landing targets (world space, placed per mission)
+  const landingZone = makeLandingZone();
+  landingZone.visible = false;
+  root.add(landingZone);
+  const droneship = makeDroneship();
+  droneship.visible = false;
+  root.add(droneship);
+
   // ISS lives in root for LEO mode
   root.add(vehicles.iss);
   vehicles.iss.visible = false;
@@ -1213,6 +1278,8 @@ export function createEarthTheater() {
     phaseLabel: "Select a launch site",
     _trajLines: [],
     LEO_VIS,
+    landingZone,
+    droneship,
   };
 
   return api;
@@ -1368,6 +1435,8 @@ function hideVehicles(api) {
     setPlume(v, false);
   }
   api.smoke.visible = false;
+  if (api.landingZone) api.landingZone.visible = false;
+  if (api.droneship) api.droneship.visible = false;
 }
 
 function drawPlannedTrajectory(api, mission, site) {
@@ -1441,6 +1510,11 @@ function schematicAscentTelemetry(t, mission) {
 /** Visible through ascent / insertion; hidden after insertion and when not launching. */
 function buildAscentHud(api, t) {
   if (api.mode !== "site" || !api.activeMission) return { visible: false };
+  if (api.recovery && api.recovery.active) {
+    // C1: during the return the HUD follows the booster (schematic numbers, kid-level)
+    const r = api.recovery.state;
+    return { visible: true, altKm: r.alt * RECOVERY_SEP_ALT_KM, velKms: r.speed * RECOVERY_SEP_VEL_KMS };
+  }
   if (t >= 0.75) return { visible: false };
   const { altKm, velKms } = schematicAscentTelemetry(t, api.activeMission);
   return { visible: true, altKm, velKms };
@@ -1487,7 +1561,9 @@ export function updateEarthTheater(api, dt, opts = {}) {
     const hint = animateLaunch(api, api.launchT);
     if (api.launchT >= 1) {
       api.launchPlaying = false;
-      api.phaseLabel = "Mission complete · scrub or pick another";
+      api.phaseLabel = api.recovery?.active
+        ? `Booster: ${api.recovery.state.label} · scrub or pick another`
+        : "Mission complete · scrub or pick another";
     }
     return {
       phaseLabel: api.phaseLabel,
@@ -1518,6 +1594,15 @@ function animateLaunch(api, t) {
   const vehicle = vehicleFor(api, mission.vehicle);
   const upper = api.vehicles.upper;
   const shipOnly = api.vehicles.shipOnly;
+
+  api.recovery = null;
+  let recoveryCam = null;
+  // C1: the booster carries the 2nd stage + fairing until separation; after that it flies alone
+  if (vehicle.userData.stage2) {
+    const stacked = !(mission.vehicle === "falcon9" && mission.recovery && !RECOVERY_STUBBED && t > RECOVERY_T0);
+    vehicle.userData.stage2.visible = stacked;
+    vehicle.userData.fairing.visible = stacked;
+  }
 
   // Prefer world-space animation for clarity after liftoff leaves the tower
   // Phase labels (staging / SECO named so HUD beats are readable)
@@ -1604,17 +1689,12 @@ function animateLaunch(api, t) {
     upper.quaternion.copy(vehicle.quaternion);
     setPlume(upper, t < 0.6, 0.8);
     // booster falls back / lands
-    if (t > 0.45) {
-      if (RECOVERY_STUBBED) {
-        // Einstein Math Space Lab: the schematic booster "landing" (a straight lerp that ends off-pad) is a
-        // coming-soon stub — the spent booster simply drops out of the shot. See docs/EXPANSION_PLAN.md (C1).
+    if (t > RECOVERY_T0) {
+      if (RECOVERY_STUBBED || !mission.recovery) {
+        // no recovery modelled for this mission: the spent booster drops out of the shot
         vehicle.visible = false;
       } else {
-        const u = clamp01((t - 0.45) / 0.4);
-        const land = padWorld.clone().add(east.clone().multiplyScalar(EARTH_R * 0.15));
-        vehicle.position.lerpVectors(pos, land, smootherstep(u));
-        vehicle.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), up);
-        setPlume(vehicle, u > 0.7 && u < 0.95, 0.9);
+        recoveryCam = animateBoosterRecovery(api, vehicle, mission, t, padWorld, up, east);
       }
       // upper to orbit
       placeOrbiting(upper, api.LEO_VIS, (t - 0.45) * Math.PI * 2, 28.5, 0);
@@ -1660,6 +1740,8 @@ function animateLaunch(api, t) {
     setPlume(vehicle, false);
   }
 
+  if (recoveryCam) return recoveryCam;
+
   // Camera: follow ascending stack; during staging/SECO frame both stages then ease to upper
   let focus = vehicle.position.clone();
   let companion = null;
@@ -1687,6 +1769,78 @@ function animateLaunch(api, t) {
     companion,
     localBlend: 0,
   });
+}
+
+// ─── C1: Falcon 9 booster recovery (boostback → entry → landing burn) ───
+
+const RECOVERY_T0 = 0.45; // mission t where the booster's return starts (just after stage sep)
+const RECOVERY_SEP_ALT_KM = 80; // schematic HUD: booster altitude at separation
+const RECOVERY_SEP_VEL_KMS = 1.0; // schematic HUD: booster speed at separation
+
+/** Where the booster touches down: LZ next to the pad (RTLS) or a droneship downrange. */
+function recoveryTargetWorld(padWorld, up, east, north, sepDown, kind) {
+  const r = padWorld.length();
+  if (kind === "droneship") {
+    return padWorld.clone().add(east.clone().multiplyScalar(sepDown * DRONESHIP_DOWNRANGE)).normalize().multiplyScalar(r - 0.03);
+  }
+  // Landing Zone 1 sits a little away from the launch tower
+  return padWorld.clone().add(north.clone().multiplyScalar(1.4)).normalize().multiplyScalar(r);
+}
+
+function animateBoosterRecovery(api, booster, mission, t, padWorld, up, east) {
+  const north = up.clone().cross(east).normalize();
+  const sepPos = sampleAscentWorld(RECOVERY_T0, padWorld, up, east, mission);
+  const sepRel = sepPos.clone().sub(padWorld);
+  const sepAlt = sepRel.dot(up);
+  const sepDown = sepRel.dot(east);
+  const u = clamp01((t - RECOVERY_T0) / (1 - RECOVERY_T0));
+  const kind = mission.recovery === "droneship" ? "droneship" : "lz";
+  const st = boosterRecovery(u, kind);
+  api.recovery = { active: true, u, state: st, kind };
+
+  const target = recoveryTargetWorld(padWorld, up, east, north, sepDown, kind);
+  const targetUp = target.clone().normalize();
+  // Ground track: from the separation point's ground spot to the landing target, along downrange
+  const groundSep = padWorld.clone().add(east.clone().multiplyScalar(sepDown)).normalize().multiplyScalar(padWorld.length());
+  const targetDown = kind === "droneship" ? DRONESHIP_DOWNRANGE : 0;
+  const k = (1 - st.downrange) / (1 - targetDown); // 0 at separation → 1 over the target (may overshoot a bit)
+  const ground = groundSep.clone().lerp(target, k).normalize().multiplyScalar(target.length());
+  const localUp = ground.clone().normalize();
+  const curved = ground.clone().add(localUp.clone().multiplyScalar(st.alt * sepAlt));
+  // Start exactly where the ascent left the booster, ease onto the curved-Earth track
+  const flat = padWorld.clone().add(east.clone().multiplyScalar(st.downrange * sepDown)).add(up.clone().multiplyScalar(st.alt * sepAlt));
+  const blend = smootherstep(clamp01(u / 0.2));
+  booster.position.copy(flat.lerp(curved, blend));
+  if (u >= 1) booster.position.copy(target);
+
+  const faceUp = localUp.clone().lerp(targetUp, smootherstep(clamp01((u - 0.8) / 0.2))).normalize();
+  const face = faceUp.clone().multiplyScalar(Math.cos(st.tilt)).add(east.clone().multiplyScalar(Math.sin(st.tilt))).normalize();
+  booster.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), face);
+  booster.visible = true;
+  setPlume(booster, !!st.burn, st.burn === "boostback" ? 1.0 : st.burn === "entry" ? 0.85 : 0.7);
+
+  // Landing target + pad are visible once the booster is heading home
+  const marker = kind === "droneship" ? api.droneship : api.landingZone;
+  if (marker) {
+    orientOnSurface(marker, target);
+    marker.scale.setScalar(1);
+    marker.visible = true;
+  }
+  if (kind === "lz") api.siteStage.visible = u > 0.55;
+
+  api.phaseLabel = `Booster: ${st.label}`;
+
+  // Camera: chase the booster, closing in for touchdown so the landing zone is in frame
+  const alt = Math.max(0, booster.position.clone().sub(target).dot(targetUp));
+  const dist = 3.4 + alt * 0.75;
+  const focus = booster.position.clone().add(face.clone().multiplyScalar(0.45));
+  const look = focus.clone().lerp(target, smootherstep(clamp01((u - 0.75) / 0.25)) * 0.35);
+  const position = focus
+    .clone()
+    .add(localUp.clone().multiplyScalar(dist * 0.35))
+    .add(north.clone().multiplyScalar(-dist * 0.85))
+    .add(east.clone().multiplyScalar(-dist * 0.4));
+  return { position, target: look, minDist: 0.6, maxDist: EARTH_R * 8 };
 }
 
 /**

@@ -84,7 +84,7 @@ Effort: XS ≈ ½ cycle, S ≤ 1 cycle, M = 2 cycles. Each ticket ends with smok
 - [ ] **X40 (M)** Physics ages 7–8 unit 2: simple machines — lever & pulley sims (4 lessons)
 - [ ] **X28 (S)** Math 7–8: add/sub within 1000, skip-count by 5/10/100, expanded form, even/odd (3 lessons) — *2.NBT, 2.OA.3*
 - [ ] **X26 (S)** Math 9–10: multiply & divide decimals, powers of 10, thousandths & rounding decimals (4 lessons) — *5.NBT*
-- [ ] **C1 (S)** Space Lab: rebuild Falcon 9 booster recovery — boostback → entry → landing burn onto a visible LZ/droneship; un-stub "Falcon 9 · first RTLS" (`STUB_MISSIONS`, `RECOVERY_STUBBED`)
+- [x] **C1 (S)** Space Lab: rebuild Falcon 9 booster recovery — boostback → entry → landing burn onto a visible LZ/droneship; un-stub "Falcon 9 · first RTLS" (`STUB_MISSIONS`, `RECOVERY_STUBBED`) — done 2026-10-15: pure model `cosmos/js/recovery.js` (separation → flip → boostback → coast → entry → descent → landing → landed), booster lands upright on a drawn Landing Zone 1 (RTLS) or a droneship (Starlink); phase labels + booster alt/vel HUD; chase cam frames the touchdown; tests/recovery.test.js; SW v2.5.8
 - [ ] **X10 (M)** Math ages 11–12 track v1: ratios, percents, negatives, one-step equations (8 lessons)
 - [ ] **X11 (S)** Fact-fluency arcade (timed sprints, streaks, bests)
 - [ ] **X41 (S)** Physics ages 5–6 unit 2: light & shadow + magnets (3 lessons)
@@ -127,6 +127,7 @@ Comprehensive World + American + Indian history, age-banded, with timelines, map
 ## 7. Progress log
 
 - 2026-10-06 · C4 shipped: Space Lab body picker usable below 560px (full-width swipeable strip, chips ≥44px tall, solar mode); hidden in Earth/LEO/Stars modes where the picker is inert, so the Earth/LEO bar no longer covers the body list. Desktop layout unchanged. SW v2.5.7.
+- 2026-10-15 · C1 shipped: Falcon 9 booster recovery rebuilt — "Falcon 9 · first RTLS" playable again (boostback, entry and landing burns onto a visible LZ-1, upright touchdown); Starlink booster lands on a droneship; `RECOVERY_STUBBED=false`, only the Starship tower catch (C2) stays stubbed; hub card now "Starship Tower Catch"; tests/recovery.test.js; SW v2.5.8
 - 2026-10-01 · X1 shipped: store schema v3 (`einstein-math-v3`), progress keyed `math:<track>`, v2/stub-v3 migrate on load (v2 key kept), subjects = math (live) + physics (soon); SW v2.3.9
 - 2026-10-01 · X2 shipped: lessons moved to subject packs `data/subjects/math.json` (was `data/curriculum.json`, same shape) + `physics.json` stub; only the packs in use are fetched (`Subjects.loadPack`/`loadCurriculum`); SW precaches math, caches other packs on first use in `einstein-math-packs-v1` (kept across versions, refreshed when online); tests/subject-packs.test.js; SW v2.4.6
 - 2026-10-01 · (side ask) progress safety net: IndexedDB mirror + auto-restore + progress report download / auto-save file / restore from file

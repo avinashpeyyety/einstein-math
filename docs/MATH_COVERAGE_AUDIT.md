@@ -1,6 +1,6 @@
 # Math coverage audit — 2026-10-03 (v2.5.0)
 
-> **Status since audit (2026-10-09):** inventory below is the 2026-10-03 snapshot (88 lessons). Shipped since then: **X20** (+4 ages 7–8 mult/div facts) and **X23** (+3 ages 5–6 Tens & Ones) → **96 math lessons** (32 / 34 / 30). Gap tickets X20 and X23 are checked off in EXPANSION_PLAN §5; remaining domain gaps in the tables still stand.
+> **Status since audit (2026-10-16):** inventory below is the 2026-10-03 snapshot (88 lessons). Shipped since then: **X20** (+4 ages 7–8 mult/div facts), **X23** (+3 ages 5–6 Tens & Ones), **X21** (+3 ages 7–8 Area), **X22** (+3 ages 9–10 unlike-denominator fractions), **X9** (procedural generators + More practice dial on 28 mapped lessons) → **102 math lessons** (32 / 37 / 33). Also Space Lab **C1** (F9 recovery) and **C3** (LEO Hubble/Starlink toggles). Gap tickets X20–X23 and X9 are checked off in EXPANSION_PLAN §5; remaining domain gaps in the tables still stand.
 
 **Method:** read `data/subjects/math.json` (the shipped pack) and `js/app.js` (diagnostic, item renderer), not the docs.
 Compared each age track to Common Core K–8 domains (CC, OA, NBT, NF, MD, G, RP, NS, EE, F, SP) + mental math + word problems.

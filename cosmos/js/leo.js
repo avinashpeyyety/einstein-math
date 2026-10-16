@@ -1,4 +1,4 @@
-/* Einstein Math Space Lab note (v2.5.0): this richer LEO mission catalog (Hubble, Starlink trains, F9 ASDS landing,
+/* Einstein Math Space Lab note (v2.5.0; C3 v2.6.0 wires the Hubble + Starlink-shell toggles from leo-catalog.js through this module): this richer LEO mission catalog (Hubble, Starlink trains, F9 ASDS landing,
  * Starship catch/loop, Falcon cadence) was never imported by main.js in the original Cosmos repo either. It is kept
  * here un-loaded as source for ticket C3 (LEO toggles) and C1/C2 (recovery sims). The live LEO view comes from earth.js. */
 /**
@@ -6,6 +6,8 @@
  * Educational / cinematic scale (sizes exaggerated for visibility).
  */
 import * as THREE from "three";
+// C3 (v2.6.0): the LEO toggles the Space Lab LEO view uses (Hubble, Starlink 550 km shell) + Kepler periods.
+export { LEO_TOGGLES, leoChips, orbitalPeriodMin, orbitalSpeedKmS, createLeoToggleState, EARTH_RADIUS_KM, MU_EARTH_KM3_S2 } from "./leo-catalog.js";
 
 // Earth radius in LEO scene units
 export const EARTH_R = 10;

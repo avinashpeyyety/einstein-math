@@ -1325,6 +1325,7 @@ function addTraj(api, points, color, opacity = 0.7) {
 
 export function setEarthMode(api, mode) {
   api.mode = mode;
+  syncLeoCatalogVisibility(api); // C3: catalog toggles only draw in LEO mode
   api.issRing.visible = mode === "leo";
   api.markers.visible = mode === "surface";
   api.siteStage.visible = mode === "site";
@@ -1546,6 +1547,7 @@ export function updateEarthTheater(api, dt, opts = {}) {
 
   // LEO continuous
   if (api.mode === "leo") {
+    updateLeoCatalog(api, performance.now());
     const ang = performance.now() * 0.00015;
     placeOrbiting(api.vehicles.iss, api.LEO_VIS, ang, 51.6, 20);
     api.vehicles.iss.visible = true;
@@ -1769,6 +1771,137 @@ function animateLaunch(api, t) {
     companion,
     localBlend: 0,
   });
+}
+
+// ─── C3: LEO catalog toggles (Hubble, Starlink 550 km shell) ───
+
+const ISS_ALT_KM = 420;
+const ISS_PERIOD_MIN = 92.8; // Kepler at 420 km — the ISS sets the on-screen pace
+const LEO_ANG_RATE = 0.00015; // ISS on-screen angular speed (rad/ms), see updateEarthTheater
+
+/** Schematic radius: ISS (420 km) sits at LEO_VIS; height above the globe scales with altitude. */
+function leoVisRadius(api, altKm) {
+  return EARTH_R + (api.LEO_VIS - EARTH_R) * (altKm / ISS_ALT_KM);
+}
+
+/** Point on a circular orbit: in-plane angle θ, inclination i, ascending node Ω (Y is Earth's spin axis). */
+function orbitPoint(r, theta, incRad, raanRad, out) {
+  const x = Math.cos(theta) * r;
+  const z0 = Math.sin(theta) * r;
+  const y = -z0 * Math.sin(incRad);
+  const z = z0 * Math.cos(incRad);
+  const c = Math.cos(raanRad), sn = Math.sin(raanRad);
+  out.set(x * c + z * sn, y, -x * sn + z * c);
+  return out;
+}
+
+function makeHubble() {
+  const g = new THREE.Group();
+  const body = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.09, 0.34, 16), mat(0xe5e7eb, { metalness: 0.7, roughness: 0.3 }));
+  body.rotation.z = Math.PI / 2;
+  g.add(body);
+  for (const s of [-1, 1]) {
+    const panel = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.005, 0.36), new THREE.MeshBasicMaterial({ color: 0x3b82f6 }));
+    panel.position.set(0, 0, s * 0.27);
+    g.add(panel);
+  }
+  return g;
+}
+
+/** Build the toggle objects once; all start hidden. entries come from leo.js (LEO_TOGGLES). */
+export function initLeoCatalog(api, entries) {
+  if (api.leoCatalog) return api.leoCatalog;
+  const cat = new Map();
+  for (const e of entries) {
+    const group = new THREE.Group();
+    group.visible = false;
+    const r = leoVisRadius(api, e.altKm);
+    const inc = THREE.MathUtils.degToRad(e.inclinationDeg);
+    const rate = LEO_ANG_RATE * (ISS_PERIOD_MIN / (2 * Math.PI * Math.sqrt(Math.pow(6371 + e.altKm, 3) / 398600) / 60));
+    const entry = { e, group, r, inc, rate, on: false };
+    if (e.kind === "shell") {
+      const n = e.planes * e.satsPerPlane;
+      const pos = new Float32Array(n * 3);
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+      const pts = new THREE.Points(geo, new THREE.PointsMaterial({ color: e.color, size: 0.16, sizeAttenuation: true, transparent: true, opacity: 0.95, depthWrite: false }));
+      group.add(pts);
+      // a few faint guide rings so the shell's tilt reads clearly
+      for (let p = 0; p < e.planes; p += 12) {
+        const ring = makeOrbitRing(r, e.color, 0.18);
+        ring.rotation.order = "YXZ";
+        ring.rotation.y = (p / e.planes) * Math.PI * 2;
+        ring.rotation.x = inc;
+        group.add(ring);
+      }
+      entry.points = pts;
+    } else {
+      const ring = makeOrbitRing(r, e.color, 0.7);
+      ring.rotation.x = inc;
+      group.add(ring);
+      const craft = makeHubble();
+      craft.scale.setScalar(2.2);
+      ring.add(craft);
+      entry.craft = craft;
+    }
+    api.root.add(group);
+    cat.set(e.id, entry);
+  }
+  api.leoCatalog = cat;
+  updateLeoCatalog(api, 0);
+  return cat;
+}
+
+/** Turn a toggle on/off. Objects only show in LEO mode. Returns the new state. */
+export function setLeoToggle(api, id, on) {
+  const entry = api.leoCatalog?.get(id);
+  if (!entry) return false;
+  entry.on = !!on;
+  syncLeoCatalogVisibility(api);
+  return entry.on;
+}
+
+/** Ids of the catalog objects actually drawn right now (for the HUD / smoke checks). */
+export function leoCatalogDrawn(api) {
+  const out = [];
+  if (!api.leoCatalog) return out;
+  for (const [id, entry] of api.leoCatalog) if (entry.group.visible) out.push(id);
+  return out;
+}
+
+function syncLeoCatalogVisibility(api) {
+  if (!api.leoCatalog) return;
+  for (const entry of api.leoCatalog.values()) entry.group.visible = entry.on && api.mode === "leo";
+}
+
+const _tmpV = new THREE.Vector3();
+function updateLeoCatalog(api, nowMs) {
+  if (!api.leoCatalog) return;
+  for (const entry of api.leoCatalog.values()) {
+    if (!entry.group.visible && nowMs !== 0) continue;
+    const base = nowMs * entry.rate;
+    if (entry.points) {
+      const { planes, satsPerPlane } = entry.e;
+      const arr = entry.points.geometry.attributes.position.array;
+      let k = 0;
+      for (let p = 0; p < planes; p++) {
+        const raan = (p / planes) * Math.PI * 2;
+        const phase = (p * 0.37) % (Math.PI * 2);
+        for (let s = 0; s < satsPerPlane; s++) {
+          orbitPoint(entry.r, base + phase + (s / satsPerPlane) * Math.PI * 2, entry.inc, raan, _tmpV);
+          arr[k++] = _tmpV.x;
+          arr[k++] = _tmpV.y;
+          arr[k++] = _tmpV.z;
+        }
+      }
+      entry.points.geometry.attributes.position.needsUpdate = true;
+    } else if (entry.craft) {
+      // ring lies in the XZ plane tilted about X — place the craft in the ring's local frame
+      const th = base + 1.3;
+      entry.craft.position.set(Math.cos(th) * entry.r, 0, -Math.sin(th) * entry.r);
+      entry.craft.rotation.set(0, th, 0);
+    }
+  }
 }
 
 // ─── C1: Falcon 9 booster recovery (boostback → entry → landing burn) ───

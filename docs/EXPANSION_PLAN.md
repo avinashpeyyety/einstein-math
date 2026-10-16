@@ -47,7 +47,7 @@ The former Cosmos app (github.com/avinashpeyyety/cosmos) now lives in this repo 
 | Low Earth Orbit (ISS 51.6° view) | ✅ working | `cosmos/?mode=leo` |
 | Life of a Star (scrubber, low/high mass fork, NS/BH ending) | ✅ working | `cosmos/?mode=stars` |
 | Rocket landings: Falcon 9 RTLS, Starship tower catch | 🚧 stub (coming-soon card + disabled mission chips; F9 booster no longer fakes a landing) | C1, C2 |
-| LEO mission catalog (Hubble, Starlink trains, F9 ASDS, Starship loop, Falcon cadence — `cosmos/js/leo.js`, never wired) | 🚧 stub | C3 |
+| LEO mission catalog — Hubble + Starlink 550 km shell toggles wired (C3); other `cosmos/js/leo.js` entries still unwired | ✅ partial | C3 |
 
 History: `_archive/cosmos-history/` (git bundle + old URLs). Original Cosmos plan: `cosmos/docs/COSMOS_SPRINT_PLAN_ORIGINAL.md`.
 
@@ -97,7 +97,7 @@ Effort: XS ≈ ½ cycle, S ≤ 1 cycle, M = 2 cycles. Each ticket ends with smok
 - [ ] **X35 (S)** Mental Math Gym unit in every track (2 lessons each: count on/back & ±10 · compensation & near doubles · ×10/×100 & estimation)
 - [ ] **X14 (S)** Puzzle of the day (math + physics rotation)
 - [ ] **X36 (S)** Word-problem types: start/change unknown (5–6), two-step with all four operations (7–8), multiplicative comparison (9–10) — 1 lesson per track
-- [ ] **C3 (S)** Space Lab: wire `cosmos/js/leo.js` catalog as LEO toggles (Hubble, one Starlink shell) with altitude/inclination/period chips
+- [x ] **C3 (S)** Space Lab: wire `cosmos/js/leo.js` catalog as LEO toggles (Hubble, one Starlink shell) with altitude/inclination/period chips — done 2026-10-16: `cosmos/js/leo-catalog.js` (re-exported by leo.js) — Hubble 540 km / 28.5° (NASA) and Starlink 550 km / 53° / 72×22 shell (FCC DA 19-1294); periods by Kepler (95.3 / 95.5 min); toggles + chips in the LEO bar draw/hide a ring + Hubble and 1,584 moving dots; tests/leo-toggles.test.js; SW v2.6.0
 - [ ] **X15 (M)** Math ages 13–14 pre-algebra v1 (8 lessons)
 - [ ] **X31 (XS)** Math 5–6: halves & fourths of shapes, positional words (2 lessons) — *1.G*
 - [ ] **X32 (XS)** Math 7–8: quadrilaterals & shape attributes (2 lessons) — *2.G, 3.G.1*
@@ -128,6 +128,7 @@ Comprehensive World + American + Indian history, age-banded, with timelines, map
 
 - 2026-10-06 · C4 shipped: Space Lab body picker usable below 560px (full-width swipeable strip, chips ≥44px tall, solar mode); hidden in Earth/LEO/Stars modes where the picker is inert, so the Earth/LEO bar no longer covers the body list. Desktop layout unchanged. SW v2.5.7.
 - 2026-10-15 · C1 shipped: Falcon 9 booster recovery rebuilt — "Falcon 9 · first RTLS" playable again (boostback, entry and landing burns onto a visible LZ-1, upright touchdown); Starlink booster lands on a droneship; `RECOVERY_STUBBED=false`, only the Starship tower catch (C2) stays stubbed; hub card now "Starship Tower Catch"; tests/recovery.test.js; SW v2.5.8
+- 2026-10-16 · C3 shipped: LEO view toggles for Hubble (540 km, 28.5°, NASA) and the Starlink 550 km / 53° shell (FCC DA 19-1294, 72×22 = 1,584 sats) with altitude / inclination / Kepler-period chips (95.3 / 95.5 min); hub "LEO Missions" stub removed; tests/leo-toggles.test.js; SW v2.6.0 (v2.5.9 was taken by X9)
 - 2026-10-01 · X1 shipped: store schema v3 (`einstein-math-v3`), progress keyed `math:<track>`, v2/stub-v3 migrate on load (v2 key kept), subjects = math (live) + physics (soon); SW v2.3.9
 - 2026-10-01 · X2 shipped: lessons moved to subject packs `data/subjects/math.json` (was `data/curriculum.json`, same shape) + `physics.json` stub; only the packs in use are fetched (`Subjects.loadPack`/`loadCurriculum`); SW precaches math, caches other packs on first use in `einstein-math-packs-v1` (kept across versions, refreshed when online); tests/subject-packs.test.js; SW v2.4.6
 - 2026-10-01 · (side ask) progress safety net: IndexedDB mirror + auto-restore + progress report download / auto-save file / restore from file

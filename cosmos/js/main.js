@@ -22,7 +22,11 @@ import {
   LAUNCH_SITES,
   EARTH_R,
   STUB_MISSIONS,
+  initLeoCatalog,
+  setLeoToggle,
+  leoCatalogDrawn,
 } from "./earth.js";
+import { LEO_TOGGLES, leoChips, createLeoToggleState } from "./leo.js";
 import {
   createStarLifecycle,
   updateStarLifecycle,
@@ -411,6 +415,36 @@ function enterLeoMode() {
     .join("");
   $("earth-phase").textContent = "Low Earth Orbit";
   syncAscentHud({ visible: false });
+  renderLeoToggles();
+}
+
+// —— C3: LEO catalog toggles (Hubble, Starlink 550 km shell) ——
+const leoToggles = createLeoToggleState(LEO_TOGGLES);
+
+function renderLeoToggles() {
+  const row = $("leo-toggle-row");
+  const chipsHost = $("leo-chips");
+  if (!row || !chipsHost) return;
+  if (earthTheater) initLeoCatalog(earthTheater, LEO_TOGGLES);
+  row.innerHTML = LEO_TOGGLES.map((e) => {
+    const on = leoToggles.isOn(e.id);
+    return `<button type="button" class="earth-mission leo-toggle ${on ? "active" : ""}" data-id="${e.id}" aria-pressed="${on}" title="${e.blurb}">${e.icon} ${e.name}</button>`;
+  }).join("");
+  chipsHost.innerHTML = LEO_TOGGLES.filter((e) => leoToggles.isOn(e.id))
+    .map((e) => `<div class="leo-chip-group" data-id="${e.id}"><span class="leo-chip-name">${e.icon} ${e.name}</span>${leoChips(e)
+      .map((c) => `<div class="meta-chip" data-chip="${c.key}"><span class="meta-label">${c.label}</span><span class="meta-value mono">${c.value}</span></div>`)
+      .join("")}</div>`)
+    .join("");
+  row.querySelectorAll(".leo-toggle").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const on = leoToggles.toggle(btn.dataset.id);
+      if (earthTheater) setLeoToggle(earthTheater, btn.dataset.id, on);
+      const e = LEO_TOGGLES.find((x) => x.id === btn.dataset.id);
+      $("earth-caption").textContent = on ? e.blurb : "Clean orbital theater — separate from surface launches";
+      renderLeoToggles();
+    });
+  });
+  $("leo-toggles").dataset.drawn = earthTheater ? leoCatalogDrawn(earthTheater).join(",") : "";
 }
 
 

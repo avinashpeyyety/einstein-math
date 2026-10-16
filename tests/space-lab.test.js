@@ -16,7 +16,8 @@ const SpaceLab = require(path.join(ROOT, 'js/space.js'));
 t('catalog: 4 working sections deep-link into cosmos/, stubs have notes and no link', () => {
   assert.deepStrictEqual(SpaceLab.working().map((s) => s.mode), ['solar', 'earth', 'leo', 'stars']);
   for (const s of SpaceLab.working()) assert.strictEqual(SpaceLab.url(s), 'cosmos/?mode=' + s.mode);
-  assert.ok(SpaceLab.stubs().length >= 2);
+  assert.ok(SpaceLab.stubs().length >= 1); // C3 (v2.6.0): LEO missions are live; the tower catch (C2) is still a stub
+  assert.ok(!SpaceLab.stubs().some((s) => s.id === 'leo-missions'));
   for (const s of SpaceLab.stubs()) { assert.strictEqual(SpaceLab.url(s), null); assert.ok(/coming soon/i.test(s.note)); }
   assert.ok(SpaceLab.stubs().some((s) => s.id === 'landings'));
 });

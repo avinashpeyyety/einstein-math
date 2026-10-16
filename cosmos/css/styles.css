@@ -1119,3 +1119,20 @@ body.stars-mode.stars-high .life-fork-low { opacity: 0.35; }
 .em-tag{font-size:.6em;font-weight:600;letter-spacing:.04em;padding:.1em .45em;border-radius:6px;background:rgba(167,139,250,.22);color:#d8ccff;vertical-align:middle}
 .earth-mission.em-soon{opacity:.55;cursor:not-allowed;border-style:dashed}
 .earth-mission.em-soon::after{content:" · coming soon";font-size:.85em;opacity:.85}
+
+/* C3: LEO catalog toggles (reuse .earth-mission chips + .meta-chip readouts) */
+.leo-toggles { display: none; margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255, 255, 255, 0.06); }
+body.leo-mode .leo-toggles { display: block; }
+.leo-toggle-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.leo-toggle-row .earth-mission { min-height: 36px; }
+.leo-chip-groups { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+.leo-chip-groups:empty { display: none; }
+.leo-chip-group { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.leo-chip-name { font-size: 0.75rem; font-weight: 600; color: #e0e7ff; min-width: 100%; }
+.leo-chip-group .meta-chip { min-width: 0; padding: 4px 10px; }
+@media (max-width: 560px) {
+  .leo-toggle-row .earth-mission { min-height: 44px; flex: 1 1 auto; }
+  .leo-chip-group .meta-chip { padding: 3px 8px; }
+  .leo-chip-group .meta-value { font-size: 0.75rem; }
+}
+#earth-missions-wrap.hidden { display: none; } /* C3: the wrap carries .earth-missions, so .earth-missions-wrap.hidden never matched */

@@ -13,21 +13,20 @@ const t = (name, fn) => { fn(); pass++; console.log('ok -', name); };
 
 const SpaceLab = require(path.join(ROOT, 'js/space.js'));
 
-t('catalog: 4 working sections deep-link into cosmos/, stubs have notes and no link', () => {
-  assert.deepStrictEqual(SpaceLab.working().map((s) => s.mode), ['solar', 'earth', 'leo', 'stars']);
-  for (const s of SpaceLab.working()) assert.strictEqual(SpaceLab.url(s), 'cosmos/?mode=' + s.mode);
-  assert.ok(SpaceLab.stubs().length >= 1); // C3 (v2.6.0): LEO missions are live; the tower catch (C2) is still a stub
-  assert.ok(!SpaceLab.stubs().some((s) => s.id === 'leo-missions'));
-  for (const s of SpaceLab.stubs()) { assert.strictEqual(SpaceLab.url(s), null); assert.ok(/coming soon/i.test(s.note)); }
-  assert.ok(SpaceLab.stubs().some((s) => s.id === 'landings'));
+t('catalog: working sections deep-link into cosmos/; no coming-soon stubs left (C2, v2.6.1)', () => {
+  assert.deepStrictEqual(SpaceLab.working().map((s) => s.mode), ['solar', 'earth', 'leo', 'stars', 'earth']);
+  for (const s of SpaceLab.working()) assert.strictEqual(SpaceLab.url(s), 'cosmos/?mode=' + s.mode + (s.site ? '&site=' + s.site : ''));
+  assert.strictEqual(SpaceLab.url('landings'), 'cosmos/?mode=earth&site=boca');
+  assert.strictEqual(SpaceLab.stubs().length, 0);
+  assert.ok(!SpaceLab.SECTIONS.some((s) => /coming soon/i.test((s.note || '') + s.blurb)));
 });
 
 t('cards html: links for working, coming-soon for stubs, escaped', () => {
   const full = SpaceLab.cardsHtml();
-  assert.strictEqual((full.match(/href="cosmos\/\?mode=/g) || []).length, 4);
+  assert.strictEqual((full.match(/href="cosmos\/\?mode=/g) || []).length, 5);
   assert.strictEqual((full.match(/Coming soon<\/span>/g) || []).length, SpaceLab.stubs().length);
   const compact = SpaceLab.cardsHtml({ compact: true });
-  assert.strictEqual((compact.match(/>GO</g) || []).length, 4);
+  assert.strictEqual((compact.match(/>GO</g) || []).length, 5);
   assert.strictEqual((compact.match(/>SOON</g) || []).length, SpaceLab.stubs().length);
   assert.ok(!/<script/i.test(full));
 });
@@ -54,13 +53,13 @@ t('cosmos page uses vendored Three.js (no CDN code) and every import resolves', 
   assert.ok(/href="\.\.\/#space"/.test(html), 'back link to the hub');
 });
 
-t('C1: Falcon 9 recovery is live; only the Starship tower catch stays stubbed', () => {
+t('C1 + C2: booster recovery is live for every mission; STUB_MISSIONS is empty', () => {
   const earth = read('cosmos/js/earth.js');
   assert.ok(/export const RECOVERY_STUBBED = false/.test(earth));
   const stubBlock = earth.slice(earth.indexOf('export const STUB_MISSIONS'), earth.indexOf('export const LAUNCH_MISSIONS'));
-  assert.ok(!stubBlock.includes('"f9-rtls"'), 'f9-rtls is playable');
+  assert.ok(!/"[a-z0-9-]+":/.test(stubBlock), 'no stub entries left');
   assert.ok(earth.includes('id: "f9-rtls"') && /recovery: "lz"/.test(earth));
-  assert.ok(earth.includes('id: "starship-ift5"') && stubBlock.includes('"starship-ift5":'), 'tower catch still stubbed (C2)');
+  assert.ok(earth.includes('id: "starship-ift5"') && /recovery: "tower"/.test(earth), 'tower catch is playable (C2)');
   const main = read('cosmos/js/main.js');
   assert.ok(/STUB_MISSIONS\[missionId\]\) return/.test(main), 'stub missions cannot start');
   assert.ok(/function applyUrlParams/.test(main));

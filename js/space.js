@@ -19,9 +19,9 @@ const SpaceLab = {
     { id: 'stars', status: 'working', icon: '✨', title: 'Life of a Star', mode: 'stars',
       blurb: 'Scrub cosmic time from a gas cloud to a red giant — then pick the ending: white dwarf, neutron star or black hole.',
       topics: ['stars', 'gravity', 'deep time'] },
-    { id: 'landings', status: 'stub', icon: '🛬', title: 'Starship Tower Catch',
-      blurb: 'Super Heavy flies home and the launch tower catches it. (Falcon 9 booster landings are live now: Launch Sites → Cape Canaveral → “Falcon 9 · first RTLS”.)',
-      note: 'Coming soon — the old catch sim hid the tower before the booster came back. Rebuild with a visible tower catch (C2).' },
+    { id: 'landings', status: 'working', icon: '🛬', title: 'Rocket Landings & Tower Catch', mode: 'earth', site: 'boca',
+      blurb: 'Boosters that fly home: Falcon 9 lands on a landing zone or a droneship, and Starship’s Super Heavy is caught by the tower’s chopstick arms. Starts at Starbase — pick “Starship · tower catch”.',
+      topics: ['rockets', 'gravity', 'slowing down', 'engineering'] },
   ],
 
   working() { return this.SECTIONS.filter((s) => s.status === 'working'); },
@@ -30,7 +30,7 @@ const SpaceLab = {
   url(section) {
     const s = typeof section === 'string' ? this.SECTIONS.find((x) => x.id === section) : section;
     if (!s || s.status !== 'working') return null;
-    return this.BASE + '?mode=' + encodeURIComponent(s.mode);
+    return this.BASE + '?mode=' + encodeURIComponent(s.mode) + (s.site ? '&site=' + encodeURIComponent(s.site) : '');
   },
 
   _esc(v) {

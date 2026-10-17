@@ -7,9 +7,16 @@
  * downrange 0 = the launch site. RTLS lands on a landing zone (LZ) next to the pad;
  * a droneship waits further downrange (no boostback needed).
  * tilt is radians from straight up (+ = nose leaning downrange, − = nose pointing back home).
+ *
+ * C2 (v2.6.1): target "tower" = Starship's Super Heavy flying back to the launch tower ("Mechazilla").
+ * It does a boostback burn but no entry burn (it falls back slowly enough), then a landing burn that
+ * ends in a hover between the tower's chopstick arms; the arms close (armClose 0 → 1) BEFORE it settles
+ * onto them. alt 0 / downrange 0 = held at the catch point on the arms.
  */
 
 export const RECOVERY_PHASES = ["separation", "flip", "boostback", "coast", "entry", "descent", "landing", "landed"];
+/** C2: Super Heavy tower catch phases (no entry burn; hover between the arms, then caught). */
+export const CATCH_PHASES = ["separation", "flip", "boostback", "coast", "descent", "landing", "hover", "caught"];
 
 const LABELS = {
   separation: "Stage separation",
@@ -20,6 +27,8 @@ const LABELS = {
   descent: "Falling · grid fins steer",
   landing: "Landing burn · legs out",
   landed: "Touchdown · The Falcon has landed!",
+  hover: "Hovering · chopsticks closing",
+  caught: "Caught! The tower grabbed the booster",
 };
 const BURNS = { boostback: "boostback", entry: "entry", landing: "landing" };
 
@@ -28,6 +37,11 @@ const PHASE_AT = [0, 0.06, 0.14, 0.3, 0.55, 0.7, 0.88, 1];
 
 /** Landing targets: downrange of the touchdown point (in separation-downrange units). */
 export const DRONESHIP_DOWNRANGE = 1.6;
+
+// C2 tower catch: its own timing (no entry burn). Arms close over ARM_CLOSE_AT, contact at CATCH_CONTACT_U.
+const CATCH_AT = [0, 0.06, 0.14, 0.3, 0.5, 0.74, 0.88, 0.97];
+export const CATCH_CONTACT_U = 0.97;
+export const ARM_CLOSE_AT = [0.86, 0.95];
 
 const PROFILES = {
   // Return to launch site: the boostback burn turns the booster around.
@@ -41,6 +55,14 @@ const PROFILES = {
     x: [1, 1.06, 1.12, 1.28, 1.48, 1.56, 1.596, DRONESHIP_DOWNRANGE],
     tilt: [1.33, 1.2, 0.35, 0.2, 0, 0, 0, 0],
     burns: ["entry", "landing"],
+  },
+  tower: {
+    at: CATCH_AT,
+    phases: CATCH_PHASES,
+    x: [1, 1.06, 1.09, 0.85, 0.32, 0.1, 0.01, 0],
+    alt: [1, 1.04, 1.08, 1.12, 0.78, 0.36, 0.035, 0],
+    tilt: [1.33, 1.2, -1.0, -1.0, 0, 0, 0, 0],
+    burns: ["boostback", "landing"],
   },
 };
 // Altitude is the same arc for both: a little climb (still moving up after MECO), then down.
@@ -88,32 +110,38 @@ const CACHE = {};
 function curves(target) {
   if (!CACHE[target]) {
     const p = PROFILES[target] || PROFILES.lz;
-    const mx = tangents(PHASE_AT, p.x), ma = tangents(PHASE_AT, ALT);
-    const sp0 = Math.hypot(hermite(PHASE_AT, p.x, mx, 0)[1], hermite(PHASE_AT, ALT, ma, 0)[1]);
-    CACHE[target] = { p, mx, ma, sp0 };
+    const at = p.at || PHASE_AT, alt = p.alt || ALT;
+    const mx = tangents(at, p.x), ma = tangents(at, alt);
+    const sp0 = Math.hypot(hermite(at, p.x, mx, 0)[1], hermite(at, alt, ma, 0)[1]);
+    CACHE[target] = { p, at, alt, mx, ma, sp0 };
   }
   return CACHE[target];
 }
 
 /**
  * @param {number} u 0..1 through the booster's return
- * @param {"lz"|"droneship"} [target]
- * @returns {{phase:string,label:string,burn:null|"boostback"|"entry"|"landing",downrange:number,alt:number,speed:number,tilt:number,target:string}}
+ * @param {"lz"|"droneship"|"tower"} [target]
+ * @returns {{phase:string,label:string,burn:null|"boostback"|"entry"|"landing",downrange:number,alt:number,speed:number,tilt:number,target:string,armClose:number}}
+ *   armClose (tower only, else 0): 0 = chopsticks wide open, 1 = closed around the booster.
  */
 export function boosterRecovery(u, target = "lz") {
   u = clamp01(Number(u) || 0);
   const tgt = PROFILES[target] ? target : "lz";
-  const { p, mx, ma, sp0 } = curves(tgt);
+  const { p, at, alt: altKeys, mx, ma, sp0 } = curves(tgt);
+  const phases = p.phases || RECOVERY_PHASES;
+  const endU = tgt === "tower" ? CATCH_CONTACT_U : 1;
+  const done = u >= endU;
   let idx = 0;
-  while (idx < PHASE_AT.length - 2 && u >= PHASE_AT[idx + 1]) idx++;
-  let phase = u >= 1 ? "landed" : RECOVERY_PHASES[idx];
+  while (idx < at.length - 2 && u >= at[idx + 1]) idx++;
+  let phase = done ? phases[phases.length - 1] : phases[idx];
   // A droneship flight has no boostback: that stretch is just a coast.
   if (phase === "boostback" && !p.burns.includes("boostback")) phase = "coast";
-  const burn = BURNS[phase] && p.burns.includes(BURNS[phase]) ? BURNS[phase] : null;
-  const [x, dx] = hermite(PHASE_AT, p.x, mx, u);
-  const [a, da] = hermite(PHASE_AT, ALT, ma, u);
-  const done = u >= 1;
+  // the landing burn keeps firing while Super Heavy hovers between the arms
+  const burn = phase === "hover" ? "landing" : BURNS[phase] && p.burns.includes(BURNS[phase]) ? BURNS[phase] : null;
+  const [x, dx] = hermite(at, p.x, mx, Math.min(u, endU));
+  const [a, da] = hermite(at, altKeys, ma, Math.min(u, endU));
   const label = phase === "coast" && tgt === "droneship" ? "Coasting to the droneship" : phase === "landed" && tgt === "droneship" ? "Touchdown on the droneship!" : LABELS[phase];
+  const armClose = tgt !== "tower" ? 0 : done ? 1 : smooth([0, ARM_CLOSE_AT[0], ARM_CLOSE_AT[1], 1], [0, 0, 1, 1], u);
   return {
     phase,
     label,
@@ -121,7 +149,8 @@ export function boosterRecovery(u, target = "lz") {
     downrange: done ? (tgt === "droneship" ? DRONESHIP_DOWNRANGE : 0) : x,
     alt: done ? 0 : Math.max(0, a),
     speed: done ? 0 : Math.hypot(dx, da) / sp0,
-    tilt: done ? 0 : smooth(PHASE_AT, p.tilt, u),
+    tilt: done ? 0 : smooth(at, p.tilt, u),
     target: tgt,
+    armClose,
   };
 }

@@ -11,7 +11,7 @@ Public interactive math program for **ages 5–10** (US K–5), delivered by **E
   - **Ages 7–8 (grades 2–3)** — place value, rounding & estimation, regrouping fluency, mult/div ideas (facts, quotative), fractions of a set, perimeter, elapsed time, bar graphs, multi-step & money WP
   - **Ages 9–10 (grades 4–5)** — multi-digit ops + long mult/div ideas, factors/primes, order of ops, fraction × whole, mixed add/sub (like denoms) & unlike-denominator add/sub with benchmark estimates, decimal add/sub, area/volume, coordinate plane, multi-step WP
 - **⚛️ Physics labs** — Einstein's interactive canvas sims (`js/sims/`, lazy-loaded on the first lab): ages 5–6 *Push, Pull, Sink & Float* (push/pull cart, heavy vs light boxes, sink-or-float tank), ages 7–8 *Forces & Friction* ramp labs + unit check, ages 9–10 *Ramp Racer*. Every lab check is graded from the kid's own run or computed by the sim.
-- **🔭 Space Lab (v2.5.0, part of Physics)** — the former Cosmos app, now at `cosmos/`: 3D solar system, launch sites & historic liftoffs, LEO/ISS view, life of a star. Open from the top nav, Home, or the Physics Mission Map. Falcon 9 booster landings (RTLS onto Landing Zone 1, droneship for Starlink) are playable at Cape Canaveral; LEO view has Hubble & Starlink-shell toggles with altitude/inclination/period chips; the Starship tower catch is a coming-soon stub. Three.js r170 vendored in `vendor/three/` (MIT); loaded only when a lab opens.
+- **🔭 Space Lab (v2.5.0, part of Physics)** — the former Cosmos app, now at `cosmos/`: 3D solar system, launch sites & historic liftoffs, LEO/ISS view, life of a star. Open from the top nav, Home, or the Physics Mission Map. Falcon 9 booster landings (RTLS onto Landing Zone 1, droneship for Starlink) are playable at Cape Canaveral; LEO view has Hubble & Starlink-shell toggles with altitude/inclination/period chips; Starship’s Super Heavy is caught by the Starbase tower’s chopstick arms (C2). Three.js r170 vendored in `vendor/three/` (MIT); loaded only when a lab opens.
 - **Mastery + spaced review** (device-local) — check ≥ ~80% → mastered & schedule review; fail &lt; 60% → needs_review + **Retry weak spots**
 - **Today's path** — Mission Map + Home suggest the next 1–3 missions (due reviews → needs_review → diagnostic path → next ready); friendly empty-state when nothing is queued
 - **Parent / Family summary** on the Progress screen — stars, done/mastered, reviews due, unit mastery, weak spots, recent activity; **Print / Save as PDF** + **Download JSON**
@@ -181,7 +181,7 @@ Localhost works for PWA install in Chromium.
 
 ## Smoke demo (2.3 trusted-home sprint)
 
-1. Load once online → DevTools → Application → Service Worker registered; Cache Storage shows `einstein-math-v2.6.0` (or the current `CACHE` in `sw.js`).
+1. Load once online → DevTools → Application → Service Worker registered; Cache Storage shows `einstein-math-v2.6.1` (or the current `CACHE` in `sw.js`).
 2. Go offline (DevTools Network → Offline) → reload → landing / Mission Map still usable.
 3. Create two explorers, earn progress → **Export all profiles** → clear site data → **Import** merge → both kids restored.
 4. Toggle **Read aloud** → Einstein bubbles speak; **Replay** repeats the last line.
@@ -248,7 +248,7 @@ einstein-math/
   data/subjects/math.json      # math lessons pack (tracks)
   data/subjects/physics.json   # physics pack (sim lessons)
   js/sims/                     # physics lab sims, lazy-loaded: engine, checks, ramp, kit + push + float (ages 5–6)
-  js/space.js                  # Space Lab catalog (working sections + coming-soon stubs)
+  js/space.js                  # Space Lab catalog (working sections; stubs list is empty since C2)
   cosmos/                      # Space Lab app (former github.com/avinashpeyyety/cosmos); ?mode=solar|earth|leo|stars
   vendor/three/                # Three.js r170 (MIT), used by cosmos/ only
   _archive/cosmos-history/     # cosmos git bundle (full history) + old URLs

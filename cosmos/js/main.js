@@ -25,6 +25,7 @@ import {
   initLeoCatalog,
   setLeoToggle,
   leoCatalogDrawn,
+  towerScreenBox,
 } from "./earth.js";
 import { LEO_TOGGLES, leoChips, createLeoToggleState } from "./leo.js";
 import {
@@ -1621,7 +1622,17 @@ function animate() {
     const stage = updateStarLifecycle(starLife, dt);
     syncLifecycleHud(stage);
   } else if (state.viewMode !== "solar" && earthTheater) {
+    // C2: tell the theater how much of the screen is free (narrow phones, the Earth bar on top) so it can frame the tower
+    let topInset = 0;
+    let bottomInset = 0;
+    if (earthTheater.activeMission) {
+      const bar = $("earth-bar");
+      if (bar && !bar.classList.contains("hidden")) topInset = Math.min(0.6, Math.max(0, bar.getBoundingClientRect().bottom / window.innerHeight));
+      const dock = document.querySelector(".hud-bottom");
+      if (dock) bottomInset = Math.min(0.3, Math.max(0, 1 - dock.getBoundingClientRect().top / window.innerHeight));
+    }
     const { phaseLabel, cameraHint, ascentHud } = updateEarthTheater(earthTheater, dt, {
+      view: { aspect: camera.aspect, fovDeg: camera.fov, topInset, bottomInset },
       autoPlay: state.playing,
     });
     if (phaseLabel && $("earth-phase")) $("earth-phase").textContent = phaseLabel;
@@ -1707,3 +1718,9 @@ function applyUrlParams() {
 }
 
 init();
+
+// C2: read-only hooks for headless smoke checks (tower framing + recovery state); no effect on the app.
+window.__spaceLab = Object.freeze({
+  towerBox: () => (earthTheater ? towerScreenBox(earthTheater, camera, window.innerWidth, window.innerHeight) : null),
+  recovery: () => (earthTheater?.recovery ? { ...earthTheater.recovery.state, u: earthTheater.recovery.u } : null),
+});

@@ -9,6 +9,12 @@
 import * as THREE from "three";
 import { boosterRecovery, DRONESHIP_DOWNRANGE } from "./recovery.js";
 
+// C2: tower-catch geometry (pad-local units; the pad stage is scaled ×0.42 in the scene)
+const TOWER_ARM_Y = 3.3; // chopstick height on the tower
+const ARM_Z = 0.5; // arms run either side of the booster (booster radius ≈ 0.44)
+const ARM_OPEN_RAD = 0.8; // how wide the arms swing open
+const CATCH_PIN_Y = 3.0; // booster hardpoints, measured up from the engines
+
 export const EARTH_R = 12;
 const KM = EARTH_R / 6371;
 
@@ -82,12 +88,12 @@ export const LAUNCH_SITES = [
  * Missions playable at a site.
  * phases: timeline of named beats (t 0–1 of the whole flight).
  */
-/** Einstein Math Space Lab: Falcon 9 booster recovery was rebuilt in C1 (v2.5.8: boostback → entry → landing burn,
- * see recovery.js). The Starship tower catch is still stubbed until C2 (STUB_MISSIONS). */
+/** Einstein Math Space Lab: booster recovery is live — Falcon 9 RTLS / droneship (C1, v2.5.8) and the Starship
+ * Super Heavy tower catch (C2, v2.6.1), both driven by recovery.js. Kept as a kill switch: true hides returning boosters. */
 export const RECOVERY_STUBBED = false;
 /** Missions shown as visible "coming soon" chips instead of playable sequences (recovery sims not working well yet). */
 export const STUB_MISSIONS = {
-  "starship-ift5": "Tower catch sim is being rebuilt — the tower is hidden by the time Super Heavy returns, so the catch can't be seen.",
+  // (empty since C2 — every mission is playable; add an entry here to show a mission as a "coming soon" chip)
 };
 
 export const LAUNCH_MISSIONS = [
@@ -167,8 +173,9 @@ export const LAUNCH_MISSIONS = [
     vehicle: "starship",
     beyond: true,
     durationSec: 44,
-    blurb: "Super Heavy catch + ship toward the edge of space.",
+    blurb: "Flight 5 — Super Heavy flies back and the tower's chopstick arms catch it, while the ship heads for space.",
     color: 0xfbbf24,
+    recovery: "tower",
   },
   {
     id: "soyuz-gagarin",
@@ -833,6 +840,14 @@ function makeStarship() {
   root.userData.plume = plume;
   root.userData.booster = booster;
   root.userData.ship = ship;
+  // C2: everything above the booster (hidden on the returning booster after hot staging)
+  root.userData.upperParts = root.children.filter((c) => c.position.y > 3.6 && c !== plume);
+  // C2: catch pins (hardpoints) the tower arms grab — just below the booster's top
+  for (const z of [-1, 1]) {
+    const pin = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.08, 0.1), dark);
+    pin.position.set(0, CATCH_PIN_Y, z * 0.46);
+    root.add(pin);
+  }
   return root;
 }
 
@@ -1074,15 +1089,35 @@ function makePadComplex() {
     lamp.position.set(x, lampY, z);
     g.add(lamp);
   }
-  // Chopsticks (Starbase style, used when needed)
-  const armL = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.1, 0.14), mat(0x94a3b8, { metalness: 0.75 }));
-  armL.position.set(-0.5, 3.5, 0.4);
-  g.add(armL);
-  const armR = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.1, 0.14), mat(0x94a3b8, { metalness: 0.75 }));
-  armR.position.set(0.5, 3.5, 0.4);
-  g.add(armR);
+  // C2: chopstick arms ("Mechazilla", Starbase style) — two arms hinged on the tower that swing shut around
+  // the booster. Pivots sit on a carriage at TOWER_ARM_Y; each arm reaches out along −X past the rocket.
+  const chopsticks = new THREE.Group();
+  chopsticks.visible = false;
+  const carriage = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.26, 1.15), mat(0x475569, { metalness: 0.7 }));
+  carriage.position.set(0.72, TOWER_ARM_Y, 0);
+  chopsticks.add(carriage);
+  // matte + a little glow so the arms read clearly against the dark sky / steel booster
+  const armMat = mat(0xe2e8f0, { metalness: 0.2, roughness: 0.55, emissive: 0x475569, emissiveIntensity: 0.55 });
+  const makeArm = (side) => {
+    const pivot = new THREE.Group();
+    pivot.position.set(0.66, TOWER_ARM_Y, side * ARM_Z);
+    const arm = new THREE.Mesh(new THREE.BoxGeometry(1.35, 0.11, 0.09), armMat);
+    arm.position.x = -0.675;
+    pivot.add(arm);
+    const tip = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.16, 0.12), mat(0xfbbf24, { metalness: 0.2, emissive: 0xf59e0b, emissiveIntensity: 0.6 }));
+    tip.position.x = -1.33;
+    pivot.add(tip);
+    chopsticks.add(pivot);
+    return pivot;
+  };
+  const armL = makeArm(1);
+  const armR = makeArm(-1);
+  g.add(chopsticks);
+  g.userData.chopsticks = chopsticks;
+  g.userData.tower = tower;
   g.userData.armL = armL;
   g.userData.armR = armR;
+  setChopsticks(g, 0);
   return g;
 }
 
@@ -1377,6 +1412,21 @@ export function selectSite(api, siteId) {
   // Scale stage so rocket is readable (~local theater)
   api.siteStage.scale.setScalar(0.42);
 
+  // C2: at Starbase, turn the pad so the catch tower sits behind/right of the booster as seen from the south.
+  // The orbit camera keeps world-Y as "up", so tower-catch views look from the south (no east component) to stay
+  // upright; this yaw makes both chopstick arms visible from there.
+  if (siteId === "boca") {
+    const { up: sUp, east: sEast, north: sNorth } = launchBasis(entry.pos);
+    const want = sNorth.clone().add(sEast.clone().multiplyScalar(0.8)).normalize();
+    const curX = new THREE.Vector3(1, 0, 0).applyQuaternion(api.siteStage.quaternion);
+    const ang = Math.atan2(curX.clone().cross(want).dot(sUp), curX.dot(want));
+    api.siteStage.quaternion.premultiply(new THREE.Quaternion().setFromAxisAngle(sUp, ang));
+  }
+  // C2: the catch tower's chopsticks only exist at Starbase
+  if (api.pad?.userData.chopsticks) {
+    api.pad.userData.chopsticks.visible = siteId === "boca";
+    setChopsticks(api.pad, 0);
+  }
   // Park vehicle on pad — pad-local fog/beams on while on/near pad
   hideVehicles(api);
   setPadAtmosphere(api, 1);
@@ -1528,6 +1578,7 @@ function buildAscentHud(api, t) {
  */
 export function updateEarthTheater(api, dt, opts = {}) {
   const { autoPlay = true } = opts;
+  api.view = opts.view || api.view || null;
 
   // Globe spin (slow, readable)
   if (api.mode === "surface" || api.mode === "leo") {
@@ -1604,6 +1655,16 @@ function animateLaunch(api, t) {
     const stacked = !(mission.vehicle === "falcon9" && mission.recovery && !RECOVERY_STUBBED && t > RECOVERY_T0);
     vehicle.userData.stage2.visible = stacked;
     vehicle.userData.fairing.visible = stacked;
+  }
+  // C2: Super Heavy flies home alone after hot staging; chopsticks start open
+  const towerCatch = mission.vehicle === "starship" && mission.recovery === "tower" && !RECOVERY_STUBBED;
+  if (vehicle.userData.upperParts) {
+    const stacked = !(towerCatch && t >= 0.3);
+    for (const part of vehicle.userData.upperParts) part.visible = stacked;
+  }
+  if (api.pad?.userData.chopsticks && mission.vehicle === "starship") {
+    api.pad.userData.chopsticks.visible = true;
+    if (!towerCatch || t <= RECOVERY_T0) setChopsticks(api.pad, 0);
   }
 
   // Prefer world-space animation for clarity after liftoff leaves the tower
@@ -1712,18 +1773,15 @@ function animateLaunch(api, t) {
     shipOnly.position.copy(pos).add(face.clone().multiplyScalar(sep * 1.2));
     shipOnly.quaternion.copy(vehicle.quaternion);
     setPlume(shipOnly, t < 0.7, 1);
-    if (t > 0.55) {
-      placeOrbiting(shipOnly, api.LEO_VIS * 1.15, (t - 0.55) * Math.PI, 28, 1);
-      // booster return to tower
-      const u = clamp01((t - 0.55) / 0.4);
-      vehicle.position.lerpVectors(pos, padWorld.clone().add(up.clone().multiplyScalar(0.3)), smootherstep(u));
-      vehicle.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), up);
-      setPlume(vehicle, u > 0.75 && u < 0.95, 1.1);
-      if (api.pad.userData.armL) {
-        const pinch = lerp(0.45, 0.02, smootherstep(u));
-        api.pad.userData.armL.rotation.z = -pinch;
-        api.pad.userData.armR.rotation.z = pinch;
-      }
+    if (t > 0.55) placeOrbiting(shipOnly, api.LEO_VIS * 1.15, (t - 0.55) * Math.PI, 28, 1);
+    if (towerCatch) {
+      // C2: the tower stays in the scene for the whole flight so the catch can be seen
+      api.siteStage.visible = true;
+      if (t > RECOVERY_T0) recoveryCam = animateTowerCatch(api, vehicle, mission, t, padWorld, up, east);
+      // start framing tower + stack just before the return so the camera has settled when it begins
+      else if (t > 0.38) recoveryCam = towerCatchCam(api, vehicle.position, up, east);
+    } else if (t > 0.55) {
+      vehicle.visible = false;
     }
   }
 
@@ -1918,6 +1976,105 @@ function recoveryTargetWorld(padWorld, up, east, north, sepDown, kind) {
   }
   // Landing Zone 1 sits a little away from the launch tower
   return padWorld.clone().add(north.clone().multiplyScalar(1.4)).normalize().multiplyScalar(r);
+}
+
+// ─── C2: Starship Super Heavy tower catch ───
+
+/** Screen-space box of the catch tower (CSS px) for smoke checks; null if the tower isn't drawn. */
+export function towerScreenBox(api, camera, width, height) {
+  const tower = api.pad?.userData.tower;
+  if (!tower || !api.siteStage.visible || api.mode !== "site") return null;
+  api.siteStage.updateMatrixWorld(true);
+  const box = new THREE.Box3().setFromObject(tower);
+  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity, behind = false;
+  for (let i = 0; i < 8; i++) {
+    const v = new THREE.Vector3(i & 1 ? box.max.x : box.min.x, i & 2 ? box.max.y : box.min.y, i & 4 ? box.max.z : box.min.z);
+    const camSpace = v.clone().applyMatrix4(camera.matrixWorldInverse);
+    if (camSpace.z > 0) behind = true;
+    v.project(camera);
+    const sx = (v.x * 0.5 + 0.5) * width, sy = (1 - (v.y * 0.5 + 0.5)) * height;
+    x0 = Math.min(x0, sx); x1 = Math.max(x1, sx); y0 = Math.min(y0, sy); y1 = Math.max(y1, sy);
+  }
+  return { x0, y0, x1, y1, behind, armClose: api.pad.userData.armClose ?? 0 };
+}
+
+/** Chopstick pose: 0 = wide open, 1 = closed around the booster. */
+function setChopsticks(pad, close) {
+  const { armL, armR } = pad.userData;
+  if (!armL || !armR) return;
+  const open = lerp(ARM_OPEN_RAD, 0, clamp01(close));
+  armL.rotation.y = open;
+  armR.rotation.y = -open;
+  pad.userData.armClose = clamp01(close);
+}
+
+/** Booster origin (engine end) when it hangs on the arms, in world space. */
+function towerCatchPointWorld(api) {
+  api.siteStage.updateMatrixWorld(true);
+  return api.siteStage.localToWorld(new THREE.Vector3(0, TOWER_ARM_Y + 0.055 + 0.04 - CATCH_PIN_Y, 0));
+}
+
+function animateTowerCatch(api, booster, mission, t, padWorld, up, east) {
+  const sepPos = sampleAscentWorld(RECOVERY_T0, padWorld, up, east, mission);
+  const catchPt = towerCatchPointWorld(api);
+  const sepRel = sepPos.clone().sub(catchPt);
+  const sepAlt = sepRel.dot(up);
+  const sepDown = sepRel.dot(east);
+  const u = clamp01((t - RECOVERY_T0) / (1 - RECOVERY_T0));
+  const st = boosterRecovery(u, "tower");
+  api.recovery = { active: true, u, state: st, kind: "tower" };
+
+  // flat (pad tangent plane) track from separation back to the catch point; curvature is negligible this close
+  const along = sepRel.clone().sub(up.clone().multiplyScalar(sepAlt));
+  const offAxis = along.clone().sub(east.clone().multiplyScalar(sepDown)); // tiny sideways part of the sep offset
+  booster.position.copy(catchPt)
+    .add(east.clone().multiplyScalar(st.downrange * sepDown))
+    .add(offAxis.multiplyScalar(st.downrange))
+    .add(up.clone().multiplyScalar(st.alt * sepAlt));
+  if (st.phase === "caught") {
+    booster.position.copy(catchPt);
+    booster.quaternion.copy(api.siteStage.getWorldQuaternion(new THREE.Quaternion()));
+  } else {
+    const face = up.clone().multiplyScalar(Math.cos(st.tilt)).add(east.clone().multiplyScalar(Math.sin(st.tilt))).normalize();
+    booster.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), face);
+    // line up with the tower (same yaw as the pad) for the last part so the catch pins meet the arms
+    if (u > 0.7) booster.quaternion.slerp(api.siteStage.getWorldQuaternion(new THREE.Quaternion()), smootherstep(clamp01((u - 0.7) / 0.2)));
+  }
+  booster.visible = true;
+  setPlume(booster, !!st.burn, st.burn === "boostback" ? 1.1 : 0.9);
+  setChopsticks(api.pad, st.armClose);
+  api.phaseLabel = `Booster: ${st.label}`;
+
+  return towerCatchCam(api, booster.position, up, east);
+}
+
+/** C2 camera: always frame BOTH the tower and the booster (pull back while the booster is far away). Accounts for
+ * narrow (portrait) screens and the Earth bar covering the top of the view, so the tower is never hidden. */
+function towerCatchCam(api, boosterPos, up, east) {
+  const north = up.clone().cross(east).normalize();
+  const towerTop = api.siteStage.localToWorld(new THREE.Vector3(0.85, 4.2, 0));
+  const towerBase = api.siteStage.localToWorld(new THREE.Vector3(0.85, 0, 0));
+  const towerMid = towerBase.clone().lerp(towerTop, 0.5);
+  const span = boosterPos.distanceTo(towerBase);
+  const mid = boosterPos.clone().lerp(towerMid, 0.5);
+  const view = api.view || {};
+  const aspect = view.aspect || 16 / 9;
+  const top = clamp01(view.topInset || 0);
+  const bottom = clamp01(view.bottomInset || 0);
+  const free = Math.max(0.3, 1 - top - bottom - 0.08); // small safety margin so the tower top never tucks under the bar
+  let dist = 2.2 + span * 1.25;
+  if (aspect < 1) dist /= Math.pow(aspect, 0.85); // portrait: horizontal field of view is narrow
+  dist /= free; // only the part between the Earth bar and the time dock is usable
+  const halfH = dist * Math.tan(THREE.MathUtils.degToRad((view.fovDeg || 50) / 2));
+  const look = mid.clone().add(up.clone().multiplyScalar(halfH * (top - bottom + 0.04))); // centre the scene in the free area
+  // far away: side-on view across the flight path; close in: look at the tower face so both chopsticks show
+  // view from the south (no east component keeps the picture upright under the world-Y camera "up")
+  const far = north.clone().multiplyScalar(-0.95).add(up.clone().multiplyScalar(0.3));
+  const near = north.clone().multiplyScalar(-0.85).add(up.clone().multiplyScalar(0.55));
+  const w = 1 - smootherstep(clamp01((span - 1.5) / 3));
+  const dir = far.normalize().lerp(near, w).normalize();
+  const position = look.clone().add(dir.multiplyScalar(dist));
+  return { position, target: look, minDist: 0.6, maxDist: EARTH_R * 12 };
 }
 
 function animateBoosterRecovery(api, booster, mission, t, padWorld, up, east) {

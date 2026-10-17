@@ -46,7 +46,7 @@ The former Cosmos app (github.com/avinashpeyyety/cosmos) now lives in this repo 
 | Launch Sites & Liftoff (6 sites, pad fog/floodlights, ascent HUD, 8 playable launches) | ✅ working | `cosmos/?mode=earth` |
 | Low Earth Orbit (ISS 51.6° view) | ✅ working | `cosmos/?mode=leo` |
 | Life of a Star (scrubber, low/high mass fork, NS/BH ending) | ✅ working | `cosmos/?mode=stars` |
-| Rocket landings: Falcon 9 RTLS ✅ · Starship tower catch | ✅ F9 RTLS/droneship playable (C1); 🚧 Starship tower catch still stubbed | C1 done · C2 |
+| Rocket landings: Falcon 9 RTLS ✅ · Starship tower catch ✅ | ✅ F9 RTLS/droneship playable (C1); ✅ Super Heavy tower catch playable (C2) | C1 · C2 done |
 | LEO mission catalog — Hubble + Starlink 550 km shell toggles wired (C3); other `cosmos/js/leo.js` entries still unwired | ✅ partial | C3 |
 
 History: `_archive/cosmos-history/` (git bundle + old URLs). Original Cosmos plan: `cosmos/docs/COSMOS_SPRINT_PLAN_ORIGINAL.md`.
@@ -92,7 +92,7 @@ Effort: XS ≈ ½ cycle, S ≤ 1 cycle, M = 2 cycles. Each ticket ends with smok
 - [ ] **X29 (M)** Math 9–10: fraction × fraction, fractions as division, unit fraction ÷ whole & whole ÷ unit fraction, fractional-side area (4 lessons) — *5.NF.3–7*
 - [ ] **X16 (M)** Physics ages 11–14: Newton's laws + Ohm's law sims (6 lessons)
 - [ ] **X34 (S)** Math 7–8: mass & liquid volume (g, kg, L), time to the minute, scaled picture/bar graphs, line plots (3 lessons) — *3.MD.1–4*
-- [ ] **C2 (S)** Space Lab: Starship tower catch rebuilt — tower stays visible through return, arms close on the booster; un-stub "Starship · tower catch"
+- [x] **C2 (S)** Space Lab: Starship tower catch rebuilt — tower stays visible through return, arms close on the booster; un-stub "Starship · tower catch" — done 2026-10-17: `recovery.js` "tower" profile (separation → flip → boostback → coast → descent → landing burn → hover → caught; no entry burn), chopstick arms hinged on the tower close (armClose 0→1 by u 0.95) before contact (u 0.97); booster ends on the arms at speed 0; camera frames tower + booster; `STUB_MISSIONS` now empty; hub card "Rocket Landings & Tower Catch" deep-links Starbase; SW v2.6.1
 - [ ] **X30 (S)** Math 5–6: unknown addend, true/false equations (=), add three numbers, turn-around facts (3 lessons) — *1.OA*
 - [ ] **X35 (S)** Mental Math Gym unit in every track (2 lessons each: count on/back & ±10 · compensation & near doubles · ×10/×100 & estimation)
 - [ ] **X14 (S)** Puzzle of the day (math + physics rotation)
@@ -147,3 +147,4 @@ Comprehensive World + American + Indian history, age-banded, with timelines, map
 - 2026-10-16 · C3 shipped: LEO view toggles for Hubble (540 km, 28.5°, NASA) and the Starlink 550 km / 53° shell (FCC DA 19-1294, 72×22 = 1,584 sats) with altitude / inclination / Kepler-period chips (95.3 / 95.5 min); hub "LEO Missions" stub removed; tests/leo-toggles.test.js; SW v2.6.0 (v2.5.9 was taken by X9)
 - 2026-10-16 CT · Friday polish / F-polish: Air reachable; baseline @ `08e832c` (C3); all 14 test suites green on Air (104 pass: storage-v3, subject-packs, subjects-x3, sims-ramp, physics-x5/x6, math-x20, x23-tens-ones, space-lab, math-x21-area, math-x22-unlike-fractions, math-x9-generators, recovery, leo-toggles); HTTP smoke of shell/packs/generators/cosmos/leo 200 OK; headless Edge dump-dom: footer v2.6.0, SW CACHE `einstein-math-v2.6.0` matches, 0 app JS console errors (throwaway profile deleted); fixed C3 checkbox `[x ]`→`[x]`; scrubbed Space Lab rocket-landings row (C1 live); MATH_COVERAGE_AUDIT status banner updated (X21/X22/X9/C1/C3); README lesson counts 32/37/33=102 + SW v2.6.0 already current; docs-only, no app/SW code change (still v2.6.0). X5 cycle 2 still waits on Studio art. Next Mon: X5 panels if Studio free, else **X12** (Physics ages 9–10: speed, gravity, circuits).
 - 2026-10-16 CT · Friday PM polish (docs-only): Air reachable; baseline @ `bfdce12` (morning polish); all 14 test suites re-run green on Air, no app/SW change since (still v2.6.0); progress log re-sorted chronologically (C4/C1/C3/morning-polish entries had landed at the top). Next Mon: X5 panels if Studio free, else **X12**.
+- 2026-10-17 · C2 shipped: Starship · tower catch playable — Super Heavy boostback → landing burn → hover between Mechazilla's chopsticks; arms close, booster caught on its pins ("Caught! The tower grabbed the booster"); tower visible + framed through the whole return; no coming-soon Space Lab stubs left (`STUB_MISSIONS` empty, `RECOVERY_STUBBED` kept as a kill switch); tests/tower-catch.test.js; SW v2.6.1

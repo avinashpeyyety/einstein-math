@@ -14,6 +14,9 @@ const Engine = require('../js/sims/engine.js');
 const Ramp = require('../js/sims/ramp.js');
 require('../js/sims/push.js');   // X6: ages 5–6 labs live in the same pack
 require('../js/sims/float.js');
+require('../js/sims/speed.js');  // X12: ages 9–10 speed / gravity / circuits
+require('../js/sims/fall.js');
+require('../js/sims/circuit.js');
 const Checks = require('../js/sims/checks.js');
 const PHYS = JSON.parse(read('data/subjects/physics.json'));
 const simLessons = Object.values(PHYS.tracks).flatMap(tr => Object.values(tr.lessons).filter(L => L.type === 'sim'));

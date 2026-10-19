@@ -4,8 +4,8 @@
     "title": "Einstein Physics",
     "status": "live",
     "schemaVersion": 3,
-    "version": "0.3.0",
-    "note": "X6: ages 5–6 Push, Pull, Sink & Float unit (3 lab lessons). X5: ages 7–8 Forces & Friction unit (4 lab lessons + unit check). Ages 9–10: Ramp Racer."
+    "version": "0.4.0",
+    "note": "X12: ages 9–10 Speed, Gravity & Circuits unit (5 lab lessons). X6: ages 5–6 Push, Pull, Sink & Float unit (3 lab lessons). X5: ages 7–8 Forces & Friction unit (4 lab lessons + unit check). Ages 9–10 also: Ramp Racer."
   },
   "tracks": {
     "ages-5-6": {
@@ -21,7 +21,11 @@
           "icon": "🛒",
           "color": "#34D399",
           "description": "Push a box, pull it back, shove heavy boxes, and drop toys in the water tank. What will happen? Let's find out!",
-          "lessons": ["ph-push-or-pull", "ph-big-small-push", "ph-sink-or-float"]
+          "lessons": [
+            "ph-push-or-pull",
+            "ph-big-small-push",
+            "ph-sink-or-float"
+          ]
         }
       ],
       "lessons": {
@@ -32,21 +36,54 @@
           "title": "Push or Pull?",
           "durationMin": 6,
           "prerequisites": [],
-          "skills": ["push-and-pull", "force-direction", "force-strength"],
+          "skills": [
+            "push-and-pull",
+            "force-direction",
+            "force-strength"
+          ],
           "einsteinIntro": "Hello, little scientist! Today we move a toy box with pushes and pulls. A push and a pull are both called a FORCE!",
           "explain": {
             "panels": [
-              { "speech": "A push moves something AWAY from you. Push a swing and — whoosh — away it goes!", "state": "explain" },
-              { "speech": "A pull brings something TOWARD you, like pulling a wagon by its handle.", "state": "think" },
-              { "speech": "A gentle push makes a little slide. A BIG push makes a big slide! Let's try it.", "state": "cheer" }
+              {
+                "speech": "A push moves something AWAY from you. Push a swing and — whoosh — away it goes!",
+                "state": "explain"
+              },
+              {
+                "speech": "A pull brings something TOWARD you, like pulling a wagon by its handle.",
+                "state": "think"
+              },
+              {
+                "speech": "A gentle push makes a little slide. A BIG push makes a big slide! Let's try it.",
+                "state": "cheer"
+              }
             ]
           },
           "sim": {
             "kind": "push",
-            "params": { "force": 10, "dir": 1, "mass": 2, "mu": 0.25, "pushTime": 0.5, "g": 9.8, "wall": 5 },
+            "params": {
+              "force": 10,
+              "dir": 1,
+              "mass": 2,
+              "mu": 0.25,
+              "pushTime": 0.5,
+              "g": 9.8,
+              "wall": 5
+            },
             "controls": [
-              { "param": "dir", "label": "Push or pull?", "min": -1, "max": 1, "step": 2 },
-              { "param": "force", "label": "How hard?", "min": 0, "max": 30, "step": 1 }
+              {
+                "param": "dir",
+                "label": "Push or pull?",
+                "min": -1,
+                "max": 1,
+                "step": 2
+              },
+              {
+                "param": "force",
+                "label": "How hard?",
+                "min": 0,
+                "max": 30,
+                "step": 1
+              }
             ],
             "explore": "Pick Push or Pull, choose how hard, then press Run it. Where does the box go?"
           },
@@ -55,29 +92,66 @@
               "id": "ph-pp-c1",
               "type": "predict",
               "prompt": "Einstein gives the box a PUSH. Which way will it slide?",
-              "setup": { "dir": 1, "force": 12 },
+              "setup": {
+                "dir": 1,
+                "force": 12
+              },
               "metric": "way",
-              "choices": [{ "label": "Away from Einstein 👉", "value": "away" }, { "label": "Toward Einstein 👈", "value": "closer" }],
+              "choices": [
+                {
+                  "label": "Away from Einstein 👉",
+                  "value": "away"
+                },
+                {
+                  "label": "Toward Einstein 👈",
+                  "value": "closer"
+                }
+              ],
               "hint": "A push sends things away from you."
             },
             {
               "id": "ph-pp-c2",
               "type": "goal",
               "prompt": "Make the box come TOWARD Einstein. Run it, then press Check.",
-              "setup": { "dir": 1, "force": 10 },
-              "goal": { "metric": "way", "op": "eq", "value": "closer", "label": "the box comes toward Einstein" },
+              "setup": {
+                "dir": 1,
+                "force": 10
+              },
+              "goal": {
+                "metric": "way",
+                "op": "eq",
+                "value": "closer",
+                "label": "the box comes toward Einstein"
+              },
               "hint": "Pushing sends it away. Try a pull!"
             },
             {
               "id": "ph-pp-c3",
               "type": "predict",
               "prompt": "First a gentle push (8). Then a BIG push (20). Will the big push send the box farther?",
-              "setup": { "dir": 1, "force": 8 },
-              "compare": { "alt": { "force": 20 }, "metric": "distance" },
+              "setup": {
+                "dir": 1,
+                "force": 8
+              },
+              "compare": {
+                "alt": {
+                  "force": 20
+                },
+                "metric": "distance"
+              },
               "choices": [
-                { "label": "Farther 🚀", "value": "more" },
-                { "label": "The same", "value": "same" },
-                { "label": "Not as far 🐢", "value": "less" }
+                {
+                  "label": "Farther 🚀",
+                  "value": "more"
+                },
+                {
+                  "label": "The same",
+                  "value": "same"
+                },
+                {
+                  "label": "Not as far 🐢",
+                  "value": "less"
+                }
               ],
               "hint": "A bigger push gives a bigger slide."
             },
@@ -85,9 +159,19 @@
               "id": "ph-pp-c4",
               "type": "goal",
               "prompt": "Push the box past the red flag (2 m)! Run it, then press Check.",
-              "setup": { "dir": 1, "force": 10 },
-              "lock": ["dir"],
-              "goal": { "metric": "distance", "op": "gt", "value": 2, "label": "the box slides past the red flag (2 m)" },
+              "setup": {
+                "dir": 1,
+                "force": 10
+              },
+              "lock": [
+                "dir"
+              ],
+              "goal": {
+                "metric": "distance",
+                "op": "gt",
+                "value": 2,
+                "label": "the box slides past the red flag (2 m)"
+              },
               "hint": "Push harder! Slide How hard? way up."
             }
           ]
@@ -98,22 +182,57 @@
           "type": "sim",
           "title": "Big Push, Small Push",
           "durationMin": 7,
-          "prerequisites": ["ph-push-or-pull"],
-          "skills": ["force-strength", "heavy-and-light", "friction-grip"],
+          "prerequisites": [
+            "ph-push-or-pull"
+          ],
+          "skills": [
+            "force-strength",
+            "heavy-and-light",
+            "friction-grip"
+          ],
           "einsteinIntro": "Some boxes are light like a pillow. Some are heavy like a pile of books. Which one is harder to push? Let's test!",
           "explain": {
             "panels": [
-              { "speech": "The floor grips the box a little. A teeny push can't beat the grip, so the box stays put.", "state": "think" },
-              { "speech": "A heavy box needs a BIGGER push to move. A light box zooms with just a small push.", "state": "explain" },
-              { "speech": "Push hard for far, gentle for near. You're the boss of the box!", "state": "cheer" }
+              {
+                "speech": "The floor grips the box a little. A teeny push can't beat the grip, so the box stays put.",
+                "state": "think"
+              },
+              {
+                "speech": "A heavy box needs a BIGGER push to move. A light box zooms with just a small push.",
+                "state": "explain"
+              },
+              {
+                "speech": "Push hard for far, gentle for near. You're the boss of the box!",
+                "state": "cheer"
+              }
             ]
           },
           "sim": {
             "kind": "push",
-            "params": { "force": 10, "dir": 1, "mass": 2, "mu": 0.25, "pushTime": 0.5, "g": 9.8, "wall": 5 },
+            "params": {
+              "force": 10,
+              "dir": 1,
+              "mass": 2,
+              "mu": 0.25,
+              "pushTime": 0.5,
+              "g": 9.8,
+              "wall": 5
+            },
             "controls": [
-              { "param": "force", "label": "How hard?", "min": 0, "max": 30, "step": 1 },
-              { "param": "mass", "label": "Box weight", "min": 1, "max": 5, "step": 1 }
+              {
+                "param": "force",
+                "label": "How hard?",
+                "min": 0,
+                "max": 30,
+                "step": 1
+              },
+              {
+                "param": "mass",
+                "label": "Box weight",
+                "min": 1,
+                "max": 5,
+                "step": 1
+              }
             ],
             "explore": "Try a light box and a heavy box. How hard do you need to push each one?"
           },
@@ -122,21 +241,50 @@
               "id": "ph-bs-c1",
               "type": "predict",
               "prompt": "Einstein gives a box a teeny-tiny push (just 3). Will the box move?",
-              "setup": { "force": 3, "mass": 2 },
+              "setup": {
+                "force": 3,
+                "mass": 2
+              },
               "metric": "moved",
-              "choices": [{ "label": "Yes, it slides 👉", "value": true }, { "label": "No, it stays put 🧱", "value": false }],
+              "choices": [
+                {
+                  "label": "Yes, it slides 👉",
+                  "value": true
+                },
+                {
+                  "label": "No, it stays put 🧱",
+                  "value": false
+                }
+              ],
               "hint": "A tiny push can't beat the floor's grip."
             },
             {
               "id": "ph-bs-c2",
               "type": "predict",
               "prompt": "Einstein pushes a LIGHT box (1 kg). Then he pushes a HEAVY box (4 kg) just as hard. Will the heavy box go farther?",
-              "setup": { "force": 10, "mass": 1 },
-              "compare": { "alt": { "mass": 4 }, "metric": "distance" },
+              "setup": {
+                "force": 10,
+                "mass": 1
+              },
+              "compare": {
+                "alt": {
+                  "mass": 4
+                },
+                "metric": "distance"
+              },
               "choices": [
-                { "label": "Farther 🚀", "value": "more" },
-                { "label": "The same", "value": "same" },
-                { "label": "Not as far 🐢", "value": "less" }
+                {
+                  "label": "Farther 🚀",
+                  "value": "more"
+                },
+                {
+                  "label": "The same",
+                  "value": "same"
+                },
+                {
+                  "label": "Not as far 🐢",
+                  "value": "less"
+                }
               ],
               "hint": "Heavy things are harder to get moving."
             },
@@ -144,18 +292,41 @@
               "id": "ph-bs-c3",
               "type": "goal",
               "prompt": "This box is HEAVY (4 kg). Push it past the blue flag (1 m)! Run it, then press Check.",
-              "setup": { "mass": 4, "force": 10 },
-              "lock": ["mass"],
-              "goal": { "metric": "distance", "op": "gt", "value": 1, "label": "the heavy box slides past the blue flag (1 m)" },
+              "setup": {
+                "mass": 4,
+                "force": 10
+              },
+              "lock": [
+                "mass"
+              ],
+              "goal": {
+                "metric": "distance",
+                "op": "gt",
+                "value": 1,
+                "label": "the heavy box slides past the blue flag (1 m)"
+              },
               "hint": "A heavy box needs a really BIG push. Try more than 22."
             },
             {
               "id": "ph-bs-c4",
               "type": "goal",
               "prompt": "Now a LIGHT box (1 kg). Give it a gentle push so it stops in the green zone, between the blue and red flags. Run it, then press Check.",
-              "setup": { "mass": 1, "force": 20 },
-              "lock": ["mass"],
-              "goal": { "metric": "distance", "op": "between", "value": [1, 2], "label": "the box stops in the green zone (1 m to 2 m)" },
+              "setup": {
+                "mass": 1,
+                "force": 20
+              },
+              "lock": [
+                "mass"
+              ],
+              "goal": {
+                "metric": "distance",
+                "op": "between",
+                "value": [
+                  1,
+                  2
+                ],
+                "label": "the box stops in the green zone (1 m to 2 m)"
+              },
               "hint": "Too far? Push more gently. Try about 6 or 7."
             }
           ]
@@ -166,20 +337,49 @@
           "type": "sim",
           "title": "Sink or Float?",
           "durationMin": 7,
-          "prerequisites": ["ph-big-small-push"],
-          "skills": ["sink-and-float", "predict-and-test"],
+          "prerequisites": [
+            "ph-big-small-push"
+          ],
+          "skills": [
+            "sink-and-float",
+            "predict-and-test"
+          ],
           "einsteinIntro": "Splash time! We drop things into my water tank. Will they float on top or sink to the bottom? Guess first, then test!",
           "explain": {
             "panels": [
-              { "speech": "Water pushes UP on everything you put in it. That push helps things float.", "state": "explain" },
-              { "speech": "Wood, apples and rubber ducks float. Rocks, coins and keys sink to the bottom.", "state": "think" },
-              { "speech": "Here's a surprise: big doesn't mean sink! A huge log floats, but a tiny coin sinks.", "state": "cheer" }
+              {
+                "speech": "Water pushes UP on everything you put in it. That push helps things float.",
+                "state": "explain"
+              },
+              {
+                "speech": "Wood, apples and rubber ducks float. Rocks, coins and keys sink to the bottom.",
+                "state": "think"
+              },
+              {
+                "speech": "Here's a surprise: big doesn't mean sink! A huge log floats, but a tiny coin sinks.",
+                "state": "cheer"
+              }
             ]
           },
           "sim": {
             "kind": "float",
-            "params": { "object": 1, "rhoWater": 1000, "depth": 0.6, "drop": 0.15, "drag": 1, "g": 9.8 },
-            "controls": [{ "param": "object", "label": "Pick something to drop", "min": 0, "max": 6, "step": 1 }],
+            "params": {
+              "object": 1,
+              "rhoWater": 1000,
+              "depth": 0.6,
+              "drop": 0.15,
+              "drag": 1,
+              "g": 9.8
+            },
+            "controls": [
+              {
+                "param": "object",
+                "label": "Pick something to drop",
+                "min": 0,
+                "max": 6,
+                "step": 1
+              }
+            ],
             "explore": "Pick something, press Run it, and watch: does it float or sink? Try them all!"
           },
           "simChecks": [
@@ -187,43 +387,90 @@
               "id": "ph-sf-c1",
               "type": "predict",
               "prompt": "Plop! Einstein drops a ROCK into the water. Will it float or sink?",
-              "setup": { "object": 1 },
+              "setup": {
+                "object": 1
+              },
               "metric": "floats",
-              "choices": [{ "label": "It floats 🛟", "value": true }, { "label": "It sinks ⬇️", "value": false }],
+              "choices": [
+                {
+                  "label": "It floats 🛟",
+                  "value": true
+                },
+                {
+                  "label": "It sinks ⬇️",
+                  "value": false
+                }
+              ],
               "hint": "Rocks are heavy for their size."
             },
             {
               "id": "ph-sf-c2",
               "type": "predict",
               "prompt": "Now an APPLE. Will it float or sink?",
-              "setup": { "object": 2 },
+              "setup": {
+                "object": 2
+              },
               "metric": "floats",
-              "choices": [{ "label": "It floats 🛟", "value": true }, { "label": "It sinks ⬇️", "value": false }],
+              "choices": [
+                {
+                  "label": "It floats 🛟",
+                  "value": true
+                },
+                {
+                  "label": "It sinks ⬇️",
+                  "value": false
+                }
+              ],
               "hint": "Apples have lots of air inside them."
             },
             {
               "id": "ph-sf-c3",
               "type": "goal",
               "prompt": "Pick something that FLOATS, drop it in, then press Check.",
-              "setup": { "object": 1 },
-              "goal": { "metric": "floats", "op": "eq", "value": true, "label": "it floats on the water" },
+              "setup": {
+                "object": 1
+              },
+              "goal": {
+                "metric": "floats",
+                "op": "eq",
+                "value": true,
+                "label": "it floats on the water"
+              },
               "hint": "Try the wooden block or the rubber duck."
             },
             {
               "id": "ph-sf-c4",
               "type": "predict",
               "prompt": "This log is BIG and heavy. Will it float or sink?",
-              "setup": { "object": 6 },
+              "setup": {
+                "object": 6
+              },
               "metric": "floats",
-              "choices": [{ "label": "It floats 🛟", "value": true }, { "label": "It sinks ⬇️", "value": false }],
+              "choices": [
+                {
+                  "label": "It floats 🛟",
+                  "value": true
+                },
+                {
+                  "label": "It sinks ⬇️",
+                  "value": false
+                }
+              ],
               "hint": "Big doesn't mean sink. Logs are made of wood!"
             },
             {
               "id": "ph-sf-c5",
               "type": "goal",
               "prompt": "The duck floats. Now find something SMALL that SINKS! Drop it in, then press Check.",
-              "setup": { "object": 4 },
-              "goal": { "metric": "floats", "op": "eq", "value": false, "label": "it sinks to the bottom" },
+              "setup": {
+                "object": 4
+              },
+              "goal": {
+                "metric": "floats",
+                "op": "eq",
+                "value": false,
+                "label": "it sinks to the bottom"
+              },
               "hint": "Try the coin or the key."
             }
           ]
@@ -243,7 +490,13 @@
           "icon": "🛝",
           "color": "#A78BFA",
           "description": "Why do things slide or stick? Test slopes, surfaces and heavy blocks in Einstein's ramp lab, then take the unit check!",
-          "lessons": ["ph-ramp-slide-or-stick", "ph-ramp-steeper-faster", "ph-ramp-surfaces", "ph-ramp-heavy-light", "ph-ff-unit-check"]
+          "lessons": [
+            "ph-ramp-slide-or-stick",
+            "ph-ramp-steeper-faster",
+            "ph-ramp-surfaces",
+            "ph-ramp-heavy-light",
+            "ph-ff-unit-check"
+          ]
         }
       ],
       "lessons": {
@@ -254,12 +507,22 @@
           "title": "Slide or Stick? The Ramp Lab",
           "durationMin": 8,
           "prerequisites": [],
-          "skills": ["friction-grip", "ramp-angle", "mass-and-sliding"],
+          "skills": [
+            "friction-grip",
+            "ramp-angle",
+            "mass-and-sliding"
+          ],
           "einsteinIntro": "Welcome to my ramp lab! Gravity pulls the block down the slope, and friction — the ramp's grip — tries to hold it. Who wins? Let's experiment!",
           "explain": {
             "panels": [
-              { "speech": "Gravity always pulls things down. On a ramp, part of that pull drags the block along the slope.", "state": "explain" },
-              { "speech": "Friction is grip between the block and the ramp. Grippy surfaces hold on; slippery ones let go.", "state": "think" },
+              {
+                "speech": "Gravity always pulls things down. On a ramp, part of that pull drags the block along the slope.",
+                "state": "explain"
+              },
+              {
+                "speech": "Friction is grip between the block and the ramp. Grippy surfaces hold on; slippery ones let go.",
+                "state": "think"
+              },
               {
                 "speech": "Make the ramp steeper and gravity's slope pull gets stronger. When it beats the grip — WHOOSH, the block slides!",
                 "state": "explain"
@@ -268,11 +531,36 @@
           },
           "sim": {
             "kind": "ramp",
-            "params": { "angleDeg": 15, "mass": 2, "muS": 0.5, "muK": 0.3, "g": 9.8, "length": 2 },
+            "params": {
+              "angleDeg": 15,
+              "mass": 2,
+              "muS": 0.5,
+              "muK": 0.3,
+              "g": 9.8,
+              "length": 2
+            },
             "controls": [
-              { "param": "angleDeg", "label": "Ramp angle", "min": 0, "max": 60, "step": 1 },
-              { "param": "mass", "label": "Block mass", "min": 0.5, "max": 10, "step": 0.5 },
-              { "param": "muS", "label": "Grip (sticky-ness)", "min": 0.3, "max": 0.9, "step": 0.05 }
+              {
+                "param": "angleDeg",
+                "label": "Ramp angle",
+                "min": 0,
+                "max": 60,
+                "step": 1
+              },
+              {
+                "param": "mass",
+                "label": "Block mass",
+                "min": 0.5,
+                "max": 10,
+                "step": 0.5
+              },
+              {
+                "param": "muS",
+                "label": "Grip (sticky-ness)",
+                "min": 0.3,
+                "max": 0.9,
+                "step": 0.05
+              }
             ],
             "explore": "Move the sliders and press Run it. Can you find the angle where the block starts to slide?"
           },
@@ -281,34 +569,80 @@
               "id": "ph-rs-c1",
               "type": "predict",
               "prompt": "The ramp is tilted just 10° and the grip is 0.5. Will the block slide?",
-              "setup": { "angleDeg": 10, "muS": 0.5 },
+              "setup": {
+                "angleDeg": 10,
+                "muS": 0.5
+              },
               "metric": "slides",
-              "choices": [{ "label": "It slides down 🛝", "value": true }, { "label": "It stays put 🧱", "value": false }],
+              "choices": [
+                {
+                  "label": "It slides down 🛝",
+                  "value": true
+                },
+                {
+                  "label": "It stays put 🧱",
+                  "value": false
+                }
+              ],
               "hint": "A gentle slope only pulls a little — and a grip of 0.5 holds on tight."
             },
             {
               "id": "ph-rs-c2",
               "type": "goal",
               "prompt": "Tilt the ramp until the block slides! (The grip is locked at 0.5.) Run it, then press Check.",
-              "setup": { "muS": 0.5 },
-              "lock": ["muS"],
-              "goal": { "metric": "slides", "op": "eq", "value": true },
+              "setup": {
+                "muS": 0.5
+              },
+              "lock": [
+                "muS"
+              ],
+              "goal": {
+                "metric": "slides",
+                "op": "eq",
+                "value": true
+              },
               "hint": "Steeper ramps pull harder. Try more than 27°."
             },
             {
               "id": "ph-rs-c3",
               "type": "predict",
               "prompt": "At 35°, a 1 kg block races to the bottom. Will a 5 kg block get there faster, slower, or at the same time?",
-              "setup": { "angleDeg": 35, "mass": 1, "muS": 0.5 },
-              "compare": { "alt": { "mass": 5 }, "metric": "t" },
-              "choices": [{ "label": "Faster", "value": "less" }, { "label": "Same time", "value": "same" }, { "label": "Slower", "value": "more" }],
+              "setup": {
+                "angleDeg": 35,
+                "mass": 1,
+                "muS": 0.5
+              },
+              "compare": {
+                "alt": {
+                  "mass": 5
+                },
+                "metric": "t"
+              },
+              "choices": [
+                {
+                  "label": "Faster",
+                  "value": "less"
+                },
+                {
+                  "label": "Same time",
+                  "value": "same"
+                },
+                {
+                  "label": "Slower",
+                  "value": "more"
+                }
+              ],
               "hint": "A heavier block gets a bigger pull AND a bigger grip — they grow together!"
             },
             {
               "id": "ph-rs-c4",
               "type": "goal",
               "prompt": "Make the block reach the bottom in less than 1.2 seconds. Run it, then press Check.",
-              "goal": { "metric": "t", "op": "lt", "value": 1.2 },
+              "goal": {
+                "metric": "t",
+                "op": "lt",
+                "value": 1.2
+              },
               "hint": "Make the ramp steeper, or the surface less grippy."
             }
           ]
@@ -319,20 +653,49 @@
           "type": "sim",
           "title": "Steeper Means Faster?",
           "durationMin": 8,
-          "prerequisites": ["ph-ramp-slide-or-stick"],
-          "skills": ["ramp-angle", "speed-on-ramp"],
+          "prerequisites": [
+            "ph-ramp-slide-or-stick"
+          ],
+          "skills": [
+            "ramp-angle",
+            "speed-on-ramp"
+          ],
           "einsteinIntro": "Big question, little scientist: does a steeper ramp make the block go faster? Let's race and find out!",
           "explain": {
             "panels": [
-              { "speech": "A steeper ramp tips more of gravity's pull along the slope. More pull means the block speeds up faster.", "state": "explain" },
-              { "speech": "But if the ramp is too gentle, the grip wins and the block won't move at all!", "state": "think" },
-              { "speech": "Scientists test one thing at a time. Today we only change the angle and watch the clock.", "state": "cheer" }
+              {
+                "speech": "A steeper ramp tips more of gravity's pull along the slope. More pull means the block speeds up faster.",
+                "state": "explain"
+              },
+              {
+                "speech": "But if the ramp is too gentle, the grip wins and the block won't move at all!",
+                "state": "think"
+              },
+              {
+                "speech": "Scientists test one thing at a time. Today we only change the angle and watch the clock.",
+                "state": "cheer"
+              }
             ]
           },
           "sim": {
             "kind": "ramp",
-            "params": { "angleDeg": 20, "mass": 2, "muS": 0.4, "muK": 0.2, "g": 9.8, "length": 2 },
-            "controls": [{ "param": "angleDeg", "label": "Ramp angle", "min": 0, "max": 60, "step": 1 }],
+            "params": {
+              "angleDeg": 20,
+              "mass": 2,
+              "muS": 0.4,
+              "muK": 0.2,
+              "g": 9.8,
+              "length": 2
+            },
+            "controls": [
+              {
+                "param": "angleDeg",
+                "label": "Ramp angle",
+                "min": 0,
+                "max": 60,
+                "step": 1
+              }
+            ],
             "explore": "Change the ramp angle and press Run it. Watch the timer: which angle wins the race?"
           },
           "simChecks": [
@@ -340,32 +703,74 @@
               "id": "ph-sf-c1",
               "type": "predict",
               "prompt": "A block slides down a 30° ramp. If we tilt the ramp to 45°, will it reach the bottom faster, slower, or at the same time?",
-              "setup": { "angleDeg": 30 },
-              "compare": { "alt": { "angleDeg": 45 }, "metric": "t" },
-              "choices": [{ "label": "Faster", "value": "less" }, { "label": "Same time", "value": "same" }, { "label": "Slower", "value": "more" }],
+              "setup": {
+                "angleDeg": 30
+              },
+              "compare": {
+                "alt": {
+                  "angleDeg": 45
+                },
+                "metric": "t"
+              },
+              "choices": [
+                {
+                  "label": "Faster",
+                  "value": "less"
+                },
+                {
+                  "label": "Same time",
+                  "value": "same"
+                },
+                {
+                  "label": "Slower",
+                  "value": "more"
+                }
+              ],
               "hint": "Steeper ramps pull harder along the slope."
             },
             {
               "id": "ph-sf-c2",
               "type": "goal",
               "prompt": "Make the block reach the bottom in less than 1 second. Run it, then press Check.",
-              "goal": { "metric": "t", "op": "lt", "value": 1.0 },
+              "goal": {
+                "metric": "t",
+                "op": "lt",
+                "value": 1.0
+              },
               "hint": "Go steep! Try more than 45°."
             },
             {
               "id": "ph-sf-c3",
               "type": "predict",
               "prompt": "The ramp is tilted 20° and the grip is 0.4. Will the block slide?",
-              "setup": { "angleDeg": 20 },
+              "setup": {
+                "angleDeg": 20
+              },
               "metric": "slides",
-              "choices": [{ "label": "It slides down 🛝", "value": true }, { "label": "It stays put 🧱", "value": false }],
+              "choices": [
+                {
+                  "label": "It slides down 🛝",
+                  "value": true
+                },
+                {
+                  "label": "It stays put 🧱",
+                  "value": false
+                }
+              ],
               "hint": "A gentle slope only pulls a little. Is it enough to beat a grip of 0.4?"
             },
             {
               "id": "ph-sf-c4",
               "type": "goal",
               "prompt": "Make a slow, gentle slide: the block should take between 1 and 1.5 seconds. Run it, then press Check.",
-              "goal": { "metric": "t", "op": "between", "value": [1.0, 1.5] },
+              "goal": {
+                "metric": "t",
+                "op": "between",
+                "value": [
+                  1.0,
+                  1.5
+                ]
+              },
               "hint": "Find the angle where it JUST starts sliding, then nudge it a little steeper."
             }
           ]
@@ -376,22 +781,55 @@
           "type": "sim",
           "title": "Ice, Wood or Carpet?",
           "durationMin": 8,
-          "prerequisites": ["ph-ramp-steeper-faster"],
-          "skills": ["friction-grip", "surfaces"],
+          "prerequisites": [
+            "ph-ramp-steeper-faster"
+          ],
+          "skills": [
+            "friction-grip",
+            "surfaces"
+          ],
           "einsteinIntro": "Ice is slippery, carpet is grippy. Let's see how the surface changes what our block does!",
           "explain": {
             "panels": [
-              { "speech": "Friction is the grip between two surfaces. Bumpy, rough surfaces grab on tight.", "state": "explain" },
-              { "speech": "Smooth surfaces like ice barely grip at all, so things slide even on a gentle slope.", "state": "think" },
-              { "speech": "That's why we sprinkle sand on icy roads: more grip, less sliding!", "state": "cheer" }
+              {
+                "speech": "Friction is the grip between two surfaces. Bumpy, rough surfaces grab on tight.",
+                "state": "explain"
+              },
+              {
+                "speech": "Smooth surfaces like ice barely grip at all, so things slide even on a gentle slope.",
+                "state": "think"
+              },
+              {
+                "speech": "That's why we sprinkle sand on icy roads: more grip, less sliding!",
+                "state": "cheer"
+              }
             ]
           },
           "sim": {
             "kind": "ramp",
-            "params": { "angleDeg": 30, "mass": 2, "muS": 0.5, "muK": 0.3, "g": 9.8, "length": 2 },
+            "params": {
+              "angleDeg": 30,
+              "mass": 2,
+              "muS": 0.5,
+              "muK": 0.3,
+              "g": 9.8,
+              "length": 2
+            },
             "controls": [
-              { "param": "muS", "label": "Grip (sticky-ness)", "min": 0.1, "max": 0.9, "step": 0.05 },
-              { "param": "angleDeg", "label": "Ramp angle", "min": 0, "max": 60, "step": 1 }
+              {
+                "param": "muS",
+                "label": "Grip (sticky-ness)",
+                "min": 0.1,
+                "max": 0.9,
+                "step": 0.05
+              },
+              {
+                "param": "angleDeg",
+                "label": "Ramp angle",
+                "min": 0,
+                "max": 60,
+                "step": 1
+              }
             ],
             "explore": "Change the grip slider from icy (low) to grippy (high) and press Run it. When does the block stick?"
           },
@@ -400,36 +838,93 @@
               "id": "ph-su-c1",
               "type": "predict",
               "prompt": "The ramp is covered in ice (grip 0.1) and tilted only 10°. Will the block slide?",
-              "setup": { "angleDeg": 10, "muS": 0.1, "muK": 0.05 },
+              "setup": {
+                "angleDeg": 10,
+                "muS": 0.1,
+                "muK": 0.05
+              },
               "metric": "slides",
-              "choices": [{ "label": "It slides down 🛝", "value": true }, { "label": "It stays put 🧱", "value": false }],
+              "choices": [
+                {
+                  "label": "It slides down 🛝",
+                  "value": true
+                },
+                {
+                  "label": "It stays put 🧱",
+                  "value": false
+                }
+              ],
               "hint": "Ice hardly grips at all, so even a tiny slope can win."
             },
             {
               "id": "ph-su-c2",
               "type": "predict",
               "prompt": "The ramp is covered in thick carpet (grip 0.9) and tilted 30°. Will the block slide?",
-              "setup": { "angleDeg": 30, "muS": 0.9, "muK": 0.7 },
+              "setup": {
+                "angleDeg": 30,
+                "muS": 0.9,
+                "muK": 0.7
+              },
               "metric": "slides",
-              "choices": [{ "label": "It slides down 🛝", "value": true }, { "label": "It stays put 🧱", "value": false }],
+              "choices": [
+                {
+                  "label": "It slides down 🛝",
+                  "value": true
+                },
+                {
+                  "label": "It stays put 🧱",
+                  "value": false
+                }
+              ],
               "hint": "Carpet grabs on tight. A 30° slope isn't steep enough to beat it."
             },
             {
               "id": "ph-su-c3",
               "type": "goal",
               "prompt": "The ramp is locked at 35°. Change the surface so the block STAYS PUT. Run it, then press Check.",
-              "setup": { "angleDeg": 35 },
-              "lock": ["angleDeg"],
-              "goal": { "metric": "slides", "op": "eq", "value": false },
+              "setup": {
+                "angleDeg": 35
+              },
+              "lock": [
+                "angleDeg"
+              ],
+              "goal": {
+                "metric": "slides",
+                "op": "eq",
+                "value": false
+              },
               "hint": "Make the surface grippier. Try a grip of 0.75 or more."
             },
             {
               "id": "ph-su-c4",
               "type": "predict",
               "prompt": "A block slides down a wooden ramp at 40°. Now we cover the ramp in ice. Will it reach the bottom faster, slower, or at the same time?",
-              "setup": { "angleDeg": 40, "muS": 0.5, "muK": 0.3 },
-              "compare": { "alt": { "muS": 0.2, "muK": 0.1 }, "metric": "t" },
-              "choices": [{ "label": "Faster", "value": "less" }, { "label": "Same time", "value": "same" }, { "label": "Slower", "value": "more" }],
+              "setup": {
+                "angleDeg": 40,
+                "muS": 0.5,
+                "muK": 0.3
+              },
+              "compare": {
+                "alt": {
+                  "muS": 0.2,
+                  "muK": 0.1
+                },
+                "metric": "t"
+              },
+              "choices": [
+                {
+                  "label": "Faster",
+                  "value": "less"
+                },
+                {
+                  "label": "Same time",
+                  "value": "same"
+                },
+                {
+                  "label": "Slower",
+                  "value": "more"
+                }
+              ],
               "hint": "Less grip means less friction holding the block back."
             }
           ]
@@ -440,22 +935,55 @@
           "type": "sim",
           "title": "Heavy vs Light: The Big Race",
           "durationMin": 8,
-          "prerequisites": ["ph-ramp-surfaces"],
-          "skills": ["mass-and-sliding", "fair-test"],
+          "prerequisites": [
+            "ph-ramp-surfaces"
+          ],
+          "skills": [
+            "mass-and-sliding",
+            "fair-test"
+          ],
           "einsteinIntro": "Will a heavy block beat a light block down the ramp? Most people guess yes. Let's test it like real scientists!",
           "explain": {
             "panels": [
-              { "speech": "A heavier block gets a BIGGER pull from gravity. Sounds like it should win, right?", "state": "think" },
-              { "speech": "But a heavier block also presses harder on the ramp, so friction grips it harder too.", "state": "explain" },
-              { "speech": "The extra pull and the extra grip grow together. Let's see who wins!", "state": "cheer" }
+              {
+                "speech": "A heavier block gets a BIGGER pull from gravity. Sounds like it should win, right?",
+                "state": "think"
+              },
+              {
+                "speech": "But a heavier block also presses harder on the ramp, so friction grips it harder too.",
+                "state": "explain"
+              },
+              {
+                "speech": "The extra pull and the extra grip grow together. Let's see who wins!",
+                "state": "cheer"
+              }
             ]
           },
           "sim": {
             "kind": "ramp",
-            "params": { "angleDeg": 35, "mass": 2, "muS": 0.5, "muK": 0.3, "g": 9.8, "length": 2 },
+            "params": {
+              "angleDeg": 35,
+              "mass": 2,
+              "muS": 0.5,
+              "muK": 0.3,
+              "g": 9.8,
+              "length": 2
+            },
             "controls": [
-              { "param": "mass", "label": "Block mass", "min": 0.5, "max": 10, "step": 0.5 },
-              { "param": "angleDeg", "label": "Ramp angle", "min": 0, "max": 60, "step": 1 }
+              {
+                "param": "mass",
+                "label": "Block mass",
+                "min": 0.5,
+                "max": 10,
+                "step": 0.5
+              },
+              {
+                "param": "angleDeg",
+                "label": "Ramp angle",
+                "min": 0,
+                "max": 60,
+                "step": 1
+              }
             ],
             "explore": "Change the block mass, press Run it, and compare the times. Does heavy beat light?"
           },
@@ -464,36 +992,98 @@
               "id": "ph-hl-c1",
               "type": "predict",
               "prompt": "On a 35° ramp, a 1 kg block races an 8 kg block. Will the heavy block get there faster, slower, or at the same time?",
-              "setup": { "angleDeg": 35, "mass": 1 },
-              "compare": { "alt": { "mass": 8 }, "metric": "t" },
-              "choices": [{ "label": "Faster", "value": "less" }, { "label": "Same time", "value": "same" }, { "label": "Slower", "value": "more" }],
+              "setup": {
+                "angleDeg": 35,
+                "mass": 1
+              },
+              "compare": {
+                "alt": {
+                  "mass": 8
+                },
+                "metric": "t"
+              },
+              "choices": [
+                {
+                  "label": "Faster",
+                  "value": "less"
+                },
+                {
+                  "label": "Same time",
+                  "value": "same"
+                },
+                {
+                  "label": "Slower",
+                  "value": "more"
+                }
+              ],
               "hint": "More mass means more pull AND more grip, and they grow together."
             },
             {
               "id": "ph-hl-c2",
               "type": "predict",
               "prompt": "A heavy 10 kg block sits on a 20° ramp with a grip of 0.5. Will it slide?",
-              "setup": { "angleDeg": 20, "mass": 10 },
+              "setup": {
+                "angleDeg": 20,
+                "mass": 10
+              },
               "metric": "slides",
-              "choices": [{ "label": "It slides down 🛝", "value": true }, { "label": "It stays put 🧱", "value": false }],
+              "choices": [
+                {
+                  "label": "It slides down 🛝",
+                  "value": true
+                },
+                {
+                  "label": "It stays put 🧱",
+                  "value": false
+                }
+              ],
               "hint": "Heavy or light, the slope has to beat the grip. Mass doesn't change who wins."
             },
             {
               "id": "ph-hl-c3",
               "type": "goal",
               "prompt": "The block is locked at 8 kg. Make it reach the bottom in less than 1 second. Run it, then press Check.",
-              "setup": { "mass": 8 },
-              "lock": ["mass"],
-              "goal": { "metric": "t", "op": "lt", "value": 1.0 },
+              "setup": {
+                "mass": 8
+              },
+              "lock": [
+                "mass"
+              ],
+              "goal": {
+                "metric": "t",
+                "op": "lt",
+                "value": 1.0
+              },
               "hint": "You can't change the mass, so what else makes it faster? Try a steeper ramp."
             },
             {
               "id": "ph-hl-c4",
               "type": "predict",
               "prompt": "At 40°, a 2 kg block hits the bottom at some speed. Will a 0.5 kg block be faster, slower, or the same speed at the bottom?",
-              "setup": { "angleDeg": 40, "mass": 2 },
-              "compare": { "alt": { "mass": 0.5 }, "metric": "v" },
-              "choices": [{ "label": "Faster", "value": "more" }, { "label": "Same speed", "value": "same" }, { "label": "Slower", "value": "less" }],
+              "setup": {
+                "angleDeg": 40,
+                "mass": 2
+              },
+              "compare": {
+                "alt": {
+                  "mass": 0.5
+                },
+                "metric": "v"
+              },
+              "choices": [
+                {
+                  "label": "Faster",
+                  "value": "more"
+                },
+                {
+                  "label": "Same speed",
+                  "value": "same"
+                },
+                {
+                  "label": "Slower",
+                  "value": "less"
+                }
+              ],
               "hint": "Remember the race: mass cancels out!"
             }
           ]
@@ -504,23 +1094,64 @@
           "type": "sim",
           "title": "Forces & Friction Check ⭐",
           "durationMin": 10,
-          "prerequisites": ["ph-ramp-heavy-light"],
-          "skills": ["friction-grip", "ramp-angle", "mass-and-sliding", "surfaces"],
+          "prerequisites": [
+            "ph-ramp-heavy-light"
+          ],
+          "skills": [
+            "friction-grip",
+            "ramp-angle",
+            "mass-and-sliding",
+            "surfaces"
+          ],
           "einsteinIntro": "Time to show what you know! Use everything you learned about slopes, grip and mass.",
           "explain": {
             "panels": [
-              { "speech": "Remember: the slope's pull has to beat the grip before anything slides.", "state": "think" },
-              { "speech": "Steeper ramps and slippery surfaces make blocks go faster. Mass? It doesn't change the race!", "state": "explain" },
-              { "speech": "Predict first, then test it in the lab. That's how scientists work. You've got this!", "state": "cheer" }
+              {
+                "speech": "Remember: the slope's pull has to beat the grip before anything slides.",
+                "state": "think"
+              },
+              {
+                "speech": "Steeper ramps and slippery surfaces make blocks go faster. Mass? It doesn't change the race!",
+                "state": "explain"
+              },
+              {
+                "speech": "Predict first, then test it in the lab. That's how scientists work. You've got this!",
+                "state": "cheer"
+              }
             ]
           },
           "sim": {
             "kind": "ramp",
-            "params": { "angleDeg": 15, "mass": 2, "muS": 0.5, "muK": 0.3, "g": 9.8, "length": 2 },
+            "params": {
+              "angleDeg": 15,
+              "mass": 2,
+              "muS": 0.5,
+              "muK": 0.3,
+              "g": 9.8,
+              "length": 2
+            },
             "controls": [
-              { "param": "angleDeg", "label": "Ramp angle", "min": 0, "max": 60, "step": 1 },
-              { "param": "mass", "label": "Block mass", "min": 0.5, "max": 10, "step": 0.5 },
-              { "param": "muS", "label": "Grip (sticky-ness)", "min": 0.3, "max": 0.9, "step": 0.05 }
+              {
+                "param": "angleDeg",
+                "label": "Ramp angle",
+                "min": 0,
+                "max": 60,
+                "step": 1
+              },
+              {
+                "param": "mass",
+                "label": "Block mass",
+                "min": 0.5,
+                "max": 10,
+                "step": 0.5
+              },
+              {
+                "param": "muS",
+                "label": "Grip (sticky-ness)",
+                "min": 0.3,
+                "max": 0.9,
+                "step": 0.05
+              }
             ],
             "explore": "Warm up in the lab: try every slider once, then start the check."
           },
@@ -529,30 +1160,81 @@
               "id": "ph-fc-c1",
               "type": "predict",
               "prompt": "The ramp is tilted 40° and the grip is 0.5. Will the block slide?",
-              "setup": { "angleDeg": 40, "muS": 0.5 },
+              "setup": {
+                "angleDeg": 40,
+                "muS": 0.5
+              },
               "metric": "slides",
-              "choices": [{ "label": "It slides down 🛝", "value": true }, { "label": "It stays put 🧱", "value": false }],
+              "choices": [
+                {
+                  "label": "It slides down 🛝",
+                  "value": true
+                },
+                {
+                  "label": "It stays put 🧱",
+                  "value": false
+                }
+              ],
               "hint": "40° is pretty steep. Can a grip of 0.5 hold on?"
             },
             {
               "id": "ph-fc-c2",
               "type": "predict",
               "prompt": "A block slides down a 30° ramp. We tilt it to 50°. Will it reach the bottom faster, slower, or at the same time?",
-              "setup": { "angleDeg": 30, "muS": 0.4, "muK": 0.2 },
-              "compare": { "alt": { "angleDeg": 50 }, "metric": "t" },
-              "choices": [{ "label": "Faster", "value": "less" }, { "label": "Same time", "value": "same" }, { "label": "Slower", "value": "more" }],
+              "setup": {
+                "angleDeg": 30,
+                "muS": 0.4,
+                "muK": 0.2
+              },
+              "compare": {
+                "alt": {
+                  "angleDeg": 50
+                },
+                "metric": "t"
+              },
+              "choices": [
+                {
+                  "label": "Faster",
+                  "value": "less"
+                },
+                {
+                  "label": "Same time",
+                  "value": "same"
+                },
+                {
+                  "label": "Slower",
+                  "value": "more"
+                }
+              ],
               "hint": "Steeper ramps pull harder."
             },
             {
               "id": "ph-fc-c3",
               "type": "predict",
               "prompt": "On a 40° ramp, will a 6 kg block beat a 2 kg block to the bottom?",
-              "setup": { "angleDeg": 40, "mass": 2 },
-              "compare": { "alt": { "mass": 6 }, "metric": "t" },
+              "setup": {
+                "angleDeg": 40,
+                "mass": 2
+              },
+              "compare": {
+                "alt": {
+                  "mass": 6
+                },
+                "metric": "t"
+              },
               "choices": [
-                { "label": "Yes, the 6 kg block is faster", "value": "less" },
-                { "label": "No, it's a tie", "value": "same" },
-                { "label": "No, the 6 kg block is slower", "value": "more" }
+                {
+                  "label": "Yes, the 6 kg block is faster",
+                  "value": "less"
+                },
+                {
+                  "label": "No, it's a tie",
+                  "value": "same"
+                },
+                {
+                  "label": "No, the 6 kg block is slower",
+                  "value": "more"
+                }
               ],
               "hint": "Think back to the Big Race."
             },
@@ -560,16 +1242,28 @@
               "id": "ph-fc-c4",
               "type": "goal",
               "prompt": "The ramp is locked at 40°. Make the block stay put. Run it, then press Check.",
-              "setup": { "angleDeg": 40 },
-              "lock": ["angleDeg"],
-              "goal": { "metric": "slides", "op": "eq", "value": false },
+              "setup": {
+                "angleDeg": 40
+              },
+              "lock": [
+                "angleDeg"
+              ],
+              "goal": {
+                "metric": "slides",
+                "op": "eq",
+                "value": false
+              },
               "hint": "Turn the grip way up, past 0.85."
             },
             {
               "id": "ph-fc-c5",
               "type": "goal",
               "prompt": "Now make the block reach the bottom in less than 1 second. Run it, then press Check.",
-              "goal": { "metric": "t", "op": "lt", "value": 1.0 },
+              "goal": {
+                "metric": "t",
+                "op": "lt",
+                "value": 1.0
+              },
               "hint": "Steep ramp, low grip. Go!"
             }
           ]
@@ -581,7 +1275,7 @@
       "label": "Ages 9–10",
       "ageRange": "9–10",
       "gradeBand": "Grades 4–5",
-      "blurb": "Ramps, friction & acceleration — measure it in Einstein's lab.",
+      "blurb": "Speed, gravity, circuits — plus ramps & acceleration in Einstein's lab.",
       "units": [
         {
           "id": "unit-ramps-acceleration",
@@ -589,7 +1283,23 @@
           "icon": "🚀",
           "color": "#60A5FA",
           "description": "Measure how fast a block speeds up — and see friction and gravity at work.",
-          "lessons": ["ph-ramp-acceleration"]
+          "lessons": [
+            "ph-ramp-acceleration"
+          ]
+        },
+        {
+          "id": "unit-speed-gravity-circuits",
+          "title": "Speed, Gravity & Circuits",
+          "icon": "⚡",
+          "color": "#F472B6",
+          "description": "Speed = distance ÷ time, gravity drops, and series vs parallel circuits — five labs in Einstein's workshop!",
+          "lessons": [
+            "ph-speed-formula",
+            "ph-speed-compare",
+            "ph-fall-gravity",
+            "ph-circuit-series",
+            "ph-circuit-parallel"
+          ]
         }
       ],
       "lessons": {
@@ -600,24 +1310,74 @@
           "title": "Ramp Racer: Friction & Acceleration",
           "durationMin": 10,
           "prerequisites": [],
-          "skills": ["static-vs-kinetic-friction", "acceleration-on-incline", "gravity-strength"],
+          "skills": [
+            "static-vs-kinetic-friction",
+            "acceleration-on-incline",
+            "gravity-strength"
+          ],
           "einsteinIntro": "Scientists measure! Today we race blocks down a ramp and discover the rule for how fast they speed up.",
           "explain": {
             "panels": [
-              { "speech": "To START sliding, the slope pull must beat static friction: tan θ > μs. Until then — stuck!", "state": "explain" },
-              { "speech": "Once sliding, kinetic friction (μk) is smaller. The block speeds up with a = g(sin θ − μk·cos θ).", "state": "think" },
-              { "speech": "Notice what's missing? Mass! It cancels out. Change g instead — try the Moon!", "state": "explain" }
+              {
+                "speech": "To START sliding, the slope pull must beat static friction: tan θ > μs. Until then — stuck!",
+                "state": "explain"
+              },
+              {
+                "speech": "Once sliding, kinetic friction (μk) is smaller. The block speeds up with a = g(sin θ − μk·cos θ).",
+                "state": "think"
+              },
+              {
+                "speech": "Notice what's missing? Mass! It cancels out. Change g instead — try the Moon!",
+                "state": "explain"
+              }
             ]
           },
           "sim": {
             "kind": "ramp",
-            "params": { "angleDeg": 25, "mass": 2, "muS": 0.4, "muK": 0.25, "g": 9.8, "length": 2 },
+            "params": {
+              "angleDeg": 25,
+              "mass": 2,
+              "muS": 0.4,
+              "muK": 0.25,
+              "g": 9.8,
+              "length": 2
+            },
             "controls": [
-              { "param": "angleDeg", "label": "Ramp angle θ", "min": 0, "max": 60, "step": 1 },
-              { "param": "muS", "label": "Static friction μs", "min": 0.05, "max": 1, "step": 0.05 },
-              { "param": "muK", "label": "Kinetic friction μk", "min": 0, "max": 1, "step": 0.05 },
-              { "param": "g", "label": "Gravity g", "min": 1.6, "max": 25, "step": 0.1 },
-              { "param": "mass", "label": "Block mass", "min": 0.5, "max": 10, "step": 0.5 }
+              {
+                "param": "angleDeg",
+                "label": "Ramp angle θ",
+                "min": 0,
+                "max": 60,
+                "step": 1
+              },
+              {
+                "param": "muS",
+                "label": "Static friction μs",
+                "min": 0.05,
+                "max": 1,
+                "step": 0.05
+              },
+              {
+                "param": "muK",
+                "label": "Kinetic friction μk",
+                "min": 0,
+                "max": 1,
+                "step": 0.05
+              },
+              {
+                "param": "g",
+                "label": "Gravity g",
+                "min": 1.6,
+                "max": 25,
+                "step": 0.1
+              },
+              {
+                "param": "mass",
+                "label": "Block mass",
+                "min": 0.5,
+                "max": 10,
+                "step": 0.5
+              }
             ],
             "explore": "Run a few races. Watch the acceleration readout as you change θ, μk and g."
           },
@@ -626,31 +1386,70 @@
               "id": "ph-ra-c1",
               "type": "predict",
               "prompt": "θ = 30°, μs = 0.7, μk = 0.5. Does the block start to slide?",
-              "setup": { "angleDeg": 30, "muS": 0.7, "muK": 0.5 },
+              "setup": {
+                "angleDeg": 30,
+                "muS": 0.7,
+                "muK": 0.5
+              },
               "metric": "slides",
-              "choices": [{ "label": "Yes, it slides", "value": true }, { "label": "No, static friction holds it", "value": false }],
+              "choices": [
+                {
+                  "label": "Yes, it slides",
+                  "value": true
+                },
+                {
+                  "label": "No, static friction holds it",
+                  "value": false
+                }
+              ],
               "hint": "Compare tan 30° ≈ 0.58 with μs."
             },
             {
               "id": "ph-ra-c2",
               "type": "goal",
               "prompt": "Set the ramp so the acceleration is about 3 m/s² (±0.3). Gravity is locked to Earth.",
-              "setup": { "g": 9.8 },
-              "lock": ["g"],
-              "goal": { "metric": "a", "op": "approx", "value": 3, "tol": 0.3 },
+              "setup": {
+                "g": 9.8
+              },
+              "lock": [
+                "g"
+              ],
+              "goal": {
+                "metric": "a",
+                "op": "approx",
+                "value": 3,
+                "tol": 0.3
+              },
               "hint": "a = g(sin θ − μk·cos θ). With μk = 0.25, try an angle in the 30s."
             },
             {
               "id": "ph-ra-c3",
               "type": "predict",
               "prompt": "θ = 40°, μs = 0.3, μk = 0.2, g = 9.8. What is the acceleration? Use a = g(sin θ − μk·cos θ).",
-              "setup": { "angleDeg": 40, "muS": 0.3, "muK": 0.2, "g": 9.8 },
+              "setup": {
+                "angleDeg": 40,
+                "muS": 0.3,
+                "muK": 0.2,
+                "g": 9.8
+              },
               "metric": "a",
               "choices": [
-                { "label": "2.1 m/s²", "value": 2.1 },
-                { "label": "4.8 m/s²", "value": 4.8 },
-                { "label": "6.3 m/s²", "value": 6.3 },
-                { "label": "9.8 m/s²", "value": 9.8 }
+                {
+                  "label": "2.1 m/s²",
+                  "value": 2.1
+                },
+                {
+                  "label": "4.8 m/s²",
+                  "value": 4.8
+                },
+                {
+                  "label": "6.3 m/s²",
+                  "value": 6.3
+                },
+                {
+                  "label": "9.8 m/s²",
+                  "value": 9.8
+                }
               ],
               "hint": "sin 40° ≈ 0.64 and cos 40° ≈ 0.77."
             },
@@ -658,10 +1457,885 @@
               "id": "ph-ra-c4",
               "type": "goal",
               "prompt": "On the Moon (g = 1.6 m/s²), get the block to the bottom of the 2 m ramp in under 3 seconds.",
-              "setup": { "g": 1.6 },
-              "lock": ["g"],
-              "goal": { "metric": "t", "op": "lt", "value": 3 },
+              "setup": {
+                "g": 1.6
+              },
+              "lock": [
+                "g"
+              ],
+              "goal": {
+                "metric": "t",
+                "op": "lt",
+                "value": 3
+              },
               "hint": "Weak gravity means a slow start — go steeper and slipperier."
+            }
+          ]
+        },
+        "ph-speed-formula": {
+          "id": "ph-speed-formula",
+          "unitId": "unit-speed-gravity-circuits",
+          "type": "sim",
+          "title": "Speed = Distance ÷ Time",
+          "durationMin": 8,
+          "prerequisites": [],
+          "skills": [
+            "speed-formula",
+            "distance-time"
+          ],
+          "einsteinIntro": "How fast is fast? Scientists measure speed as distance divided by time. Let's race on the track!",
+          "explain": {
+            "panels": [
+              {
+                "speech": "Speed tells you how much distance you cover in each second. The formula is speed = distance ÷ time.",
+                "state": "explain"
+              },
+              {
+                "speech": "If you run 100 metres in 10 seconds, your speed is 100 ÷ 10 = 10 metres per second.",
+                "state": "think"
+              },
+              {
+                "speech": "Same distance in less time? You're faster! Longer distance in the same time? Also faster!",
+                "state": "cheer"
+              }
+            ]
+          },
+          "sim": {
+            "kind": "speed",
+            "params": {
+              "distance": 100,
+              "time": 10
+            },
+            "controls": [
+              {
+                "param": "distance",
+                "label": "Distance",
+                "min": 50,
+                "max": 400,
+                "step": 10
+              },
+              {
+                "param": "time",
+                "label": "Time",
+                "min": 2,
+                "max": 40,
+                "step": 1
+              }
+            ],
+            "explore": "Change distance and time, press Run it, and watch the speed readout. Can you make 20 m/s?"
+          },
+          "simChecks": [
+            {
+              "id": "ph-sp-c1",
+              "type": "predict",
+              "prompt": "A runner covers 100 m in 10 s. What is the speed?",
+              "setup": {
+                "distance": 100,
+                "time": 10
+              },
+              "metric": "speed",
+              "choices": [
+                {
+                  "label": "5 m/s",
+                  "value": 5
+                },
+                {
+                  "label": "10 m/s",
+                  "value": 10
+                },
+                {
+                  "label": "20 m/s",
+                  "value": 20
+                },
+                {
+                  "label": "100 m/s",
+                  "value": 100
+                }
+              ],
+              "hint": "Speed = distance ÷ time. 100 ÷ 10 = ?"
+            },
+            {
+              "id": "ph-sp-c2",
+              "type": "goal",
+              "prompt": "Make the speed about 20 m/s (±1). Run it, then press Check.",
+              "goal": {
+                "metric": "speed",
+                "op": "approx",
+                "value": 20,
+                "tol": 1,
+                "label": "speed about 20 m/s"
+              },
+              "hint": "Try 200 m in 10 s, or 100 m in 5 s."
+            },
+            {
+              "id": "ph-sp-c3",
+              "type": "predict",
+              "prompt": "You keep the distance at 100 m but finish in 5 s instead of 10 s. Is the new speed less, the same, or more?",
+              "setup": {
+                "distance": 100,
+                "time": 10
+              },
+              "compare": {
+                "alt": {
+                  "time": 5
+                },
+                "metric": "speed"
+              },
+              "choices": [
+                {
+                  "label": "Less",
+                  "value": "less"
+                },
+                {
+                  "label": "Same",
+                  "value": "same"
+                },
+                {
+                  "label": "More",
+                  "value": "more"
+                }
+              ],
+              "hint": "Same distance in half the time means double the speed."
+            },
+            {
+              "id": "ph-sp-c4",
+              "type": "goal",
+              "prompt": "Make a slow jog: speed between 4 and 8 m/s. Run it, then press Check.",
+              "goal": {
+                "metric": "speed",
+                "op": "between",
+                "value": [
+                  4,
+                  8
+                ],
+                "label": "speed between 4 and 8 m/s"
+              },
+              "hint": "Try a long time for a medium distance — like 100 m in 20 s."
+            }
+          ]
+        },
+        "ph-speed-compare": {
+          "id": "ph-speed-compare",
+          "unitId": "unit-speed-gravity-circuits",
+          "type": "sim",
+          "title": "Who Is Faster?",
+          "durationMin": 8,
+          "prerequisites": [
+            "ph-speed-formula"
+          ],
+          "skills": [
+            "comparing-speeds",
+            "speed-formula"
+          ],
+          "einsteinIntro": "Two racers, different distances and times — who wins on speed? Compare like a scientist!",
+          "explain": {
+            "panels": [
+              {
+                "speech": "To compare who is faster, compute each speed: distance ÷ time. The bigger speed wins.",
+                "state": "explain"
+              },
+              {
+                "speech": "Don't just look at who finished first — a short race can finish early with a slow speed!",
+                "state": "think"
+              },
+              {
+                "speech": "Fair comparisons use the same units: metres per second for both.",
+                "state": "cheer"
+              }
+            ]
+          },
+          "sim": {
+            "kind": "speed",
+            "params": {
+              "distance": 200,
+              "time": 20
+            },
+            "controls": [
+              {
+                "param": "distance",
+                "label": "Distance",
+                "min": 50,
+                "max": 400,
+                "step": 10
+              },
+              {
+                "param": "time",
+                "label": "Time",
+                "min": 2,
+                "max": 40,
+                "step": 1
+              }
+            ],
+            "explore": "Set up each racer's distance and time. Which combo makes the higher speed?"
+          },
+          "simChecks": [
+            {
+              "id": "ph-sc-c1",
+              "type": "predict",
+              "prompt": "Racer A: 100 m in 10 s. Racer B: 150 m in 10 s. Is B's speed less, the same, or more than A's?",
+              "setup": {
+                "distance": 100,
+                "time": 10
+              },
+              "compare": {
+                "alt": {
+                  "distance": 150
+                },
+                "metric": "speed"
+              },
+              "choices": [
+                {
+                  "label": "Less",
+                  "value": "less"
+                },
+                {
+                  "label": "Same",
+                  "value": "same"
+                },
+                {
+                  "label": "More",
+                  "value": "more"
+                }
+              ],
+              "hint": "Same time, longer distance → higher speed."
+            },
+            {
+              "id": "ph-sc-c2",
+              "type": "predict",
+              "prompt": "Racer A: 200 m in 20 s (10 m/s). Racer B: 100 m in 5 s. Who is faster — is B less, same, or more?",
+              "setup": {
+                "distance": 200,
+                "time": 20
+              },
+              "compare": {
+                "alt": {
+                  "distance": 100,
+                  "time": 5
+                },
+                "metric": "speed"
+              },
+              "choices": [
+                {
+                  "label": "B is slower",
+                  "value": "less"
+                },
+                {
+                  "label": "Same speed",
+                  "value": "same"
+                },
+                {
+                  "label": "B is faster",
+                  "value": "more"
+                }
+              ],
+              "hint": "100 ÷ 5 = 20 m/s. Compare to 10 m/s."
+            },
+            {
+              "id": "ph-sc-c3",
+              "type": "goal",
+              "prompt": "Beat 15 m/s! Make speed greater than 15 m/s. Run it, then press Check.",
+              "goal": {
+                "metric": "speed",
+                "op": "gt",
+                "value": 15,
+                "label": "speed over 15 m/s"
+              },
+              "hint": "Raise distance or lower time until distance ÷ time > 15."
+            },
+            {
+              "id": "ph-sc-c4",
+              "type": "predict",
+              "prompt": "Two racers both do 120 m in 12 s. If the second also does 120 m in 12 s, is the speed less, same, or more?",
+              "setup": {
+                "distance": 120,
+                "time": 12
+              },
+              "compare": {
+                "alt": {
+                  "distance": 120,
+                  "time": 12
+                },
+                "metric": "speed"
+              },
+              "choices": [
+                {
+                  "label": "Less",
+                  "value": "less"
+                },
+                {
+                  "label": "Same",
+                  "value": "same"
+                },
+                {
+                  "label": "More",
+                  "value": "more"
+                }
+              ],
+              "hint": "Identical distance and time → identical speed."
+            }
+          ]
+        },
+        "ph-fall-gravity": {
+          "id": "ph-fall-gravity",
+          "unitId": "unit-speed-gravity-circuits",
+          "type": "sim",
+          "title": "Gravity & Falling",
+          "durationMin": 9,
+          "prerequisites": [
+            "ph-speed-compare"
+          ],
+          "skills": [
+            "gravity",
+            "free-fall",
+            "mass-independence"
+          ],
+          "einsteinIntro": "Drop a feather and a hammer on the Moon — they land together! Let's see why mass cancels in free fall.",
+          "explain": {
+            "panels": [
+              {
+                "speech": "Gravity pulls everything downward. Stronger gravity (bigger g) means a faster fall from the same height.",
+                "state": "explain"
+              },
+              {
+                "speech": "In a vacuum (no air), heavy and light objects fall together — mass cancels out of the math!",
+                "state": "think"
+              },
+              {
+                "speech": "Air drag changes the story: light fluffy things slow down more. Try vacuum vs air in the lab.",
+                "state": "cheer"
+              }
+            ]
+          },
+          "sim": {
+            "kind": "fall",
+            "params": {
+              "height": 20,
+              "g": 9.8,
+              "mass": 1,
+              "drag": 0
+            },
+            "controls": [
+              {
+                "param": "height",
+                "label": "Drop height",
+                "min": 5,
+                "max": 50,
+                "step": 1
+              },
+              {
+                "param": "g",
+                "label": "Gravity g",
+                "min": 1.6,
+                "max": 25,
+                "step": 0.1
+              },
+              {
+                "param": "mass",
+                "label": "Mass",
+                "min": 0.5,
+                "max": 10,
+                "step": 0.5
+              },
+              {
+                "param": "drag",
+                "label": "Air drag",
+                "min": 0,
+                "max": 2,
+                "step": 0.1
+              }
+            ],
+            "explore": "Drop in vacuum first. Change mass — does the time change? Then add air drag!"
+          },
+          "simChecks": [
+            {
+              "id": "ph-fg-c1",
+              "type": "predict",
+              "prompt": "In a vacuum, a 1 kg ball falls from 20 m. Will an 8 kg ball take less, the same, or more time?",
+              "setup": {
+                "height": 20,
+                "mass": 1,
+                "drag": 0,
+                "g": 9.8
+              },
+              "compare": {
+                "alt": {
+                  "mass": 8
+                },
+                "metric": "t"
+              },
+              "choices": [
+                {
+                  "label": "Less time",
+                  "value": "less"
+                },
+                {
+                  "label": "Same time",
+                  "value": "same"
+                },
+                {
+                  "label": "More time",
+                  "value": "more"
+                }
+              ],
+              "hint": "In vacuum, mass cancels. Heavy and light land together!"
+            },
+            {
+              "id": "ph-fg-c2",
+              "type": "predict",
+              "prompt": "From 20 m in vacuum, Earth g = 9.8. If we crank g to 20 (stronger gravity), is the fall time less, same, or more?",
+              "setup": {
+                "height": 20,
+                "g": 9.8,
+                "drag": 0
+              },
+              "compare": {
+                "alt": {
+                  "g": 20
+                },
+                "metric": "t"
+              },
+              "choices": [
+                {
+                  "label": "Less time",
+                  "value": "less"
+                },
+                {
+                  "label": "Same time",
+                  "value": "same"
+                },
+                {
+                  "label": "More time",
+                  "value": "more"
+                }
+              ],
+              "hint": "Stronger pull → you hit the ground sooner."
+            },
+            {
+              "id": "ph-fg-c3",
+              "type": "goal",
+              "prompt": "Vacuum is locked. Make the fall take less than 1.5 seconds. Run it, then press Check.",
+              "setup": {
+                "drag": 0
+              },
+              "lock": [
+                "drag"
+              ],
+              "goal": {
+                "metric": "t",
+                "op": "lt",
+                "value": 1.5,
+                "label": "fall time under 1.5 s"
+              },
+              "hint": "Raise g or lower the drop height."
+            },
+            {
+              "id": "ph-fg-c4",
+              "type": "predict",
+              "prompt": "With windy air drag (1.5), a light 0.5 kg ball falls from 20 m. Will a heavy 8 kg ball take less, same, or more time?",
+              "setup": {
+                "height": 20,
+                "mass": 0.5,
+                "drag": 1.5,
+                "g": 9.8
+              },
+              "compare": {
+                "alt": {
+                  "mass": 8
+                },
+                "metric": "t"
+              },
+              "choices": [
+                {
+                  "label": "Less time (heavy is faster)",
+                  "value": "less"
+                },
+                {
+                  "label": "Same time",
+                  "value": "same"
+                },
+                {
+                  "label": "More time (heavy is slower)",
+                  "value": "more"
+                }
+              ],
+              "hint": "Air slows light things more. Heavy punches through!"
+            }
+          ]
+        },
+        "ph-circuit-series": {
+          "id": "ph-circuit-series",
+          "unitId": "unit-speed-gravity-circuits",
+          "type": "sim",
+          "title": "Series Circuits",
+          "durationMin": 9,
+          "prerequisites": [
+            "ph-fall-gravity"
+          ],
+          "skills": [
+            "series-circuit",
+            "current",
+            "ohms-law"
+          ],
+          "einsteinIntro": "Bulbs in a single loop share the battery. Open the switch and everything goes dark — that's a series circuit!",
+          "explain": {
+            "panels": [
+              {
+                "speech": "In a series circuit, electricity has only ONE path. Current is the same through every bulb.",
+                "state": "explain"
+              },
+              {
+                "speech": "Two bulbs in series share the battery voltage, so each glows dimmer than one bulb alone.",
+                "state": "think"
+              },
+              {
+                "speech": "If the switch is open, the path is broken — current is zero and the bulbs stay dark.",
+                "state": "cheer"
+              }
+            ]
+          },
+          "sim": {
+            "kind": "circuit",
+            "params": {
+              "mode": 0,
+              "voltage": 6,
+              "bulbs": 2,
+              "resistance": 3,
+              "sw": 1
+            },
+            "controls": [
+              {
+                "param": "voltage",
+                "label": "Battery",
+                "min": 1,
+                "max": 12,
+                "step": 1
+              },
+              {
+                "param": "bulbs",
+                "label": "Bulbs",
+                "min": 1,
+                "max": 2,
+                "step": 1
+              },
+              {
+                "param": "sw",
+                "label": "Switch",
+                "min": 0,
+                "max": 1,
+                "step": 1
+              },
+              {
+                "param": "resistance",
+                "label": "Bulb resistance",
+                "min": 1,
+                "max": 10,
+                "step": 1
+              }
+            ],
+            "explore": "Stay in series. Add a second bulb — do they get dimmer? Open the switch!"
+          },
+          "simChecks": [
+            {
+              "id": "ph-cs-c1",
+              "type": "predict",
+              "prompt": "Series, 6 V, 2 bulbs, switch CLOSED. Do the bulbs light up?",
+              "setup": {
+                "mode": 0,
+                "voltage": 6,
+                "bulbs": 2,
+                "resistance": 3,
+                "sw": 1
+              },
+              "metric": "lit",
+              "choices": [
+                {
+                  "label": "Yes, they light 💡",
+                  "value": true
+                },
+                {
+                  "label": "No, they stay dark",
+                  "value": false
+                }
+              ],
+              "hint": "Closed switch means the path is complete."
+            },
+            {
+              "id": "ph-cs-c2",
+              "type": "predict",
+              "prompt": "Same series circuit, but the switch is OPEN. Do the bulbs light?",
+              "setup": {
+                "mode": 0,
+                "voltage": 6,
+                "bulbs": 2,
+                "sw": 0
+              },
+              "metric": "lit",
+              "choices": [
+                {
+                  "label": "Yes, they light 💡",
+                  "value": true
+                },
+                {
+                  "label": "No, they stay dark",
+                  "value": false
+                }
+              ],
+              "hint": "Open switch = broken path = no current."
+            },
+            {
+              "id": "ph-cs-c3",
+              "type": "predict",
+              "prompt": "Series at 6 V with 1 bulb. If we add a second bulb (still series), is brightness less, same, or more?",
+              "setup": {
+                "mode": 0,
+                "voltage": 6,
+                "bulbs": 1,
+                "resistance": 3,
+                "sw": 1
+              },
+              "compare": {
+                "alt": {
+                  "bulbs": 2
+                },
+                "metric": "brightness"
+              },
+              "choices": [
+                {
+                  "label": "Dimmer",
+                  "value": "less"
+                },
+                {
+                  "label": "Same",
+                  "value": "same"
+                },
+                {
+                  "label": "Brighter",
+                  "value": "more"
+                }
+              ],
+              "hint": "Two bulbs share the battery — each gets less voltage."
+            },
+            {
+              "id": "ph-cs-c4",
+              "type": "goal",
+              "prompt": "Series wiring is locked with 2 bulbs. Make the bulbs stay DARK. Run it, then press Check.",
+              "setup": {
+                "mode": 0,
+                "bulbs": 2
+              },
+              "lock": [
+                "mode",
+                "bulbs"
+              ],
+              "goal": {
+                "metric": "lit",
+                "op": "eq",
+                "value": false,
+                "label": "the bulbs stay dark"
+              },
+              "hint": "Open the switch (set it to Open / 0)."
+            }
+          ]
+        },
+        "ph-circuit-parallel": {
+          "id": "ph-circuit-parallel",
+          "unitId": "unit-speed-gravity-circuits",
+          "type": "sim",
+          "title": "Parallel Circuits & Unit Check ⭐",
+          "durationMin": 10,
+          "prerequisites": [
+            "ph-circuit-series"
+          ],
+          "skills": [
+            "parallel-circuit",
+            "series-vs-parallel",
+            "speed-formula",
+            "gravity"
+          ],
+          "einsteinIntro": "Parallel paths give each bulb the full battery — brighter! Then prove what you know across speed, gravity and circuits.",
+          "explain": {
+            "panels": [
+              {
+                "speech": "In a parallel circuit, each bulb gets its own path to the battery, so each feels the full voltage.",
+                "state": "explain"
+              },
+              {
+                "speech": "That's why parallel bulbs glow brighter than the same bulbs wired in series.",
+                "state": "think"
+              },
+              {
+                "speech": "Total current is bigger in parallel (currents add). Ready for the mixed check?",
+                "state": "cheer"
+              }
+            ]
+          },
+          "sim": {
+            "kind": "circuit",
+            "params": {
+              "mode": 1,
+              "voltage": 6,
+              "bulbs": 2,
+              "resistance": 3,
+              "sw": 1
+            },
+            "controls": [
+              {
+                "param": "mode",
+                "label": "Wiring",
+                "min": 0,
+                "max": 1,
+                "step": 1
+              },
+              {
+                "param": "voltage",
+                "label": "Battery",
+                "min": 1,
+                "max": 12,
+                "step": 1
+              },
+              {
+                "param": "bulbs",
+                "label": "Bulbs",
+                "min": 1,
+                "max": 2,
+                "step": 1
+              },
+              {
+                "param": "sw",
+                "label": "Switch",
+                "min": 0,
+                "max": 1,
+                "step": 1
+              }
+            ],
+            "explore": "Flip between series and parallel. Which wiring makes brighter bulbs?"
+          },
+          "simChecks": [
+            {
+              "id": "ph-cp-c1",
+              "type": "predict",
+              "prompt": "2 bulbs, 6 V, switch on. Series brightness vs parallel — is parallel less, same, or more bright?",
+              "setup": {
+                "mode": 0,
+                "voltage": 6,
+                "bulbs": 2,
+                "resistance": 3,
+                "sw": 1
+              },
+              "compare": {
+                "alt": {
+                  "mode": 1
+                },
+                "metric": "brightness"
+              },
+              "choices": [
+                {
+                  "label": "Parallel is dimmer",
+                  "value": "less"
+                },
+                {
+                  "label": "Same brightness",
+                  "value": "same"
+                },
+                {
+                  "label": "Parallel is brighter",
+                  "value": "more"
+                }
+              ],
+              "hint": "Parallel gives each bulb the full battery voltage."
+            },
+            {
+              "id": "ph-cp-c2",
+              "type": "predict",
+              "prompt": "Same setup: is the TOTAL current in parallel less, the same, or more than in series?",
+              "setup": {
+                "mode": 0,
+                "voltage": 6,
+                "bulbs": 2,
+                "resistance": 3,
+                "sw": 1
+              },
+              "compare": {
+                "alt": {
+                  "mode": 1
+                },
+                "metric": "current"
+              },
+              "choices": [
+                {
+                  "label": "Less current",
+                  "value": "less"
+                },
+                {
+                  "label": "Same current",
+                  "value": "same"
+                },
+                {
+                  "label": "More current",
+                  "value": "more"
+                }
+              ],
+              "hint": "Parallel paths add their currents together."
+            },
+            {
+              "id": "ph-cp-c3",
+              "type": "goal",
+              "prompt": "2 bulbs locked. Make brightness greater than 0.7 (nice and bright!). Run it, then press Check.",
+              "setup": {
+                "mode": 0,
+                "bulbs": 2,
+                "voltage": 6,
+                "resistance": 3,
+                "sw": 1
+              },
+              "lock": [
+                "bulbs",
+                "resistance",
+                "voltage",
+                "sw"
+              ],
+              "goal": {
+                "metric": "brightness",
+                "op": "gt",
+                "value": 0.7,
+                "label": "brightness over 0.7"
+              },
+              "hint": "Flip Wiring to Parallel (series is too dim with 2 bulbs)."
+            },
+            {
+              "id": "ph-cp-c4",
+              "type": "goal",
+              "prompt": "Make the bulbs stay dark. Run it, then press Check.",
+              "goal": {
+                "metric": "lit",
+                "op": "eq",
+                "value": false,
+                "label": "the bulbs stay dark"
+              },
+              "hint": "Open the switch."
+            },
+            {
+              "id": "ph-cp-c5",
+              "type": "predict",
+              "prompt": "Parallel, 6 V, 2 bulbs, switch closed. Do they light?",
+              "setup": {
+                "mode": 1,
+                "voltage": 6,
+                "bulbs": 2,
+                "sw": 1
+              },
+              "metric": "lit",
+              "choices": [
+                {
+                  "label": "Yes, they light 💡",
+                  "value": true
+                },
+                {
+                  "label": "No, they stay dark",
+                  "value": false
+                }
+              ],
+              "hint": "Closed switch + parallel paths = glowing bulbs."
             }
           ]
         }

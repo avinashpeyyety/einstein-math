@@ -73,15 +73,16 @@
     return { ok: ctx.choice === expected, expected, actual: ctx.choice };
   }
 
-  const METRIC_WORDS = { slides: 'slides', a: 'acceleration', t: 'time to the bottom', v: 'speed', distance: 'distance', speed: 'top speed', under: 'part under water' };
-  const UNITS = { t: ' s', a: ' m/s²', v: ' m/s', speed: ' m/s', distance: ' m', under: '' };
-  // X6: yes/no metrics of the ages 5–6 labs (push, float) — [goal text when true, when false]
+  const METRIC_WORDS = { slides: 'slides', a: 'acceleration', t: 'time to the bottom', v: 'speed', distance: 'distance', speed: 'speed', under: 'part under water', current: 'current', brightness: 'brightness', time: 'time' };
+  const UNITS = { t: ' s', a: ' m/s²', v: ' m/s', speed: ' m/s', distance: ' m', under: '', current: ' A', brightness: '', time: ' s' };
+  // X6/X12: yes/no metrics — [goal text when true, when false]
   const BOOL_GOALS = {
     slides: ['the block slides', 'the block stays put'],
     moved: ['it moves', 'it stays put'],
     floats: ['it floats', 'it sinks'],
     sinks: ['it sinks', 'it floats'],
-    bonk: ['it reaches the end', 'it stops before the end']
+    bonk: ['it reaches the end', 'it stops before the end'],
+    lit: ['the bulbs light up', 'the bulbs stay dark']
   };
   const WORD_VALUES = { away: 'it slides away from Einstein', closer: 'it comes toward Einstein', still: 'it stays put' };
 

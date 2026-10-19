@@ -2451,7 +2451,10 @@
   const SIM_KINDS = {
     ramp: { global: 'SimRamp', scripts: ['js/sims/ramp.js'] },
     push: { global: 'SimPush', scripts: ['js/sims/kit.js', 'js/sims/push.js'] },
-    float: { global: 'SimFloat', scripts: ['js/sims/kit.js', 'js/sims/float.js'] }
+    float: { global: 'SimFloat', scripts: ['js/sims/kit.js', 'js/sims/float.js'] },
+    speed: { global: 'SimSpeed', scripts: ['js/sims/kit.js', 'js/sims/speed.js'] },
+    fall: { global: 'SimFall', scripts: ['js/sims/kit.js', 'js/sims/fall.js'] },
+    circuit: { global: 'SimCircuit', scripts: ['js/sims/kit.js', 'js/sims/circuit.js'] }
   };
   const simScriptPromises = {};
   let simLab = null;

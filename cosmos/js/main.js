@@ -1720,6 +1720,16 @@ function applyUrlParams() {
 init();
 
 // C2: read-only hooks for headless smoke checks (tower framing + recovery state); no effect on the app.
+// C4b: keep the Earth/LEO bar just below the header (its height changes with width, wrapping and mode)
+(() => {
+  const top = document.querySelector(".hud-top");
+  if (!top) return;
+  const sync = () => document.documentElement.style.setProperty("--hud-top-bottom", `${Math.ceil(top.getBoundingClientRect().bottom)}px`);
+  sync();
+  if (typeof ResizeObserver === "function") new ResizeObserver(sync).observe(top);
+  window.addEventListener("resize", sync);
+})();
+
 window.__spaceLab = Object.freeze({
   towerBox: () => (earthTheater ? towerScreenBox(earthTheater, camera, window.innerWidth, window.innerHeight) : null),
   recovery: () => (earthTheater?.recovery ? { ...earthTheater.recovery.state, u: earthTheater.recovery.u } : null),

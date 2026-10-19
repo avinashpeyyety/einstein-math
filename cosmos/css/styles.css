@@ -182,7 +182,8 @@ body {
 .earth-bar {
   position: fixed;
   z-index: 10;
-  top: calc(78px + var(--safe-t));
+  /* C4b: sit just below the header, whatever its height (main.js keeps --hud-top-bottom in sync; 78px fallback) */
+  top: calc(var(--hud-top-bottom, calc(70px + var(--safe-t))) + 8px);
   left: 50%;
   transform: translateX(-50%);
   width: min(960px, calc(100vw - 32px));
@@ -354,6 +355,11 @@ body.leo-mode .hud-left,
 body.stars-mode .hud-left {
   opacity: 0.28;
   pointer-events: none;
+}
+/* C4b: the body list is inert in Earth/LEO, so hide it at every width (phones already did, C4) — the bar never sits on it */
+body.earth-mode .hud-left,
+body.leo-mode .hud-left {
+  display: none;
 }
 body.earth-mode .brand-sub,
 body.leo-mode .brand-sub,
@@ -898,6 +904,12 @@ kbd {
   }
 
   .hud-left .body-item .period {
+    display: none;
+  }
+
+  /* C4b: in Earth mode the epoch/Δt/scale chips mean nothing (the bar shows the mission date; the dock shows the
+     time scale), so drop them on phones — the shorter header leaves room for the bar + mission HUD + the scene below */
+  body.earth-mode .hud-top .meta-chip {
     display: none;
   }
 

@@ -686,6 +686,103 @@
         </div>`;
   }
 
+  /** X24 — lightweight SVG geometry figures (4.G.1–2, 4.MD.5–7), no third-party code. `kind`:
+   *  'lines' (line / ray / segment rows), 'angles' (side-by-side angles from `angles` in degrees, each with
+   *  an arc, its size and acute/right/obtuse name), 'protractor' (half-circle 0–180 scale with an angle of
+   *  `deg`, or `parts` [a, b] drawn as two adjoining angles that add up), 'parallel', 'perpendicular'. */
+  function geometryFigure(opts) {
+    const o = Object.assign({ kind: 'lines', deg: 60, parts: null, angles: [50, 90, 130], caption: '', aria: '' }, opts || {});
+    const INK = '#1a1a1a', HOT = '#FF6B35', COOL = '#7C5CFF', FONT = 'Bangers,Impact,sans-serif';
+    const f = (v) => (+v).toFixed(1);
+    const rad = (d) => d * Math.PI / 180;
+    const pt = (cx, cy, r, d) => [cx + r * Math.cos(rad(d)), cy - r * Math.sin(rad(d))];
+    const seg = (a, b, c, w) => `<line x1="${f(a[0])}" y1="${f(a[1])}" x2="${f(b[0])}" y2="${f(b[1])}" stroke="${c || INK}" stroke-width="${w || 2.5}" stroke-linecap="round"/>`;
+    const dot = (p, c) => `<circle cx="${f(p[0])}" cy="${f(p[1])}" r="4" fill="${c || INK}"/>`;
+    const head = (from, to, c) => {
+      const a = Math.atan2(to[1] - from[1], to[0] - from[0]), L = 10, s = 0.45;
+      const p1 = [to[0] - L * Math.cos(a - s), to[1] - L * Math.sin(a - s)];
+      const p2 = [to[0] - L * Math.cos(a + s), to[1] - L * Math.sin(a + s)];
+      return `<polygon points="${f(to[0])},${f(to[1])} ${f(p1[0])},${f(p1[1])} ${f(p2[0])},${f(p2[1])}" fill="${c || INK}"/>`;
+    };
+    const txt = (x, y, s, c, size, halo) => `<text x="${f(x)}" y="${f(y)}" text-anchor="middle" font-size="${size || 13}" font-family="${FONT}" fill="${c || INK}"${halo ? ` stroke="${halo}" stroke-width="3" paint-order="stroke"` : ''}>${s}</text>`;
+    const arc = (cx, cy, r, d0, d1, c) => {
+      const a = pt(cx, cy, r, d0), b = pt(cx, cy, r, d1);
+      return `<path d="M${f(a[0])} ${f(a[1])} A${r} ${r} 0 0 0 ${f(b[0])} ${f(b[1])}" fill="none" stroke="${c || HOT}" stroke-width="2.5"/>`;
+    };
+    const square = (cx, cy, d0, s, c) => {
+      const a = pt(cx, cy, s, d0), b = pt(cx, cy, s, d0 + 90), m = [a[0] + b[0] - cx, a[1] + b[1] - cy];
+      return `<path d="M${f(a[0])} ${f(a[1])} L${f(m[0])} ${f(m[1])} L${f(b[0])} ${f(b[1])}" fill="none" stroke="${c || HOT}" stroke-width="2"/>`;
+    };
+    const kindOf = (d) => (d < 90 ? 'acute' : d === 90 ? 'right' : d < 180 ? 'obtuse' : 'straight');
+    let out = '', W = 280, H = 150;
+    if (o.kind === 'lines') {
+      [['line AB', 80, 200], ['ray CD', 40, 160], ['segment EF', 40, 240]].forEach(([name, xa, xb], i) => {
+        const y = 32 + i * 48, L = [32, y], R = [248, y];
+        const nm = name.split(' ')[1];
+        out += txt(140, y - 10, name, COOL, 12);
+        if (i === 0) out += seg(L, R) + head(R, L) + head(L, R);
+        else if (i === 1) out += seg([xa, y], R) + head([xa, y], R);
+        else out += seg([xa, y], [xb, y]);
+        out += dot([xa, y]) + dot([xb, y]) + txt(xa, y + 18, nm[0]) + txt(xb, y + 18, nm[1]);
+      });
+    } else if (o.kind === 'angles') {
+      const n = Math.max(1, o.angles.length), w = W / n, vy = 92;
+      o.angles.forEach((d, i) => {
+        const Lr = Math.min(62, (w - 18) / (1 - Math.min(0, Math.cos(rad(d)))));
+        const lo = Math.min(0, Lr * Math.cos(rad(d)));
+        const vx = i * w + w / 2 - (lo + Lr) / 2;
+        const tip0 = [vx + Lr, vy], tip1 = pt(vx, vy, Lr, d);
+        out += seg([vx, vy], tip0) + head([vx, vy], tip0) + seg([vx, vy], tip1) + head([vx, vy], tip1);
+        out += d === 90 ? square(vx, vy, 0, 13) : arc(vx, vy, 18, 0, d);
+        const lab = pt(vx, vy, 32, d / 2);
+        out += dot([vx, vy]) + txt(lab[0], lab[1] + 4, d + '°', HOT, 12) + txt(i * w + w / 2, vy + 26, kindOf(d), COOL, 14);
+      });
+      H = 128;
+    } else if (o.kind === 'protractor') {
+      const cx = 140, cy = 140, r = 118;
+      out += `<path d="M${cx - r} ${cy} A${r} ${r} 0 0 1 ${cx + r} ${cy} Z" fill="#FFF8E1" stroke="${INK}" stroke-width="2"/>`;
+      for (let d = 0; d <= 180; d += 10) {
+        const big = d % 30 === 0;
+        out += seg(pt(cx, cy, r, d), pt(cx, cy, r - (big ? 12 : 7), d), INK, big ? 1.8 : 1.2);
+        if (big) {
+          const a = pt(cx, cy, r - 22, d), b = pt(cx, cy, r - 36, d), lift = d % 180 === 0 ? -9 : 0;
+          out += txt(a[0], a[1] + 4 + lift, String(d), INK, 11, '#FFF8E1') + txt(b[0], b[1] + 4 + lift, String(180 - d), '#9a9a9a', 9, '#FFF8E1');
+        }
+      }
+      const rays = o.parts ? [0, o.parts[0], o.parts[0] + o.parts[1]] : [0, o.deg];
+      if (o.parts) {
+        out += arc(cx, cy, 34, 0, o.parts[0], HOT) + arc(cx, cy, 44, o.parts[0], rays[2], COOL);
+        const a = pt(cx, cy, 56, o.parts[0] / 2), b = pt(cx, cy, 66, o.parts[0] + o.parts[1] / 2);
+        out += txt(a[0], a[1] + 4, o.parts[0] + '°', HOT, 13) + txt(b[0], b[1] + 4, o.parts[1] + '°', COOL, 13);
+      } else {
+        const a = pt(cx, cy, 54, o.deg / 2);
+        out += arc(cx, cy, 34, 0, o.deg, HOT) + txt(a[0], a[1] + 4, o.deg + '°', HOT, 15);
+      }
+      rays.forEach((d) => { const tip = pt(cx, cy, r - 2, d); out += seg([cx, cy], tip, HOT, 3) + head([cx, cy], tip, HOT); });
+      out += dot([cx, cy]);
+      H = 150;
+    } else if (o.kind === 'parallel') {
+      [42, 92].forEach((y) => {
+        out += seg([28, y], [252, y]) + head([252, y], [28, y]) + head([28, y], [252, y]);
+        out += `<path d="M134 ${y - 6} L142 ${y} L134 ${y + 6}" fill="none" stroke="${HOT}" stroke-width="2.5"/>`;
+      });
+      [70, 210].forEach((x) => { out += `<line x1="${x}" y1="46" x2="${x}" y2="88" stroke="${COOL}" stroke-width="2" stroke-dasharray="4 3"/>`; });
+      out += txt(70, 112, 'same gap', COOL, 12) + txt(210, 112, 'same gap', COOL, 12);
+      H = 122;
+    } else if (o.kind === 'perpendicular') {
+      out += seg([28, 96], [252, 96]) + head([252, 96], [28, 96]) + head([28, 96], [252, 96]);
+      out += seg([140, 16], [140, 132]) + head([140, 132], [140, 16]) + head([140, 16], [140, 132]);
+      out += square(140, 96, 0, 15) + txt(170, 82, '90°', HOT, 15) + dot([140, 96]);
+      H = 142;
+    }
+    const aria = o.aria || o.caption || 'geometry figure';
+    const cap = o.caption ? `<div style="font-family:Comic Neue,cursive;font-size:0.95rem;margin-top:0.25rem;">${o.caption}</div>` : '';
+    return `<div class="viz-box" role="img" aria-label="${aria}">
+          <svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" aria-hidden="true">${out}</svg>
+          ${cap}
+        </div>`;
+  }
+
   function renderVisual(key) {
     const map = {
       'place-value-247': `
@@ -1504,6 +1601,37 @@
         bars: [{ d: 3, n: 2, label: '2/3' }, { d: 6, n: 2, label: '2/6', color: '#FFE66D' }],
         caption: 'Same number of pieces: thirds are bigger → 2/3 <strong>&gt;</strong> 2/6',
         aria: 'Fraction bars: two thirds is greater than two sixths'
+      }),
+      // X24 — ages 9–10 geometry: lines/rays/angles, protractor, parallel/perpendicular (4.G.1–2, 4.MD.5–7)
+      'geo-line-ray-seg': geometryFigure({
+        kind: 'lines',
+        caption: 'Line ↔ forever both ways · Ray → 1 endpoint · Segment • — • 2 endpoints',
+        aria: 'A line with arrows on both ends, a ray with one endpoint and one arrow, and a segment with two endpoints'
+      }),
+      'geo-angle-types': geometryFigure({
+        kind: 'angles', angles: [50, 90, 130],
+        caption: '<strong>acute</strong> &lt; 90° · <strong>right</strong> = 90° (square corner) · <strong>obtuse</strong> &gt; 90°',
+        aria: 'Three angles: 50 degrees acute, 90 degrees right with a square corner mark, 130 degrees obtuse'
+      }),
+      'geo-protractor-60': geometryFigure({
+        kind: 'protractor', deg: 60,
+        caption: 'Center dot on the vertex, one ray on 0 → read the other ray: <strong>60°</strong>',
+        aria: 'A protractor with one ray on 0 and the other on 60, making a 60 degree angle'
+      }),
+      'geo-angle-add': geometryFigure({
+        kind: 'protractor', parts: [30, 45],
+        caption: 'Angle parts add up: 30° + 45° = <strong>75°</strong>',
+        aria: 'A protractor showing a 30 degree angle next to a 45 degree angle, together 75 degrees'
+      }),
+      'geo-parallel': geometryFigure({
+        kind: 'parallel',
+        caption: '<strong>Parallel</strong> lines never meet — the gap stays the same',
+        aria: 'Two parallel lines with arrow marks and equal dashed gaps between them'
+      }),
+      'geo-perpendicular': geometryFigure({
+        kind: 'perpendicular',
+        caption: '<strong>Perpendicular</strong> lines cross at a square corner: 90°',
+        aria: 'Two perpendicular lines crossing with a right angle mark'
       }),
       'skip-mult': `
         <div class="viz-box" style="font-family:Bangers,Impact,sans-serif;font-size:1.3rem;">

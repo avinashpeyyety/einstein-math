@@ -138,7 +138,8 @@ t('6. checks words for new metrics; SIM_KINDS wired; SW footer match; sims not p
   });
   const m = sw.match(/einstein-math-v(\d+\.\d+\.\d+)/);
   assert.ok(m && html.includes('v' + m[1] + ' ·'), 'SW matches footer');
-  assert.strictEqual(m[1], '2.6.3');
+  // shipped in v2.6.3; later bumps (X25 v2.6.4, X24 v2.6.5, …) must not break this check
+  assert.ok(m[1].split('.').map(Number).reduce((a, v) => a * 1000 + v, 0) >= 2006003, 'SW at or after v2.6.3, got ' + m[1]);
   const pre = sw.slice(sw.indexOf('const PRECACHE'), sw.indexOf('];', sw.indexOf('const PRECACHE')));
   assert.ok(!/sims\/(speed|fall|circuit)/.test(pre), 'new sims not precached');
 });

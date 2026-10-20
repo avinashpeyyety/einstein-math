@@ -9287,7 +9287,10 @@
           "color": "#95E1D3",
           "description": "Coordinate plane and spatial ideas",
           "lessons": [
-            "g4-coord-plane"
+            "g4-coord-plane",
+            "g4-lines-rays-angles",
+            "g4-measure-angles",
+            "g4-parallel-perp"
           ]
         },
         {
@@ -13385,6 +13388,443 @@
                 "6/8"
               ],
               "answer": "3/8"
+            }
+          ]
+        },
+        "g4-lines-rays-angles": {
+          "id": "g4-lines-rays-angles",
+          "unitId": "u4-geometry",
+          "title": "Points, Lines, Rays & Angles",
+          "durationMin": 9,
+          "prerequisites": [
+            "g4-coord-plane"
+          ],
+          "skills": [
+            "lines-rays-segments",
+            "angle-types"
+          ],
+          "einsteinIntro": "Geometry detectives, assemble! Lines, rays and segments are the building blocks — and two rays make an angle!",
+          "explain": {
+            "panels": [
+              {
+                "speech": "A line goes on forever both ways. A ray starts at one endpoint and zooms off forever. A segment stops at two endpoints!",
+                "visual": "geo-line-ray-seg",
+                "state": "explain"
+              },
+              {
+                "speech": "Two rays that share an endpoint make an angle. Smaller than a square corner? Acute. Exactly a square corner? Right (90°). Wider? Obtuse!",
+                "visual": "geo-angle-types",
+                "state": "think"
+              }
+            ]
+          },
+          "workedExample": {
+            "title": "Worked Example",
+            "speech": "What kind of angle is 120°?",
+            "steps": [
+              "A right angle is exactly 90°",
+              "120° is more than 90° but less than 180°",
+              "So 120° is an obtuse angle"
+            ]
+          },
+          "practice": [
+            {
+              "id": "x24a-p1",
+              "type": "mc",
+              "prompt": "A straight path that goes on forever in BOTH directions is a…",
+              "choices": [
+                "line",
+                "ray",
+                "line segment",
+                "angle"
+              ],
+              "answer": "line",
+              "hint": "Look for arrows on both ends.",
+              "feedbackCorrect": "A line — forever both ways!",
+              "feedbackWrong": "A ray goes forever only one way, and a segment stops at both ends. Forever both ways is a line."
+            },
+            {
+              "id": "x24a-p2",
+              "type": "fill",
+              "prompt": "How many endpoints does a line segment have?",
+              "answer": "2",
+              "accept": [
+                "2",
+                "two"
+              ],
+              "hint": "A segment is a piece of a line that stops at each end.",
+              "feedbackCorrect": "2 endpoints!",
+              "feedbackWrong": "A segment has an endpoint at each end — 2 in all."
+            },
+            {
+              "id": "x24a-p3",
+              "type": "mc",
+              "prompt": "An angle measures 35°. What kind of angle is it?",
+              "choices": [
+                "acute",
+                "right",
+                "obtuse",
+                "straight"
+              ],
+              "answer": "acute",
+              "hint": "Is it smaller than a square corner?",
+              "feedbackCorrect": "Acute — a sharp little angle!",
+              "feedbackWrong": "35° is less than 90°, so it is acute."
+            },
+            {
+              "id": "x24a-p4",
+              "type": "mc",
+              "prompt": "An angle measures 120°. What kind of angle is it?",
+              "choices": [
+                "acute",
+                "right",
+                "obtuse",
+                "straight"
+              ],
+              "answer": "obtuse",
+              "hint": "Compare it with 90° and 180°.",
+              "feedbackCorrect": "Obtuse!",
+              "feedbackWrong": "120° is more than 90° but less than 180°, so it is obtuse."
+            },
+            {
+              "id": "x24a-p5",
+              "type": "mc",
+              "prompt": "At 3:00, the hands of a clock make what kind of angle?",
+              "choices": [
+                "right",
+                "acute",
+                "obtuse",
+                "straight"
+              ],
+              "answer": "right",
+              "hint": "Picture the hands pointing at 12 and 3.",
+              "feedbackCorrect": "Right — a square corner!",
+              "feedbackWrong": "12 to 3 is a quarter turn, a square corner: a right angle (90°)."
+            }
+          ],
+          "quickCheck": [
+            {
+              "id": "x24a-q1",
+              "type": "mc",
+              "prompt": "Which one has exactly ONE endpoint?",
+              "choices": [
+                "ray",
+                "line",
+                "line segment",
+                "point"
+              ],
+              "answer": "ray"
+            },
+            {
+              "id": "x24a-q2",
+              "type": "mc",
+              "prompt": "An angle measures 60°. What kind of angle is it?",
+              "choices": [
+                "acute",
+                "right",
+                "obtuse",
+                "straight"
+              ],
+              "answer": "acute"
+            },
+            {
+              "id": "x24a-q3",
+              "type": "mc",
+              "prompt": "An angle measures 150°. What kind of angle is it?",
+              "choices": [
+                "acute",
+                "right",
+                "obtuse",
+                "straight"
+              ],
+              "answer": "obtuse"
+            }
+          ]
+        },
+        "g4-measure-angles": {
+          "id": "g4-measure-angles",
+          "unitId": "u4-geometry",
+          "title": "Measure Angles",
+          "durationMin": 10,
+          "prerequisites": [
+            "g4-lines-rays-angles"
+          ],
+          "skills": [
+            "measure-angles",
+            "angle-addition"
+          ],
+          "einsteinIntro": "Angles are measured in degrees (°). A full turn is 360°. Grab your protractor — let's measure!",
+          "explain": {
+            "panels": [
+              {
+                "speech": "Put the protractor's center dot on the vertex. Line up one ray with 0. The other ray points to the size — here 60°!",
+                "visual": "geo-protractor-60",
+                "state": "explain"
+              },
+              {
+                "speech": "Angles add up! Put a 30° angle next to a 45° angle and together they make 75°.",
+                "visual": "geo-angle-add",
+                "state": "cheer"
+              }
+            ]
+          },
+          "workedExample": {
+            "title": "Worked Example",
+            "speech": "A right angle (90°) is split into two parts. One part is 35°. How big is the other?",
+            "steps": [
+              "The two parts add up to the whole: 90°",
+              "Missing part = 90° − 35°",
+              "The other part is 55°"
+            ]
+          },
+          "practice": [
+            {
+              "id": "x24b-p1",
+              "type": "mc",
+              "prompt": "A full turn all the way around a circle is how many degrees?",
+              "choices": [
+                "360",
+                "180",
+                "90",
+                "100"
+              ],
+              "answer": "360",
+              "hint": "Half a turn is 180°.",
+              "feedbackCorrect": "360° — a full spin!",
+              "feedbackWrong": "A full turn is 360°; half a turn is 180°."
+            },
+            {
+              "id": "x24b-p2",
+              "type": "mc",
+              "prompt": "On a protractor, one ray of an angle sits on 0°. The other ray points to 50°. How many degrees is the angle?",
+              "choices": [
+                "50",
+                "130",
+                "40",
+                "180"
+              ],
+              "answer": "50",
+              "hint": "Use the scale that starts at 0 where the first ray sits.",
+              "feedbackCorrect": "50°!",
+              "feedbackWrong": "Read the scale that starts at 0 on your first ray: 50°. 130 is the other scale."
+            },
+            {
+              "id": "x24b-p3",
+              "type": "fill",
+              "prompt": "An angle is split into two parts: 30° and 45°. How big is the whole angle?",
+              "answer": "75",
+              "accept": [
+                "75",
+                "75°"
+              ],
+              "hint": "Add the two parts.",
+              "feedbackCorrect": "75°!",
+              "feedbackWrong": "30° + 45° = 75°."
+            },
+            {
+              "id": "x24b-p4",
+              "type": "fill",
+              "prompt": "A right angle (90°) is split into two parts. One part is 25°. How big is the other part?",
+              "answer": "65",
+              "accept": [
+                "65",
+                "65°"
+              ],
+              "hint": "The parts add up to 90°.",
+              "feedbackCorrect": "65°!",
+              "feedbackWrong": "90° − 25° = 65°."
+            },
+            {
+              "id": "x24b-p5",
+              "type": "mc",
+              "prompt": "A ray turns through 1/4 of a full circle. How many degrees is that?",
+              "choices": [
+                "90",
+                "25",
+                "45",
+                "180"
+              ],
+              "answer": "90",
+              "hint": "A full circle is 360°. What is 1/4 of 360?",
+              "feedbackCorrect": "90° — a quarter turn!",
+              "feedbackWrong": "360° ÷ 4 = 90°."
+            }
+          ],
+          "quickCheck": [
+            {
+              "id": "x24b-q1",
+              "type": "fill",
+              "prompt": "On a protractor, one ray of an angle sits on 0°. The other ray points to 135°. How many degrees is the angle?",
+              "answer": "135",
+              "accept": [
+                "135",
+                "135°"
+              ]
+            },
+            {
+              "id": "x24b-q2",
+              "type": "fill",
+              "prompt": "An angle is split into two parts: 60° and 20°. How big is the whole angle?",
+              "answer": "80",
+              "accept": [
+                "80",
+                "80°"
+              ]
+            },
+            {
+              "id": "x24b-q3",
+              "type": "fill",
+              "prompt": "A straight angle (180°) is split into two parts. One part is 110°. How big is the other part?",
+              "answer": "70",
+              "accept": [
+                "70",
+                "70°"
+              ]
+            }
+          ]
+        },
+        "g4-parallel-perp": {
+          "id": "g4-parallel-perp",
+          "unitId": "u4-geometry",
+          "title": "Parallel & Perpendicular",
+          "durationMin": 8,
+          "prerequisites": [
+            "g4-measure-angles"
+          ],
+          "skills": [
+            "parallel-perpendicular"
+          ],
+          "einsteinIntro": "Some lines are best friends that never meet. Others cross at a perfect square corner. Let's spot them!",
+          "explain": {
+            "panels": [
+              {
+                "speech": "Parallel lines run side by side forever and never meet — the gap between them stays the same, like train tracks!",
+                "visual": "geo-parallel",
+                "state": "explain"
+              },
+              {
+                "speech": "Perpendicular lines cross to make square corners — right angles of 90°. Look at the corner of a book!",
+                "visual": "geo-perpendicular",
+                "state": "think"
+              }
+            ]
+          },
+          "workedExample": {
+            "title": "Worked Example",
+            "speech": "In the letter H, how do the lines fit together?",
+            "steps": [
+              "The two tall sides never meet and stay the same distance apart → parallel",
+              "The middle bar crosses each tall side at a square corner",
+              "So the middle bar is perpendicular to both tall sides"
+            ]
+          },
+          "practice": [
+            {
+              "id": "x24c-p1",
+              "type": "mc",
+              "prompt": "Two lines that never meet and stay the same distance apart are…",
+              "choices": [
+                "parallel",
+                "perpendicular",
+                "intersecting",
+                "rays"
+              ],
+              "answer": "parallel",
+              "hint": "Think of train tracks.",
+              "feedbackCorrect": "Parallel!",
+              "feedbackWrong": "Lines that never meet, with the same gap, are parallel."
+            },
+            {
+              "id": "x24c-p2",
+              "type": "mc",
+              "prompt": "Two lines that cross to make square corners are…",
+              "choices": [
+                "perpendicular",
+                "parallel",
+                "obtuse",
+                "segments"
+              ],
+              "answer": "perpendicular",
+              "hint": "Square corner = right angle.",
+              "feedbackCorrect": "Perpendicular!",
+              "feedbackWrong": "Lines that cross at right angles are perpendicular."
+            },
+            {
+              "id": "x24c-p3",
+              "type": "fill",
+              "prompt": "Perpendicular lines meet at an angle of how many degrees?",
+              "answer": "90",
+              "accept": [
+                "90",
+                "90°"
+              ],
+              "hint": "A square corner.",
+              "feedbackCorrect": "90°!",
+              "feedbackWrong": "Perpendicular lines make right angles: 90°."
+            },
+            {
+              "id": "x24c-p4",
+              "type": "mc",
+              "prompt": "In the letter H, the two tall sides are…",
+              "choices": [
+                "parallel",
+                "perpendicular",
+                "neither"
+              ],
+              "answer": "parallel",
+              "hint": "Do the tall sides ever meet?",
+              "feedbackCorrect": "Parallel!",
+              "feedbackWrong": "The tall sides of H never meet and stay the same distance apart."
+            },
+            {
+              "id": "x24c-p5",
+              "type": "mc",
+              "prompt": "Two roads cross like an X, but not at square corners. Are they perpendicular?",
+              "choices": [
+                "no — they cross, but not at 90°",
+                "yes — any lines that cross are perpendicular",
+                "no — they are parallel"
+              ],
+              "answer": "no — they cross, but not at 90°",
+              "hint": "Perpendicular needs a square corner.",
+              "feedbackCorrect": "Sharp eyes!",
+              "feedbackWrong": "Crossing is not enough — perpendicular lines must meet at 90°. These lines just intersect."
+            }
+          ],
+          "quickCheck": [
+            {
+              "id": "x24c-q1",
+              "type": "mc",
+              "prompt": "The top and bottom edges of a door are…",
+              "choices": [
+                "parallel",
+                "perpendicular",
+                "neither"
+              ],
+              "answer": "parallel"
+            },
+            {
+              "id": "x24c-q2",
+              "type": "mc",
+              "prompt": "In the letter T, the two lines are…",
+              "choices": [
+                "perpendicular",
+                "parallel",
+                "neither"
+              ],
+              "answer": "perpendicular"
+            },
+            {
+              "id": "x24c-q3",
+              "type": "mc",
+              "prompt": "Perpendicular lines make what kind of angle?",
+              "choices": [
+                "right",
+                "acute",
+                "obtuse",
+                "straight"
+              ],
+              "answer": "right"
             }
           ]
         }

@@ -65,11 +65,11 @@ function checker(prompt) {
   return null;
 }
 
-t('1. the 3 lessons sit in u4-fractions right after g4-mixed-sub; track has 33 lessons; old lessons untouched', () => {
+t('1. the 3 lessons sit in u4-fractions right after g4-mixed-sub; track has 36 lessons (X24 +3); old lessons untouched', () => {
   const i = unit.lessons.indexOf('g4-mixed-sub');
   assert.ok(i >= 0);
   assert.deepStrictEqual(unit.lessons.slice(i + 1, i + 4), IDS);
-  assert.strictEqual(Object.keys(tr.lessons).length, 33);
+  assert.strictEqual(Object.keys(tr.lessons).length, 36); // +3 X24
   IDS.forEach(id => assert.strictEqual(tr.lessons[id].unitId, 'u4-fractions', id));
   ['g4-frac-equiv', 'g4-frac-compare', 'g4-frac-add-same', 'g4-mixed-intro', 'g4-frac-times-whole', 'g4-mixed-add', 'g4-frac-sub-same']
     .forEach(id => assert.ok(unit.lessons.includes(id), id));

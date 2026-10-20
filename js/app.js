@@ -651,6 +651,41 @@
         </div>`;
   }
 
+  /** X25 — number line(s) from 0 to `max` cut into d equal parts (3.NF.2–3). One row per line; every row
+   *  shares the same 0..max scale so equivalent fractions line up. Whole numbers are labelled under
+   *  the line (`labelTicks` also labels each k/d); points are given as k = jumps from 0. */
+  function fractionLineParts(opts) {
+    const o = Object.assign({ lines: [], max: 1, labelTicks: false, caption: '', aria: '' }, opts || {});
+    const x0 = 22, x1 = 258, rowH = 58, top = 26;
+    const max = Math.max(1, o.max | 0);
+    const X = (v) => (x0 + (x1 - x0) * v / max).toFixed(1);
+    let out = '';
+    o.lines.forEach((ln, r) => {
+      const d = Math.max(1, ln.d | 0);
+      const y = top + r * rowH;
+      out += `<line x1="${x0}" y1="${y}" x2="${x1}" y2="${y}" stroke="#1a1a1a" stroke-width="2"/>`;
+      for (let k = 0; k <= d * max; k++) {
+        const whole = k % d === 0;
+        const t = whole ? String(k / d) : (o.labelTicks ? k + '/' + d : '');
+        out += `<line x1="${X(k / d)}" y1="${y - (whole ? 8 : 5)}" x2="${X(k / d)}" y2="${y + (whole ? 8 : 5)}" stroke="#1a1a1a" stroke-width="${whole ? 2 : 1.5}"/>`;
+        if (t) out += `<text x="${X(k / d)}" y="${y + 22}" text-anchor="middle" font-size="${whole ? 13 : 11}" font-family="Bangers,Impact,sans-serif">${t}</text>`;
+      }
+      (ln.points || []).forEach((pt) => {
+        const q = typeof pt === 'number' ? { k: pt } : pt;
+        const color = q.color || ln.color || '#FF6B35';
+        out += `<circle cx="${X(q.k / d)}" cy="${y}" r="5" fill="${color}" stroke="#1a1a1a" stroke-width="1.5"/>`;
+        out += `<text x="${X(q.k / d)}" y="${y - 11}" text-anchor="middle" font-size="12" font-family="Bangers,Impact,sans-serif" fill="${color}">${q.label || (q.k + '/' + d)}</text>`;
+      });
+    });
+    const vbH = top + Math.max(1, o.lines.length) * rowH - 14;
+    const aria = o.aria || o.caption || 'fraction number line';
+    const cap = o.caption ? `<div style="font-family:Comic Neue,cursive;font-size:0.95rem;margin-top:0.25rem;">${o.caption}</div>` : '';
+    return `<div class="viz-box" role="img" aria-label="${aria}">
+          <svg viewBox="0 0 280 ${vbH}" width="280" height="${vbH}" aria-hidden="true">${out}</svg>
+          ${cap}
+        </div>`;
+  }
+
   function renderVisual(key) {
     const map = {
       'place-value-247': `
@@ -1437,6 +1472,38 @@
         points: [{ v: 0.4, label: '2/5' }, { v: 0.9, label: '9/10', color: '#7C5CFF' }],
         caption: '2/5 is a bit less than 1/2 → 2/5 + 1/2 is a bit less than 1 (9/10)',
         aria: 'Number line from 0 to 1 with two fifths just below one half and nine tenths just below one'
+      }),
+      // X25 — ages 7–8 fractions on a number line, equivalence, compare (3.NF.2–3)
+      'nl-quarters': fractionLineParts({
+        lines: [{ d: 4, points: [3] }], labelTicks: true,
+        caption: '4 equal jumps make 1 · 3 jumps from 0 → <strong>3/4</strong>',
+        aria: 'Number line from 0 to 1 cut into 4 equal parts with a point at three fourths'
+      }),
+      'nl-sixths': fractionLineParts({
+        lines: [{ d: 6, points: [5] }],
+        caption: 'Bottom 6 = jumps in 1 whole · top 5 = jumps taken → <strong>5/6</strong>',
+        aria: 'Number line from 0 to 1 cut into 6 equal parts with a point at five sixths'
+      }),
+      'nl-equiv-half': fractionLineParts({
+        lines: [{ d: 2, points: [1] }, { d: 4, points: [2], color: '#7C5CFF' }], labelTicks: true,
+        caption: '1/2 and 2/4 land on the <strong>same spot</strong> → 1/2 = 2/4',
+        aria: 'Two number lines, one in halves and one in fourths; one half and two fourths are at the same spot'
+      }),
+      'frac-equiv-bars': fractionBars({
+        bars: [{ d: 3, n: 2, label: '2/3' }, { d: 6, n: 4, label: '= 4/6', color: '#FFE66D' }, { d: 4, n: 4, label: '4/4 = 1', color: '#7C5CFF' }],
+        labelW: 70,
+        caption: '2/3 = 4/6 · a full bar is <strong>1 whole</strong>',
+        aria: 'Fraction bars: two thirds equals four sixths; four fourths fills the whole bar'
+      }),
+      'frac-compare-same-den': fractionBars({
+        bars: [{ d: 8, n: 3, label: '3/8' }, { d: 8, n: 5, label: '5/8', color: '#FFE66D' }],
+        caption: 'Same-size pieces: 3/8 <strong>&lt;</strong> 5/8',
+        aria: 'Fraction bars: three eighths is less than five eighths'
+      }),
+      'frac-compare-same-num': fractionBars({
+        bars: [{ d: 3, n: 2, label: '2/3' }, { d: 6, n: 2, label: '2/6', color: '#FFE66D' }],
+        caption: 'Same number of pieces: thirds are bigger → 2/3 <strong>&gt;</strong> 2/6',
+        aria: 'Fraction bars: two thirds is greater than two sixths'
       }),
       'skip-mult': `
         <div class="viz-box" style="font-family:Bangers,Impact,sans-serif;font-size:1.3rem;">

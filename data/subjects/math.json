@@ -4189,7 +4189,10 @@
             "fr-halves-fourths",
             "fr-thirds-set",
             "fr-set-of",
-            "fr-unit-fractions"
+            "fr-unit-fractions",
+            "fr-number-line",
+            "fr-equivalent",
+            "fr-compare-same"
           ]
         },
         {
@@ -8778,6 +8781,426 @@
                 "26"
               ],
               "answer": "16"
+            }
+          ]
+        },
+        "fr-number-line": {
+          "id": "fr-number-line",
+          "unitId": "unit-fractions",
+          "title": "Fractions on a Number Line",
+          "durationMin": 8,
+          "prerequisites": [
+            "fr-unit-fractions"
+          ],
+          "skills": [
+            "frac-number-line"
+          ],
+          "einsteinIntro": "A number line is a ruler for fractions! Cut 0 to 1 into equal jumps — each jump is a unit fraction.",
+          "explain": {
+            "panels": [
+              {
+                "speech": "Cut 0 to 1 into 4 equal jumps. Each jump is 1/4. Three jumps from 0 lands on 3/4!",
+                "visual": "nl-quarters",
+                "state": "explain"
+              },
+              {
+                "speech": "The bottom number says how many equal jumps make 1. The top number says how many jumps you take from 0.",
+                "visual": "nl-sixths",
+                "state": "think"
+              }
+            ]
+          },
+          "workedExample": {
+            "title": "Worked Example",
+            "speech": "Where is 2/3 on a number line?",
+            "steps": [
+              "Cut 0 to 1 into 3 equal jumps",
+              "Each jump is 1/3",
+              "Take 2 jumps from 0 → that point is 2/3"
+            ]
+          },
+          "practice": [
+            {
+              "id": "x25a-p1",
+              "type": "mc",
+              "prompt": "A line from 0 to 1 is cut into 4 equal parts. Point A is 3 jumps from 0. What fraction is A?",
+              "choices": [
+                "3/4",
+                "1/4",
+                "4/3",
+                "3/1"
+              ],
+              "answer": "3/4",
+              "hint": "4 equal parts → each jump is 1/4.",
+              "feedbackCorrect": "3/4!",
+              "feedbackWrong": "Each jump is 1/4, and 3 jumps make 3/4."
+            },
+            {
+              "id": "x25a-p2",
+              "type": "fill",
+              "prompt": "A line from 0 to 1 is cut into 6 equal parts. How many jumps from 0 to 5/6?",
+              "answer": "5",
+              "accept": [
+                "5"
+              ],
+              "hint": "Each jump is 1/6. The top number counts the jumps.",
+              "feedbackCorrect": "5 jumps!",
+              "feedbackWrong": "5/6 means 5 jumps of 1/6."
+            },
+            {
+              "id": "x25a-p3",
+              "type": "mc",
+              "prompt": "To show thirds, cut the line from 0 to 1 into how many equal parts?",
+              "choices": [
+                "3",
+                "2",
+                "1",
+                "6"
+              ],
+              "answer": "3",
+              "hint": "Thirds → the bottom number is 3.",
+              "feedbackCorrect": "3 equal parts!",
+              "feedbackWrong": "Thirds means 3 equal parts between 0 and 1."
+            },
+            {
+              "id": "x25a-p4",
+              "type": "fill",
+              "prompt": "A line from 0 to 1 is cut into 8 equal parts. Point B is 3 jumps from 0. What fraction is B?",
+              "answer": "3/8",
+              "accept": [
+                "3/8"
+              ],
+              "hint": "8 equal parts → each jump is 1/8.",
+              "feedbackCorrect": "3/8!",
+              "feedbackWrong": "3 jumps of 1/8 make 3/8."
+            },
+            {
+              "id": "x25a-p5",
+              "type": "mc",
+              "prompt": "A line from 0 to 1 is cut into 3 equal parts. Point C is 3 jumps from 0. What fraction is C?",
+              "choices": [
+                "3/3",
+                "1/3",
+                "3/1",
+                "0/3"
+              ],
+              "answer": "3/3",
+              "hint": "Count all 3 jumps — where do you land?",
+              "feedbackCorrect": "3/3 — right on 1!",
+              "feedbackWrong": "3 jumps of 1/3 make 3/3, and that lands right on 1."
+            }
+          ],
+          "quickCheck": [
+            {
+              "id": "x25a-q1",
+              "type": "mc",
+              "prompt": "A line from 0 to 1 is cut into 6 equal parts. Point D is 1 jump from 0. What fraction is D?",
+              "choices": [
+                "1/6",
+                "6/1",
+                "1/1",
+                "5/6"
+              ],
+              "answer": "1/6"
+            },
+            {
+              "id": "x25a-q2",
+              "type": "fill",
+              "prompt": "A line from 0 to 1 is cut into 4 equal parts. How many jumps from 0 to 2/4?",
+              "answer": "2",
+              "accept": [
+                "2"
+              ]
+            },
+            {
+              "id": "x25a-q3",
+              "type": "mc",
+              "prompt": "A line from 0 to 1 is cut into 8 equal parts. Point E is 7 jumps from 0. What fraction is E?",
+              "choices": [
+                "7/8",
+                "1/8",
+                "8/8",
+                "7/1"
+              ],
+              "answer": "7/8"
+            }
+          ]
+        },
+        "fr-equivalent": {
+          "id": "fr-equivalent",
+          "unitId": "unit-fractions",
+          "title": "Same Spot, Same Amount",
+          "durationMin": 9,
+          "prerequisites": [
+            "fr-number-line"
+          ],
+          "skills": [
+            "frac-equivalent-simple",
+            "frac-whole-numbers"
+          ],
+          "einsteinIntro": "Two different names, ONE spot on the number line? Those fractions are equivalent — they are equal!",
+          "explain": {
+            "panels": [
+              {
+                "speech": "Cut one line into halves and one into fourths. 1/2 and 2/4 land on the SAME spot — so 1/2 = 2/4!",
+                "visual": "nl-equiv-half",
+                "state": "explain"
+              },
+              {
+                "speech": "Bars show it too: 2/3 covers the same amount as 4/6. And 4/4 fills the whole bar — that's 1!",
+                "visual": "frac-equiv-bars",
+                "state": "cheer"
+              }
+            ]
+          },
+          "workedExample": {
+            "title": "Worked Example",
+            "speech": "Is 2/4 equal to 1/2?",
+            "steps": [
+              "Cut one line from 0 to 1 into 4 parts and one into 2 parts",
+              "2/4 and 1/2 land on the same spot",
+              "Same spot → 2/4 = 1/2"
+            ]
+          },
+          "practice": [
+            {
+              "id": "x25b-p1",
+              "type": "mc",
+              "prompt": "Which fraction sits at the same spot as 1/2?",
+              "choices": [
+                "2/4",
+                "1/4",
+                "2/3",
+                "1/3"
+              ],
+              "answer": "2/4",
+              "hint": "How many fourths fill one half?",
+              "feedbackCorrect": "2/4 — same spot, same amount!",
+              "feedbackWrong": "Two fourths fill the same space as one half, so 1/2 = 2/4."
+            },
+            {
+              "id": "x25b-p2",
+              "type": "fill",
+              "prompt": "1/2 = ?/6",
+              "answer": "3",
+              "accept": [
+                "3"
+              ],
+              "hint": "Split each half into 3 sixths.",
+              "feedbackCorrect": "3/6!",
+              "feedbackWrong": "One half is 3 sixths, so 1/2 = 3/6."
+            },
+            {
+              "id": "x25b-p3",
+              "type": "fill",
+              "prompt": "2/3 = ?/6",
+              "answer": "4",
+              "accept": [
+                "4"
+              ],
+              "hint": "Each third splits into 2 sixths.",
+              "feedbackCorrect": "4/6!",
+              "feedbackWrong": "2 thirds × 2 sixths each = 4 sixths."
+            },
+            {
+              "id": "x25b-p4",
+              "type": "mc",
+              "prompt": "Is 3/4 equal to 6/8?",
+              "choices": [
+                "yes",
+                "no"
+              ],
+              "answer": "yes",
+              "hint": "Split each fourth into 2 eighths.",
+              "feedbackCorrect": "Yes — 3/4 = 6/8!",
+              "feedbackWrong": "Each fourth is 2 eighths, so 3 fourths = 6 eighths."
+            },
+            {
+              "id": "x25b-p5",
+              "type": "fill",
+              "prompt": "4/4 = ?",
+              "answer": "1",
+              "accept": [
+                "1"
+              ],
+              "hint": "4 of the 4 fourths fills the whole.",
+              "feedbackCorrect": "1 whole!",
+              "feedbackWrong": "All 4 fourths make 1 whole: 4/4 = 1."
+            }
+          ],
+          "quickCheck": [
+            {
+              "id": "x25b-q1",
+              "type": "mc",
+              "prompt": "Which fraction sits at the same spot as 1/4?",
+              "choices": [
+                "2/8",
+                "1/8",
+                "2/4",
+                "4/1"
+              ],
+              "answer": "2/8"
+            },
+            {
+              "id": "x25b-q2",
+              "type": "fill",
+              "prompt": "3 = ?/1",
+              "answer": "3",
+              "accept": [
+                "3"
+              ]
+            },
+            {
+              "id": "x25b-q3",
+              "type": "mc",
+              "prompt": "Is 2/3 equal to 2/6?",
+              "choices": [
+                "no",
+                "yes"
+              ],
+              "answer": "no"
+            }
+          ]
+        },
+        "fr-compare-same": {
+          "id": "fr-compare-same",
+          "unitId": "unit-fractions",
+          "title": "Compare Fractions",
+          "durationMin": 9,
+          "prerequisites": [
+            "fr-equivalent"
+          ],
+          "skills": [
+            "frac-compare-same-den",
+            "frac-compare-same-num"
+          ],
+          "einsteinIntro": "Which is more pizza? With the same whole, you can compare fractions with <, > or = — no measuring needed!",
+          "explain": {
+            "panels": [
+              {
+                "speech": "Same bottom number? Same-size pieces! 3/8 < 5/8 because 3 pieces is less than 5 pieces.",
+                "visual": "frac-compare-same-den",
+                "state": "explain"
+              },
+              {
+                "speech": "Same top number? Look at the piece size. Thirds are bigger than sixths, so 2/3 > 2/6. Only compare when the wholes are the same size!",
+                "visual": "frac-compare-same-num",
+                "state": "think"
+              }
+            ]
+          },
+          "workedExample": {
+            "title": "Worked Example",
+            "speech": "Compare 3/4 and 3/8.",
+            "steps": [
+              "Same top number: 3 pieces each",
+              "Fourths are bigger pieces than eighths",
+              "3/4 > 3/8"
+            ]
+          },
+          "practice": [
+            {
+              "id": "x25c-p1",
+              "type": "mc",
+              "prompt": "Pick the sign: 3/8 ? 5/8",
+              "choices": [
+                "<",
+                ">",
+                "="
+              ],
+              "answer": "<",
+              "hint": "Same-size pieces — who has more?",
+              "feedbackCorrect": "3/8 < 5/8!",
+              "feedbackWrong": "Eighths are the same size, and 3 is less than 5, so 3/8 < 5/8."
+            },
+            {
+              "id": "x25c-p2",
+              "type": "mc",
+              "prompt": "Pick the sign: 2/3 ? 2/6",
+              "choices": [
+                ">",
+                "<",
+                "="
+              ],
+              "answer": ">",
+              "hint": "Same number of pieces — whose pieces are bigger?",
+              "feedbackCorrect": "2/3 > 2/6!",
+              "feedbackWrong": "Thirds are bigger pieces than sixths, so 2 thirds > 2 sixths."
+            },
+            {
+              "id": "x25c-p3",
+              "type": "mc",
+              "prompt": "Which is bigger: 1/4 or 1/8?",
+              "choices": [
+                "1/4",
+                "1/8",
+                "same"
+              ],
+              "answer": "1/4",
+              "hint": "Fewer pieces in the whole → bigger pieces.",
+              "feedbackCorrect": "1/4!",
+              "feedbackWrong": "A whole cut into 4 has bigger pieces than one cut into 8."
+            },
+            {
+              "id": "x25c-p4",
+              "type": "mc",
+              "prompt": "Pick the sign: 4/6 ? 4/6",
+              "choices": [
+                "=",
+                "<",
+                ">"
+              ],
+              "answer": "=",
+              "hint": "Look closely — are they different?",
+              "feedbackCorrect": "Equal!",
+              "feedbackWrong": "Same fraction, same amount: 4/6 = 4/6."
+            },
+            {
+              "id": "x25c-p5",
+              "type": "mc",
+              "prompt": "Lily ate 3/4 of a small pizza. Max ate 3/4 of a giant pizza. Did they eat the same amount?",
+              "choices": [
+                "no — the wholes are different sizes",
+                "yes — 3/4 is 3/4",
+                "yes — they both ate 3 pieces"
+              ],
+              "answer": "no — the wholes are different sizes",
+              "hint": "Are the two pizzas the same size?",
+              "feedbackCorrect": "Sharp! Compare only with the same whole.",
+              "feedbackWrong": "3/4 of a giant pizza is more pizza — fractions compare fairly only when the wholes match."
+            }
+          ],
+          "quickCheck": [
+            {
+              "id": "x25c-q1",
+              "type": "mc",
+              "prompt": "Pick the sign: 5/6 ? 1/6",
+              "choices": [
+                ">",
+                "<",
+                "="
+              ],
+              "answer": ">"
+            },
+            {
+              "id": "x25c-q2",
+              "type": "mc",
+              "prompt": "Pick the sign: 3/4 ? 3/8",
+              "choices": [
+                "<",
+                ">",
+                "="
+              ],
+              "answer": ">"
+            },
+            {
+              "id": "x25c-q3",
+              "type": "fill",
+              "prompt": "Which is smaller: 2/3 or 2/8?",
+              "answer": "2/8",
+              "accept": [
+                "2/8"
+              ]
             }
           ]
         }

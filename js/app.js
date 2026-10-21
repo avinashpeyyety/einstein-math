@@ -2711,7 +2711,8 @@
     float: { global: 'SimFloat', scripts: ['js/sims/kit.js', 'js/sims/float.js'] },
     speed: { global: 'SimSpeed', scripts: ['js/sims/kit.js', 'js/sims/speed.js'] },
     fall: { global: 'SimFall', scripts: ['js/sims/kit.js', 'js/sims/fall.js'] },
-    circuit: { global: 'SimCircuit', scripts: ['js/sims/kit.js', 'js/sims/circuit.js'] }
+    circuit: { global: 'SimCircuit', scripts: ['js/sims/kit.js', 'js/sims/circuit.js'] },
+    lever: { global: 'SimLever', scripts: ['js/sims/kit.js', 'js/sims/lever.js'] }
   };
   const simScriptPromises = {};
   let simLab = null;

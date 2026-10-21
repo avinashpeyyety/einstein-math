@@ -4,8 +4,8 @@
     "title": "Einstein Physics",
     "status": "live",
     "schemaVersion": 3,
-    "version": "0.4.0",
-    "note": "X12: ages 9–10 Speed, Gravity & Circuits unit (5 lab lessons). X6: ages 5–6 Push, Pull, Sink & Float unit (3 lab lessons). X5: ages 7–8 Forces & Friction unit (4 lab lessons + unit check). Ages 9–10 also: Ramp Racer."
+    "version": "0.5.0",
+    "note": "X40 (cycle 1/2): ages 7–8 Simple Machines unit — lever labs (Lever Lift, Balance the Seesaw); pulleys next. X12: ages 9–10 Speed, Gravity & Circuits unit (5 lab lessons). X6: ages 5–6 Push, Pull, Sink & Float unit (3 lab lessons). X5: ages 7–8 Forces & Friction unit (4 lab lessons + unit check). Ages 9–10 also: Ramp Racer."
   },
   "tracks": {
     "ages-5-6": {
@@ -496,6 +496,17 @@
             "ph-ramp-surfaces",
             "ph-ramp-heavy-light",
             "ph-ff-unit-check"
+          ]
+        },
+        {
+          "id": "unit-simple-machines",
+          "title": "Simple Machines",
+          "icon": "🏗️",
+          "color": "#F59E0B",
+          "description": "Levers and pulleys make heavy things easy! Find the fulcrum trick in Einstein's seesaw lab.",
+          "lessons": [
+            "ph-lever-lift",
+            "ph-lever-balance"
           ]
         }
       ],
@@ -1265,6 +1276,364 @@
                 "value": 1.0
               },
               "hint": "Steep ramp, low grip. Go!"
+            }
+          ]
+        },
+        "ph-lever-lift": {
+          "id": "ph-lever-lift",
+          "unitId": "unit-simple-machines",
+          "type": "sim",
+          "title": "Lever Lift",
+          "durationMin": 8,
+          "prerequisites": [],
+          "skills": [
+            "lever",
+            "fulcrum",
+            "effort-arm"
+          ],
+          "einsteinIntro": "A lever is a stiff bar that turns on a point called the fulcrum. Push far from the fulcrum and heavy things get easy to lift!",
+          "explain": {
+            "panels": [
+              {
+                "speech": "This seesaw is a lever. The pointy stand in the middle is the fulcrum — the beam turns around it.",
+                "state": "explain"
+              },
+              {
+                "speech": "The farther from the fulcrum I push, the less push I need. A long push arm is like a superpower!",
+                "state": "think"
+              },
+              {
+                "speech": "Lever rule: load × its distance must be beaten by push × its distance.",
+                "state": "cheer"
+              }
+            ]
+          },
+          "sim": {
+            "kind": "lever",
+            "params": {
+              "load": 20,
+              "loadArm": 1,
+              "effortArm": 1,
+              "push": 10
+            },
+            "controls": [
+              {
+                "param": "load",
+                "label": "Load",
+                "min": 5,
+                "max": 60,
+                "step": 5
+              },
+              {
+                "param": "loadArm",
+                "label": "Load distance",
+                "min": 0.5,
+                "max": 3,
+                "step": 0.5
+              },
+              {
+                "param": "effortArm",
+                "label": "Push distance",
+                "min": 0.5,
+                "max": 3,
+                "step": 0.5
+              },
+              {
+                "param": "push",
+                "label": "Einstein's push",
+                "min": 5,
+                "max": 60,
+                "step": 5
+              }
+            ],
+            "explore": "Keep the push at 10 kg. Slide the push farther from the fulcrum — when does the 20 kg box lift?"
+          },
+          "simChecks": [
+            {
+              "id": "ph-ll-c1",
+              "type": "predict",
+              "prompt": "A 20 kg box sits 1 m from the fulcrum. Einstein pushes with 10 kg, also 1 m away. Does the box lift?",
+              "setup": {
+                "load": 20,
+                "loadArm": 1,
+                "effortArm": 1,
+                "push": 10
+              },
+              "metric": "lifts",
+              "choices": [
+                {
+                  "label": "Yes, it lifts ⬆️",
+                  "value": true
+                },
+                {
+                  "label": "No, it stays down",
+                  "value": false
+                }
+              ],
+              "hint": "Same distance on both sides — so the bigger weight wins."
+            },
+            {
+              "id": "ph-ll-c2",
+              "type": "predict",
+              "prompt": "Now Einstein moves his push from 1 m to 3 m from the fulcrum. Does he need less, the same, or more push to lift the box?",
+              "setup": {
+                "load": 20,
+                "loadArm": 1,
+                "effortArm": 1,
+                "push": 10
+              },
+              "compare": {
+                "alt": {
+                  "effortArm": 3
+                },
+                "metric": "needed"
+              },
+              "choices": [
+                {
+                  "label": "Less push",
+                  "value": "less"
+                },
+                {
+                  "label": "Same push",
+                  "value": "same"
+                },
+                {
+                  "label": "More push",
+                  "value": "more"
+                }
+              ],
+              "hint": "Pushing farther from the fulcrum makes the lever stronger."
+            },
+            {
+              "id": "ph-ll-c3",
+              "type": "predict",
+              "prompt": "A 30 kg box is 1 m from the fulcrum. Einstein pushes 3 m away. About how much push does he need to balance it?",
+              "setup": {
+                "load": 30,
+                "loadArm": 1,
+                "effortArm": 3,
+                "push": 5
+              },
+              "metric": "needed",
+              "choices": [
+                {
+                  "label": "10 kg",
+                  "value": 10
+                },
+                {
+                  "label": "30 kg",
+                  "value": 30
+                },
+                {
+                  "label": "90 kg",
+                  "value": 90
+                }
+              ],
+              "hint": "3 times as far away means one-third of the push: 30 ÷ 3."
+            },
+            {
+              "id": "ph-ll-c4",
+              "type": "goal",
+              "prompt": "The box is 40 kg and Einstein can only push 15 kg. Move the push to lift the box! Run it, then press Check.",
+              "setup": {
+                "load": 40,
+                "loadArm": 1,
+                "push": 15,
+                "effortArm": 1
+              },
+              "lock": [
+                "load",
+                "push"
+              ],
+              "goal": {
+                "metric": "lifts",
+                "op": "eq",
+                "value": true,
+                "label": "the load lifts up"
+              },
+              "hint": "Push farther from the fulcrum — or slide the box closer to it."
+            }
+          ]
+        },
+        "ph-lever-balance": {
+          "id": "ph-lever-balance",
+          "unitId": "unit-simple-machines",
+          "type": "sim",
+          "title": "Balance the Seesaw",
+          "durationMin": 8,
+          "prerequisites": [
+            "ph-lever-lift"
+          ],
+          "skills": [
+            "lever",
+            "balance",
+            "effort-arm"
+          ],
+          "einsteinIntro": "A big kid and a small kid can balance on a seesaw — if they sit in the right spots. Let's find them!",
+          "explain": {
+            "panels": [
+              {
+                "speech": "A seesaw balances when weight × distance is the same on both sides.",
+                "state": "explain"
+              },
+              {
+                "speech": "So a heavy load sits close to the fulcrum, and a lighter push sits far away.",
+                "state": "think"
+              },
+              {
+                "speech": "20 kg at 1 m balances 10 kg at 2 m, because 20 × 1 = 10 × 2!",
+                "state": "cheer"
+              }
+            ]
+          },
+          "sim": {
+            "kind": "lever",
+            "params": {
+              "load": 20,
+              "loadArm": 1,
+              "effortArm": 1,
+              "push": 10
+            },
+            "controls": [
+              {
+                "param": "load",
+                "label": "Load",
+                "min": 5,
+                "max": 60,
+                "step": 5
+              },
+              {
+                "param": "loadArm",
+                "label": "Load distance",
+                "min": 0.5,
+                "max": 3,
+                "step": 0.5
+              },
+              {
+                "param": "effortArm",
+                "label": "Push distance",
+                "min": 0.5,
+                "max": 3,
+                "step": 0.5
+              },
+              {
+                "param": "push",
+                "label": "Einstein's push",
+                "min": 5,
+                "max": 60,
+                "step": 5
+              }
+            ],
+            "explore": "Try to make the beam sit perfectly level. Which spots balance 20 kg against 10 kg?"
+          },
+          "simChecks": [
+            {
+              "id": "ph-lb-c1",
+              "type": "predict",
+              "prompt": "20 kg sits 1 m from the fulcrum. Einstein pushes 10 kg, 2 m away. Does the seesaw balance?",
+              "setup": {
+                "load": 20,
+                "loadArm": 1,
+                "effortArm": 2,
+                "push": 10
+              },
+              "metric": "balanced",
+              "choices": [
+                {
+                  "label": "Yes, it balances ⚖️",
+                  "value": true
+                },
+                {
+                  "label": "No, it tips",
+                  "value": false
+                }
+              ],
+              "hint": "Multiply each weight by its distance: 20 × 1 and 10 × 2."
+            },
+            {
+              "id": "ph-lb-c2",
+              "type": "predict",
+              "prompt": "It's balanced. Now the 20 kg box slides from 1 m out to 2 m from the fulcrum. Does Einstein need less, the same, or more push?",
+              "setup": {
+                "load": 20,
+                "loadArm": 1,
+                "effortArm": 2,
+                "push": 10
+              },
+              "compare": {
+                "alt": {
+                  "loadArm": 2
+                },
+                "metric": "needed"
+              },
+              "choices": [
+                {
+                  "label": "Less push",
+                  "value": "less"
+                },
+                {
+                  "label": "Same push",
+                  "value": "same"
+                },
+                {
+                  "label": "More push",
+                  "value": "more"
+                }
+              ],
+              "hint": "A load far from the fulcrum is harder to lift."
+            },
+            {
+              "id": "ph-lb-c3",
+              "type": "predict",
+              "prompt": "A 40 kg box is 1 m from the fulcrum and Einstein pushes 2 m away. What push balances it?",
+              "setup": {
+                "load": 40,
+                "loadArm": 1,
+                "effortArm": 2,
+                "push": 5
+              },
+              "metric": "needed",
+              "choices": [
+                {
+                  "label": "10 kg",
+                  "value": 10
+                },
+                {
+                  "label": "20 kg",
+                  "value": 20
+                },
+                {
+                  "label": "40 kg",
+                  "value": 40
+                },
+                {
+                  "label": "80 kg",
+                  "value": 80
+                }
+              ],
+              "hint": "Twice as far away means half the push: 40 ÷ 2."
+            },
+            {
+              "id": "ph-lb-c4",
+              "type": "goal",
+              "prompt": "The load is 30 kg and the push is 10 kg (both locked). Move them so the seesaw sits perfectly level! Run it, then press Check.",
+              "setup": {
+                "load": 30,
+                "loadArm": 1,
+                "effortArm": 1,
+                "push": 10
+              },
+              "lock": [
+                "load",
+                "push"
+              ],
+              "goal": {
+                "metric": "balanced",
+                "op": "eq",
+                "value": true,
+                "label": "the seesaw balances"
+              },
+              "hint": "The push needs 3 times the distance of the load — try 0.5 m and 1.5 m, or 1 m and 3 m."
             }
           ]
         }

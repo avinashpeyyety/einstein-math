@@ -73,16 +73,18 @@
     return { ok: ctx.choice === expected, expected, actual: ctx.choice };
   }
 
-  const METRIC_WORDS = { slides: 'slides', a: 'acceleration', t: 'time to the bottom', v: 'speed', distance: 'distance', speed: 'speed', under: 'part under water', current: 'current', brightness: 'brightness', time: 'time' };
-  const UNITS = { t: ' s', a: ' m/s²', v: ' m/s', speed: ' m/s', distance: ' m', under: '', current: ' A', brightness: '', time: ' s' };
-  // X6/X12: yes/no metrics — [goal text when true, when false]
+  const METRIC_WORDS = { slides: 'slides', a: 'acceleration', t: 'time to the bottom', v: 'speed', distance: 'distance', speed: 'speed', under: 'part under water', current: 'current', brightness: 'brightness', time: 'time', needed: 'push needed' };
+  const UNITS = { t: ' s', a: ' m/s²', v: ' m/s', speed: ' m/s', distance: ' m', under: '', current: ' A', brightness: '', time: ' s', needed: ' kg' };
+  // X6/X12/X40: yes/no metrics — [goal text when true, when false]
   const BOOL_GOALS = {
     slides: ['the block slides', 'the block stays put'],
     moved: ['it moves', 'it stays put'],
     floats: ['it floats', 'it sinks'],
     sinks: ['it sinks', 'it floats'],
     bonk: ['it reaches the end', 'it stops before the end'],
-    lit: ['the bulbs light up', 'the bulbs stay dark']
+    lit: ['the bulbs light up', 'the bulbs stay dark'],
+    lifts: ['the load lifts up', 'the load stays down'],
+    balanced: ['the seesaw balances', 'the seesaw tips']
   };
   const WORD_VALUES = { away: 'it slides away from Einstein', closer: 'it comes toward Einstein', still: 'it stays put' };
 

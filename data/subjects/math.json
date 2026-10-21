@@ -9290,7 +9290,9 @@
             "g4-coord-plane",
             "g4-lines-rays-angles",
             "g4-measure-angles",
-            "g4-parallel-perp"
+            "g4-parallel-perp",
+            "g4-classify-shapes",
+            "g4-symmetry"
           ]
         },
         {
@@ -13825,6 +13827,293 @@
                 "straight"
               ],
               "answer": "right"
+            }
+          ]
+        },
+        "g4-classify-shapes": {
+          "id": "g4-classify-shapes",
+          "unitId": "u4-geometry",
+          "title": "Classify Triangles & Quadrilaterals",
+          "durationMin": 10,
+          "prerequisites": [
+            "g4-parallel-perp"
+          ],
+          "skills": [
+            "classify-triangles",
+            "classify-quadrilaterals"
+          ],
+          "einsteinIntro": "Shapes have families! Let's sort triangles by their sides and angles — and find out why every square is secretly a rectangle!",
+          "explain": {
+            "panels": [
+              {
+                "speech": "By sides: equilateral = all 3 sides equal, isosceles = 2 sides equal, scalene = no sides equal. By angles: a right triangle has one 90° corner, obtuse has one wide angle, acute has all sharp angles!",
+                "visual": "geo-triangle-types",
+                "state": "explain"
+              },
+              {
+                "speech": "Quadrilaterals have 4 sides. A parallelogram has 2 pairs of parallel sides. A rectangle is a parallelogram with 4 right angles. A rhombus has 4 equal sides. A square is BOTH — so a square is a rectangle AND a rhombus!",
+                "visual": "geo-quad-family",
+                "state": "think"
+              }
+            ]
+          },
+          "workedExample": {
+            "title": "Worked Example",
+            "speech": "A shape has 4 equal sides and 4 right angles. Name every family it belongs to.",
+            "steps": [
+              "4 sides → it is a quadrilateral; 2 pairs of parallel sides → a parallelogram",
+              "4 right angles → a rectangle; 4 equal sides → a rhombus",
+              "Both at once → it is a square (and still a rectangle, rhombus and parallelogram)"
+            ]
+          },
+          "practice": [
+            {
+              "id": "x24d-p1",
+              "type": "mc",
+              "prompt": "A triangle has sides 5 cm, 5 cm and 5 cm. What kind of triangle is it (by its sides)?",
+              "choices": [
+                "equilateral",
+                "scalene",
+                "right"
+              ],
+              "answer": "equilateral",
+              "hint": "Are all three sides the same length?",
+              "feedbackCorrect": "Equilateral — all sides equal!",
+              "feedbackWrong": "5, 5 and 5 are all equal, so it is equilateral."
+            },
+            {
+              "id": "x24d-p2",
+              "type": "mc",
+              "prompt": "A triangle has sides 6 cm, 6 cm and 4 cm. What kind of triangle is it (by its sides)?",
+              "choices": [
+                "isosceles",
+                "equilateral",
+                "scalene"
+              ],
+              "answer": "isosceles",
+              "hint": "How many sides match?",
+              "feedbackCorrect": "Isosceles — two equal sides!",
+              "feedbackWrong": "Two sides are 6 cm and one is 4 cm: exactly two equal sides means isosceles."
+            },
+            {
+              "id": "x24d-p3",
+              "type": "mc",
+              "prompt": "A triangle has angles 90°, 50° and 40°. What kind of triangle is it (by its angles)?",
+              "choices": [
+                "acute",
+                "right",
+                "obtuse"
+              ],
+              "answer": "right",
+              "hint": "Is one of the angles a square corner?",
+              "feedbackCorrect": "Right triangle!",
+              "feedbackWrong": "One angle is exactly 90°, so it is a right triangle."
+            },
+            {
+              "id": "x24d-p4",
+              "type": "mc",
+              "prompt": "A square has 4 equal sides and 4 right angles. Is a square also a rectangle?",
+              "choices": [
+                "yes — it has 4 right angles",
+                "no — a rectangle needs 2 long sides",
+                "only if it is big"
+              ],
+              "answer": "yes — it has 4 right angles",
+              "hint": "What does a shape need to be a rectangle?",
+              "feedbackCorrect": "Yes! Every square is a rectangle.",
+              "feedbackWrong": "A rectangle just needs 4 right angles. A square has them, so a square is a special rectangle."
+            },
+            {
+              "id": "x24d-p5",
+              "type": "mc",
+              "prompt": "A quadrilateral has 4 equal sides but no right angles. What is it?",
+              "choices": [
+                "rhombus",
+                "square",
+                "rectangle",
+                "pentagon"
+              ],
+              "answer": "rhombus",
+              "hint": "A square needs right angles too.",
+              "feedbackCorrect": "A rhombus!",
+              "feedbackWrong": "4 equal sides without right angles is a rhombus. A square would need right angles."
+            }
+          ],
+          "quickCheck": [
+            {
+              "id": "x24d-q1",
+              "type": "mc",
+              "prompt": "A triangle has sides 7 cm, 7 cm and 3 cm. What kind of triangle is it (by its sides)?",
+              "choices": [
+                "isosceles",
+                "equilateral",
+                "scalene"
+              ],
+              "answer": "isosceles"
+            },
+            {
+              "id": "x24d-q2",
+              "type": "mc",
+              "prompt": "A triangle has angles 100°, 45° and 35°. What kind of triangle is it (by its angles)?",
+              "choices": [
+                "acute",
+                "right",
+                "obtuse"
+              ],
+              "answer": "obtuse"
+            },
+            {
+              "id": "x24d-q3",
+              "type": "mc",
+              "prompt": "Every rectangle is also a…",
+              "choices": [
+                "parallelogram",
+                "square",
+                "rhombus",
+                "triangle"
+              ],
+              "answer": "parallelogram"
+            }
+          ]
+        },
+        "g4-symmetry": {
+          "id": "g4-symmetry",
+          "unitId": "u4-geometry",
+          "title": "Line Symmetry",
+          "durationMin": 8,
+          "prerequisites": [
+            "g4-classify-shapes"
+          ],
+          "skills": [
+            "line-symmetry"
+          ],
+          "einsteinIntro": "Fold it in half — do the two sides match perfectly? Then you've found a line of symmetry! Mirror magic time!",
+          "explain": {
+            "panels": [
+              {
+                "speech": "A line of symmetry folds a shape into two halves that match exactly. A square has 4, a rectangle has 2, an equilateral triangle has 3!",
+                "visual": "geo-symmetry-shapes",
+                "state": "explain"
+              },
+              {
+                "speech": "Letters can be symmetric too! A has a line straight down the middle, H has two, B folds top to bottom — but F has none.",
+                "visual": "geo-symmetry-letters",
+                "state": "cheer"
+              }
+            ]
+          },
+          "workedExample": {
+            "title": "Worked Example",
+            "speech": "How many lines of symmetry does a rectangle (not a square) have?",
+            "steps": [
+              "Fold top to bottom: the halves match → 1 line",
+              "Fold left to right: the halves match → 2 lines",
+              "Fold corner to corner: the halves do NOT match, so a rectangle has 2 lines"
+            ]
+          },
+          "practice": [
+            {
+              "id": "x24e-p1",
+              "type": "mc",
+              "prompt": "A line of symmetry folds a shape so the two halves…",
+              "choices": [
+                "match exactly",
+                "are different sizes",
+                "make a triangle"
+              ],
+              "answer": "match exactly",
+              "hint": "Think of folding paper in half.",
+              "feedbackCorrect": "Match exactly!",
+              "feedbackWrong": "On a line of symmetry, the two halves are mirror images that match exactly."
+            },
+            {
+              "id": "x24e-p2",
+              "type": "fill",
+              "prompt": "How many lines of symmetry does a square have?",
+              "answer": "4",
+              "accept": [
+                "4",
+                "four"
+              ],
+              "hint": "Try up-down, left-right and both diagonals.",
+              "feedbackCorrect": "4 lines!",
+              "feedbackWrong": "A square folds evenly up-down, left-right and along both diagonals: 4 lines."
+            },
+            {
+              "id": "x24e-p3",
+              "type": "fill",
+              "prompt": "How many lines of symmetry does an equilateral triangle have?",
+              "answer": "3",
+              "accept": [
+                "3",
+                "three"
+              ],
+              "hint": "Fold from each corner to the middle of the opposite side.",
+              "feedbackCorrect": "3 lines!",
+              "feedbackWrong": "Each corner gives one fold line to the middle of the opposite side: 3 lines."
+            },
+            {
+              "id": "x24e-p4",
+              "type": "mc",
+              "prompt": "Which capital letter has a line of symmetry?",
+              "choices": [
+                "A",
+                "F",
+                "G",
+                "J"
+              ],
+              "answer": "A",
+              "hint": "Imagine a mirror down the middle.",
+              "feedbackCorrect": "A — straight down the middle!",
+              "feedbackWrong": "A folds evenly down the middle. F, G and J don't match on either side."
+            },
+            {
+              "id": "x24e-p5",
+              "type": "fill",
+              "prompt": "How many lines of symmetry does a rectangle (not a square) have?",
+              "answer": "2",
+              "accept": [
+                "2",
+                "two"
+              ],
+              "hint": "Diagonal folds don't match on a rectangle.",
+              "feedbackCorrect": "2 lines!",
+              "feedbackWrong": "Up-down and left-right work; the diagonals don't. So 2 lines."
+            }
+          ],
+          "quickCheck": [
+            {
+              "id": "x24e-q1",
+              "type": "mc",
+              "prompt": "Which capital letter has NO line of symmetry?",
+              "choices": [
+                "R",
+                "M",
+                "T",
+                "E"
+              ],
+              "answer": "R"
+            },
+            {
+              "id": "x24e-q2",
+              "type": "fill",
+              "prompt": "How many lines of symmetry does an isosceles triangle (not equilateral) have?",
+              "answer": "1",
+              "accept": [
+                "1",
+                "one"
+              ]
+            },
+            {
+              "id": "x24e-q3",
+              "type": "mc",
+              "prompt": "How many lines of symmetry does a scalene triangle have?",
+              "choices": [
+                "0",
+                "1",
+                "3"
+              ],
+              "answer": "0"
             }
           ]
         }

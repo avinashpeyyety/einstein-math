@@ -774,6 +774,47 @@
       out += seg([140, 16], [140, 132]) + head([140, 132], [140, 16]) + head([140, 16], [140, 132]);
       out += square(140, 96, 0, 15) + txt(170, 82, '90°', HOT, 15) + dot([140, 96]);
       H = 142;
+    } else if (o.kind === 'triangles') {
+      const poly = (pts, c) => `<polygon points="${pts.map((q) => f(q[0]) + ',' + f(q[1])).join(' ')}" fill="${c || '#FFF8E1'}" stroke="${INK}" stroke-width="2.5" stroke-linejoin="round"/>`;
+      [['equilateral', [[-30, 0], [30, 0], [0, -52]]],
+        ['isosceles', [[-22, 0], [22, 0], [0, -70]]],
+        ['scalene', [[-36, 0], [34, 0], [-16, -56]]]].forEach(([name, ps], i) => {
+        const cx = 47 + i * 93, by = 92;
+        out += poly(ps.map(([x, y]) => [cx + x, by + y])) + txt(cx, by + 22, name, COOL, 13);
+      });
+      H = 124;
+    } else if (o.kind === 'quads') {
+      const poly = (pts) => `<polygon points="${pts.map((q) => f(q[0]) + ',' + f(q[1])).join(' ')}" fill="#FFF8E1" stroke="${INK}" stroke-width="2.5" stroke-linejoin="round"/>`;
+      [['square', [[-22, -22], [22, -22], [22, 22], [-22, 22]]],
+        ['rectangle', [[-30, -17], [30, -17], [30, 17], [-30, 17]]],
+        ['rhombus', [[0, -28], [22, 0], [0, 28], [-22, 0]]],
+        ['parallelogram', [[-20, -17], [30, -17], [20, 17], [-30, 17]]]].forEach(([name, ps], i) => {
+        const cx = 35 + i * 70, cy = 48;
+        out += poly(ps.map(([x, y]) => [cx + x, cy + y])) + txt(cx, 98, name, COOL, 10);
+      });
+      H = 110;
+    } else if (o.kind === 'symmetry') {
+      const dash = (a, b) => `<line x1="${f(a[0])}" y1="${f(a[1])}" x2="${f(b[0])}" y2="${f(b[1])}" stroke="${HOT}" stroke-width="2" stroke-dasharray="5 4"/>`;
+      const poly = (pts) => `<polygon points="${pts.map((q) => f(q[0]) + ',' + f(q[1])).join(' ')}" fill="#FFF8E1" stroke="${INK}" stroke-width="2.5" stroke-linejoin="round"/>`;
+      const cy = 58;
+      const sq = [[17, cy - 30], [77, cy - 30], [77, cy + 30], [17, cy + 30]];
+      out += poly(sq) + dash([47, cy - 38], [47, cy + 38]) + dash([9, cy], [85, cy]) + dash(sq[0], sq[2]) + dash(sq[1], sq[3]);
+      out += poly([[102, cy - 22], [178, cy - 22], [178, cy + 22], [102, cy + 22]]) + dash([140, cy - 32], [140, cy + 32]) + dash([94, cy], [186, cy]);
+      const tv = [[201, cy + 26], [265, cy + 26], [233, cy + 26 - 55.4]];
+      out += poly(tv);
+      tv.forEach((v, i) => { const a = tv[(i + 1) % 3], b = tv[(i + 2) % 3]; out += dash(v, [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2]); });
+      out += txt(47, 112, '4 lines', COOL, 13) + txt(140, 112, '2 lines', COOL, 13) + txt(233, 112, '3 lines', COOL, 13);
+      H = 124;
+    } else if (o.kind === 'letters') {
+      const dash = (a, b) => `<line x1="${f(a[0])}" y1="${f(a[1])}" x2="${f(b[0])}" y2="${f(b[1])}" stroke="${HOT}" stroke-width="2" stroke-dasharray="5 4"/>`;
+      [['A', 'v', '1 line'], ['H', 'vh', '2 lines'], ['B', 'h', '1 line'], ['F', '', 'none']].forEach(([ch, ax, lab], i) => {
+        const cx = 35 + i * 70;
+        out += `<text x="${cx}" y="80" text-anchor="middle" font-size="60" font-weight="700" font-family="Arial,Helvetica,sans-serif" fill="${INK}">${ch}</text>`;
+        if (ax.includes('v')) out += dash([cx, 14], [cx, 88]);
+        if (ax.includes('h')) out += dash([cx - 28, 58], [cx + 28, 58]);
+        out += txt(cx, 108, lab, ax ? COOL : INK, 13);
+      });
+      H = 118;
     }
     const aria = o.aria || o.caption || 'geometry figure';
     const cap = o.caption ? `<div style="font-family:Comic Neue,cursive;font-size:0.95rem;margin-top:0.25rem;">${o.caption}</div>` : '';
@@ -1632,6 +1673,27 @@
         kind: 'perpendicular',
         caption: '<strong>Perpendicular</strong> lines cross at a square corner: 90°',
         aria: 'Two perpendicular lines crossing with a right angle mark'
+      }),
+      // X24 cycle 2 — classify triangles & quadrilaterals (4.G.2, 5.G.3–4), line symmetry (4.G.3)
+      'geo-triangle-types': geometryFigure({
+        kind: 'triangles',
+        caption: '<strong>equilateral</strong> 3 equal sides · <strong>isosceles</strong> 2 equal · <strong>scalene</strong> none equal',
+        aria: 'Three triangles: equilateral with all sides equal, isosceles with two equal sides, scalene with no equal sides'
+      }),
+      'geo-quad-family': geometryFigure({
+        kind: 'quads',
+        caption: 'A <strong>square</strong> is a rectangle AND a rhombus · every rectangle and rhombus is a parallelogram',
+        aria: 'Four quadrilaterals: square, rectangle, rhombus and parallelogram'
+      }),
+      'geo-symmetry-shapes': geometryFigure({
+        kind: 'symmetry',
+        caption: 'Lines of symmetry: square <strong>4</strong> · rectangle <strong>2</strong> · equilateral triangle <strong>3</strong>',
+        aria: 'A square with 4 dashed lines of symmetry, a rectangle with 2, and an equilateral triangle with 3'
+      }),
+      'geo-symmetry-letters': geometryFigure({
+        kind: 'letters',
+        caption: 'Fold to check: A down the middle, H both ways, B top to bottom, F <strong>no</strong> line',
+        aria: 'Letters A, H, B and F with their dashed lines of symmetry; F has none'
       }),
       'skip-mult': `
         <div class="viz-box" style="font-family:Bangers,Impact,sans-serif;font-size:1.3rem;">

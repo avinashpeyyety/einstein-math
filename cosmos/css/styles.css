@@ -825,6 +825,16 @@ kbd {
   }
 }
 
+/* C4c: on desktop the right info panel (16px + 280px) stays open in Earth/LEO; the body list is hidden there (C4b),
+   so left-align the bar and stop it 12px short of the panel instead of centring it under the panel. */
+@media (min-width: 901px) {
+  .earth-bar {
+    left: 16px;
+    transform: none;
+    width: min(960px, calc(100vw - 16px - 280px - 16px - 12px));
+  }
+}
+
 /* Responsive */
 @media (max-width: 900px) {
   .hud-right {

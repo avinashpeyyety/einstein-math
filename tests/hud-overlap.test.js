@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* C4b (v2.6.2): the Earth/LEO bar never overlaps the header or the body list — plain Node, no deps.
+/* C4b (v2.6.2) + C4c (v2.6.8): the Earth/LEO bar never overlaps the header, the body list or the right info panel — plain Node, no deps.
  * Static wiring checks; the pixel overlaps (0 at 360–1280px) are measured by the headless-Chrome smoke.
  * Run: node tests/hud-overlap.test.js   (from repo root) */
 'use strict';
@@ -48,5 +48,22 @@ t('phones: Earth mode drops the header meta chips so the bar + mission HUD fit (
   const block = css.slice(m, css.indexOf('\n}\n', m));
   assert.match(block, /body\.earth-mode \.hud-top \.meta-chip \{\s*display: none;/);
   assert.doesNotMatch(topLevel, /body\.earth-mode \.hud-top \.meta-chip/);
+});
+t('C4c desktop: bar is left-aligned and stops 12px short of the right info panel (>900px only)', () => {
+  const m = css.indexOf('@media (min-width: 901px) {\n  .earth-bar {');
+  assert.ok(m >= 0, 'missing C4c desktop rule');
+  const r = css.slice(m, css.indexOf('}', m));
+  assert.match(r, /left:\s*16px/);
+  assert.match(r, /transform:\s*none/);
+  assert.match(r, /width:\s*min\(960px, calc\(100vw - 16px - 280px - 16px - 12px\)\)/);
+  // geometry: panel = right 16px + 280px wide; the bar's right edge must clear it at 1024/1280/1440
+  const hr = rule(topLevel, '.hud-right'); assert.match(hr, /right:\s*16px/);
+  assert.match(rule(topLevel, '.hud-panel'), /width:\s*min\(280px/);
+  for (const vw of [1024, 1280, 1440]) {
+    const barRight = 16 + Math.min(960, vw - 16 - 280 - 16 - 12), panelLeft = vw - 16 - 280;
+    assert.ok(barRight <= panelLeft - 12, `${vw}px: bar right ${barRight} vs panel left ${panelLeft}`);
+  }
+  // the panel is hidden at ≤900px, so the C4c rule must not reach that range
+  assert.match(css, /@media \(max-width: 900px\) \{\s*\.hud-right \{\s*display: none;/);
 });
 console.log(`# pass ${pass}`);

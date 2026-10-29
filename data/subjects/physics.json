@@ -4,8 +4,8 @@
     "title": "Einstein Physics",
     "status": "live",
     "schemaVersion": 3,
-    "version": "0.5.0",
-    "note": "X40 (cycle 1/2): ages 7–8 Simple Machines unit — lever labs (Lever Lift, Balance the Seesaw); pulleys next. X12: ages 9–10 Speed, Gravity & Circuits unit (5 lab lessons). X6: ages 5–6 Push, Pull, Sink & Float unit (3 lab lessons). X5: ages 7–8 Forces & Friction unit (4 lab lessons + unit check). Ages 9–10 also: Ramp Racer."
+    "version": "0.6.0",
+    "note": "X40: ages 7–8 Simple Machines unit — lever labs (Lever Lift, Balance the Seesaw) + pulley labs (Pulley Power, The Rope Trade). X12: ages 9–10 Speed, Gravity & Circuits unit (5 lab lessons). X6: ages 5–6 Push, Pull, Sink & Float unit (3 lab lessons). X5: ages 7–8 Forces & Friction unit (4 lab lessons + unit check). Ages 9–10 also: Ramp Racer."
   },
   "tracks": {
     "ages-5-6": {
@@ -506,7 +506,9 @@
           "description": "Levers and pulleys make heavy things easy! Find the fulcrum trick in Einstein's seesaw lab.",
           "lessons": [
             "ph-lever-lift",
-            "ph-lever-balance"
+            "ph-lever-balance",
+            "ph-pulley-power",
+            "ph-pulley-trade"
           ]
         }
       ],
@@ -1634,6 +1636,365 @@
                 "label": "the seesaw balances"
               },
               "hint": "The push needs 3 times the distance of the load — try 0.5 m and 1.5 m, or 1 m and 3 m."
+            }
+          ]
+        },
+        "ph-pulley-power": {
+          "id": "ph-pulley-power",
+          "unitId": "unit-simple-machines",
+          "type": "sim",
+          "title": "Pulley Power",
+          "durationMin": 8,
+          "prerequisites": [
+            "ph-lever-balance"
+          ],
+          "skills": [
+            "pulley",
+            "fixed-pulley",
+            "movable-pulley"
+          ],
+          "einsteinIntro": "Builders lift heavy things with ropes and wheels called pulleys. Let's see how many ropes it takes!",
+          "explain": {
+            "panels": [
+              {
+                "speech": "One pulley on the ceiling lets you pull DOWN to lift UP — but you still pull the whole weight.",
+                "state": "explain"
+              },
+              {
+                "speech": "Add a moving pulley and the load hangs on 2 ropes. Each rope holds half, so you pull half!",
+                "state": "think"
+              },
+              {
+                "speech": "More ropes holding the load means less pull: 60 kg on 3 ropes needs 60 ÷ 3 = 20 kg.",
+                "state": "cheer"
+              }
+            ]
+          },
+          "sim": {
+            "kind": "pulley",
+            "params": {
+              "load": 40,
+              "ropes": 1,
+              "pull": 20,
+              "height": 1
+            },
+            "controls": [
+              {
+                "param": "load",
+                "label": "Load",
+                "min": 10,
+                "max": 80,
+                "step": 10
+              },
+              {
+                "param": "ropes",
+                "label": "Ropes holding the load",
+                "min": 1,
+                "max": 4,
+                "step": 1
+              },
+              {
+                "param": "pull",
+                "label": "Einstein's pull",
+                "min": 5,
+                "max": 60,
+                "step": 5
+              }
+            ],
+            "explore": "Try 1, 2, 3 and 4 ropes. How strong does Einstein's pull have to be each time?"
+          },
+          "simChecks": [
+            {
+              "id": "ph-pp-c1",
+              "type": "predict",
+              "prompt": "A 40 kg box hangs on 1 rope over a ceiling pulley. Einstein pulls 20 kg. Does the box lift?",
+              "setup": {
+                "load": 40,
+                "ropes": 1,
+                "pull": 20
+              },
+              "metric": "lifts",
+              "choices": [
+                {
+                  "label": "Yes, up it goes ⬆️",
+                  "value": true
+                },
+                {
+                  "label": "No, it stays down",
+                  "value": false
+                }
+              ],
+              "hint": "With 1 rope, you have to pull more than the whole 40 kg."
+            },
+            {
+              "id": "ph-pp-c2",
+              "type": "predict",
+              "prompt": "Now the same 40 kg box hangs on 2 ropes with a moving pulley. Does Einstein need less, the same, or more pull?",
+              "setup": {
+                "load": 40,
+                "ropes": 1,
+                "pull": 20
+              },
+              "compare": {
+                "alt": {
+                  "ropes": 2
+                },
+                "metric": "needed"
+              },
+              "choices": [
+                {
+                  "label": "Less pull",
+                  "value": "less"
+                },
+                {
+                  "label": "Same pull",
+                  "value": "same"
+                },
+                {
+                  "label": "More pull",
+                  "value": "more"
+                }
+              ],
+              "hint": "2 ropes share the load, so each one holds half."
+            },
+            {
+              "id": "ph-pp-c3",
+              "type": "predict",
+              "prompt": "A 60 kg box hangs on 3 ropes. What pull holds it still?",
+              "setup": {
+                "load": 60,
+                "ropes": 3,
+                "pull": 5
+              },
+              "metric": "needed",
+              "choices": [
+                {
+                  "label": "10 kg",
+                  "value": 10
+                },
+                {
+                  "label": "20 kg",
+                  "value": 20
+                },
+                {
+                  "label": "30 kg",
+                  "value": 30
+                },
+                {
+                  "label": "60 kg",
+                  "value": 60
+                }
+              ],
+              "hint": "Share 60 kg among 3 ropes: 60 ÷ 3."
+            },
+            {
+              "id": "ph-pp-c4",
+              "type": "goal",
+              "prompt": "The load is 60 kg and Einstein can only pull 20 kg (both locked). Add ropes until the load lifts up! Run it, then press Check.",
+              "setup": {
+                "load": 60,
+                "ropes": 1,
+                "pull": 20
+              },
+              "lock": [
+                "load",
+                "pull"
+              ],
+              "goal": {
+                "metric": "lifts",
+                "op": "eq",
+                "value": true,
+                "label": "the load lifts up"
+              },
+              "hint": "3 ropes × 20 kg only holds 60 kg still. You need one more rope!"
+            }
+          ]
+        },
+        "ph-pulley-trade": {
+          "id": "ph-pulley-trade",
+          "unitId": "unit-simple-machines",
+          "type": "sim",
+          "title": "The Rope Trade",
+          "durationMin": 8,
+          "prerequisites": [
+            "ph-pulley-power"
+          ],
+          "skills": [
+            "pulley",
+            "trade-off",
+            "work"
+          ],
+          "einsteinIntro": "Pulleys make lifting easier — but nothing is free! Let's find out what you pay for an easy pull.",
+          "explain": {
+            "panels": [
+              {
+                "speech": "To lift a load 1 m on 2 ropes, both ropes get 1 m shorter — so you pull 2 m of rope.",
+                "state": "explain"
+              },
+              {
+                "speech": "More ropes: less pull, but more rope to pull. Rope pulled = lift height × ropes.",
+                "state": "think"
+              },
+              {
+                "speech": "Easy pull, long pull. That's the pulley trade!",
+                "state": "cheer"
+              }
+            ]
+          },
+          "sim": {
+            "kind": "pulley",
+            "params": {
+              "load": 40,
+              "ropes": 2,
+              "pull": 30,
+              "height": 1
+            },
+            "controls": [
+              {
+                "param": "load",
+                "label": "Load",
+                "min": 10,
+                "max": 80,
+                "step": 10
+              },
+              {
+                "param": "ropes",
+                "label": "Ropes holding the load",
+                "min": 1,
+                "max": 4,
+                "step": 1
+              },
+              {
+                "param": "pull",
+                "label": "Einstein's pull",
+                "min": 5,
+                "max": 60,
+                "step": 5
+              },
+              {
+                "param": "height",
+                "label": "Lift height",
+                "min": 0.5,
+                "max": 2,
+                "step": 0.5
+              }
+            ],
+            "explore": "Lift the box 1 m with 1, 2 and 4 ropes. Watch how much rope Einstein pulls each time."
+          },
+          "simChecks": [
+            {
+              "id": "ph-pt-c1",
+              "type": "predict",
+              "prompt": "Einstein lifts a box 1 m with a pulley that has 2 ropes holding it. How much rope does he pull?",
+              "setup": {
+                "load": 40,
+                "ropes": 2,
+                "pull": 30,
+                "height": 1
+              },
+              "metric": "rope",
+              "choices": [
+                {
+                  "label": "1 m",
+                  "value": 1
+                },
+                {
+                  "label": "2 m",
+                  "value": 2
+                },
+                {
+                  "label": "4 m",
+                  "value": 4
+                }
+              ],
+              "hint": "Each of the 2 ropes gets 1 m shorter."
+            },
+            {
+              "id": "ph-pt-c2",
+              "type": "predict",
+              "prompt": "Same box, same 1 m lift, but now 4 ropes hold it. Does Einstein pull less, the same, or more rope?",
+              "setup": {
+                "load": 40,
+                "ropes": 2,
+                "pull": 30,
+                "height": 1
+              },
+              "compare": {
+                "alt": {
+                  "ropes": 4
+                },
+                "metric": "rope"
+              },
+              "choices": [
+                {
+                  "label": "Less rope",
+                  "value": "less"
+                },
+                {
+                  "label": "Same rope",
+                  "value": "same"
+                },
+                {
+                  "label": "More rope",
+                  "value": "more"
+                }
+              ],
+              "hint": "Rope pulled = lift height × ropes."
+            },
+            {
+              "id": "ph-pt-c3",
+              "type": "predict",
+              "prompt": "And with those 4 ropes, does he need less, the same, or more pull than with 2?",
+              "setup": {
+                "load": 40,
+                "ropes": 2,
+                "pull": 30,
+                "height": 1
+              },
+              "compare": {
+                "alt": {
+                  "ropes": 4
+                },
+                "metric": "needed"
+              },
+              "choices": [
+                {
+                  "label": "Less pull",
+                  "value": "less"
+                },
+                {
+                  "label": "Same pull",
+                  "value": "same"
+                },
+                {
+                  "label": "More pull",
+                  "value": "more"
+                }
+              ],
+              "hint": "More ropes share the load."
+            },
+            {
+              "id": "ph-pt-c4",
+              "type": "goal",
+              "prompt": "Einstein pulls 15 kg and the box is 40 kg (both locked). Set the ropes and the lift height so the box goes up and he pulls exactly 6 m of rope! Run it, then press Check.",
+              "setup": {
+                "load": 40,
+                "ropes": 1,
+                "pull": 15,
+                "height": 1
+              },
+              "lock": [
+                "load",
+                "pull"
+              ],
+              "goal": {
+                "metric": "pulled",
+                "op": "approx",
+                "value": 6,
+                "tol": 0.01,
+                "label": "the box lifts and Einstein pulls 6 m of rope"
+              },
+              "hint": "First add enough ropes to lift 40 kg with 15 kg of pull. Then rope pulled = height × ropes: 3 ropes × 2 m, or 4 ropes × 1.5 m."
             }
           ]
         }

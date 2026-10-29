@@ -18,6 +18,7 @@ require('../js/sims/speed.js');  // X12: ages 9–10 speed / gravity / circuits
 require('../js/sims/fall.js');
 require('../js/sims/circuit.js');
 require('../js/sims/lever.js');  // X40: ages 7–8 simple machines
+require('../js/sims/pulley.js');  // X40 cycle 2: pulleys
 const Checks = require('../js/sims/checks.js');
 const PHYS = JSON.parse(read('data/subjects/physics.json'));
 const simLessons = Object.values(PHYS.tracks).flatMap(tr => Object.values(tr.lessons).filter(L => L.type === 'sim'));

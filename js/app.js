@@ -2712,7 +2712,8 @@
     speed: { global: 'SimSpeed', scripts: ['js/sims/kit.js', 'js/sims/speed.js'] },
     fall: { global: 'SimFall', scripts: ['js/sims/kit.js', 'js/sims/fall.js'] },
     circuit: { global: 'SimCircuit', scripts: ['js/sims/kit.js', 'js/sims/circuit.js'] },
-    lever: { global: 'SimLever', scripts: ['js/sims/kit.js', 'js/sims/lever.js'] }
+    lever: { global: 'SimLever', scripts: ['js/sims/kit.js', 'js/sims/lever.js'] },
+    pulley: { global: 'SimPulley', scripts: ['js/sims/kit.js', 'js/sims/pulley.js'] }
   };
   const simScriptPromises = {};
   let simLab = null;

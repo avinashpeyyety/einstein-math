@@ -41,8 +41,8 @@ t('1. lever law: needed = load·loadArm ÷ effortArm; lifts / balanced / stays d
 t('2. unit after Forces & Friction; 2 sim lessons; prereq chain; validateLesson empty; X5 unit untouched', () => {
   assert.deepStrictEqual(tr.units.map(u => u.id), ['unit-forces-friction', 'unit-simple-machines']);
   assert.strictEqual(tr.units[0].lessons.length, 5);
-  assert.deepStrictEqual(unit.lessons, ['ph-lever-lift', 'ph-lever-balance']);
-  unit.lessons.forEach((id, i) => {
+  assert.deepStrictEqual(unit.lessons.slice(0, 2), ['ph-lever-lift', 'ph-lever-balance']);  // cycle 2 appends pulleys (physics-x40b)
+  unit.lessons.slice(0, 2).forEach((id, i) => {
     const L = tr.lessons[id];
     assert.strictEqual(L.unitId, unit.id);
     assert.strictEqual(L.type, 'sim');
@@ -51,12 +51,12 @@ t('2. unit after Forces & Friction; 2 sim lessons; prereq chain; validateLesson 
     assert.deepStrictEqual(L.prerequisites, i ? [unit.lessons[i - 1]] : [], id + ' prereqs');
     assert.ok(L.explain.panels.length >= 2 && L.simChecks.length >= 3);
   });
-  assert.strictEqual(PHYS.meta.version, '0.5.0');
+  assert.ok(PHYS.meta.version >= '0.5.0');
 });
 
 t('3. every goal needs a change and is reachable; predictions match the sim', () => {
   let goals = 0, predicts = 0;
-  unit.lessons.forEach(id => {
+  unit.lessons.slice(0, 2).forEach(id => {
     const L = tr.lessons[id];
     L.simChecks.forEach(c => {
       if (c.type === 'goal') {

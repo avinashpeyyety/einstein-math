@@ -61,11 +61,11 @@ function checker(prompt) {
   return null;
 }
 
-t('1. the 3 lessons sit in unit-fractions right after fr-unit-fractions; track has 40 lessons; old lessons untouched', () => {
+t('1. the 3 lessons sit in unit-fractions right after fr-unit-fractions; track has 43 lessons (X28 +3); old lessons untouched', () => {
   const i = unit.lessons.indexOf('fr-unit-fractions');
   assert.ok(i >= 0);
   assert.deepStrictEqual(unit.lessons.slice(i + 1, i + 4), IDS);
-  assert.strictEqual(Object.keys(tr.lessons).length, 40);
+  assert.strictEqual(Object.keys(tr.lessons).length, 43);
   IDS.forEach(id => assert.strictEqual(tr.lessons[id].unitId, 'unit-fractions', id));
   ['fr-halves-fourths', 'fr-thirds-set', 'fr-set-of'].forEach(id => assert.ok(unit.lessons.includes(id), id));
   const all = tr.units.flatMap(u => u.lessons);

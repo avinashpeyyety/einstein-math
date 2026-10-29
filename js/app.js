@@ -1546,6 +1546,46 @@
           <div style="font-family:Comic Neue,cursive;font-size:1rem;">10 ones make a NEW ten!</div>
         </div>`,
 
+      // X28 — ages 7–8 add/sub within 1000, skip-count & expanded form, even/odd (2.NBT, 2.OA.3)
+      'add-1000-regroup': `
+        <div class="viz-box" style="font-family:monospace;font-size:1.25rem;">
+          <span style="color:#FF6B35;">&nbsp;¹¹</span><br>&nbsp;&nbsp;456<br>+ 278<br>─────<br>&nbsp;&nbsp;734
+          <div style="font-family:Comic Neue,cursive;font-size:0.95rem;">Ones 6+8=14 → write 4, carry 1 · Tens 5+7+1=13 → write 3, carry 1 · Hundreds 4+2+1=7</div>
+        </div>`,
+      'sub-1000-borrow': `
+        <div class="viz-box" style="font-family:monospace;font-size:1.25rem;">
+          &nbsp;&nbsp;532<br>− 187<br>─────<br>&nbsp;&nbsp;345
+          <div style="font-family:Comic Neue,cursive;font-size:0.95rem;">Trade a ten: 12−7=5 · Trade a hundred: 12−8=4 · 4−1=3</div>
+        </div>`,
+      'skip-count-5-10-100': `
+        <div class="viz-box" style="font-family:Bangers,Impact,sans-serif;font-size:1.2rem;line-height:1.6;">
+          5s: 5 · 10 · 15 · 20 · <span style="color:#FF6B35;">25</span><br>
+          10s: 340 · 350 · 360 · <span style="color:#FF6B35;">370</span><br>
+          100s: 200 · 300 · 400 · <span style="color:#FF6B35;">500</span>
+          <div style="font-family:Comic Neue,cursive;font-size:1rem;">🦘 Hop by 10 → the tens change. Hop by 100 → the hundreds change!</div>
+        </div>`,
+      'expanded-482': `
+        <div class="viz-box">
+          <div class="place-blocks">
+            <div class="place-block hundreds">4 hundreds<br>= 400</div>
+            <div class="place-block tens">8 tens<br>= 80</div>
+            <div class="place-block ones">2 ones<br>= 2</div>
+          </div>
+          <div style="margin-top:0.5rem;font-family:Bangers,Impact,sans-serif;font-size:1.4rem;">482 = 400 + 80 + 2</div>
+        </div>`,
+      'even-pairs-8-7': `
+        <div class="viz-box" style="font-size:1.3rem;line-height:1.5;">
+          <div>(●●) (●●) (●●) (●●) &nbsp;<span style="font-family:Bangers,Impact,sans-serif;">8 = EVEN</span></div>
+          <div>(●●) (●●) (●●) <span style="color:#FF6B35;">●</span> &nbsp;<span style="font-family:Bangers,Impact,sans-serif;">7 = ODD</span></div>
+          <div style="font-family:Comic Neue,cursive;font-size:1rem;">Everyone has a partner → even. One left over → odd!</div>
+        </div>`,
+      'even-doubles': `
+        <div class="viz-box" style="font-family:Bangers,Impact,sans-serif;font-size:1.3rem;line-height:1.5;">
+          6 = 3 + 3 &nbsp;·&nbsp; 10 = 5 + 5 &nbsp;→ even<br>
+          7 = 3 + 3 + <span style="color:#FF6B35;">1</span> &nbsp;→ odd
+          <div style="font-family:Comic Neue,cursive;font-size:1rem;">Even numbers end in 0, 2, 4, 6 or 8!</div>
+        </div>`,
+
       // X21 — ages 7–8 area (3.MD) unit-square grids
       'area-grid-3x4': unitSquareGrid({
         rows: 3, cols: 4,

@@ -4132,7 +4132,8 @@
             "ns-compare-numbers",
             "ns-rounding-intro",
             "ns-estimate-sums",
-            "ns-round-hundreds"
+            "ns-round-hundreds",
+            "ns-skip-count-expanded"
           ]
         },
         {
@@ -4146,7 +4147,8 @@
             "as-sub-within-100",
             "as-add-regroup",
             "as-sub-regroup",
-            "as-add-fluency"
+            "as-add-fluency",
+            "as-add-sub-1000"
           ]
         },
         {
@@ -4156,6 +4158,7 @@
           "color": "#FFE66D",
           "description": "Equal groups, arrays, and sharing — the secret of times tables!",
           "lessons": [
+            "md-even-odd",
             "md-equal-groups",
             "md-arrays-div",
             "md-facts-2-5-10",
@@ -9200,6 +9203,458 @@
               "answer": "2/8",
               "accept": [
                 "2/8"
+              ]
+            }
+          ]
+        },
+        "as-add-sub-1000": {
+          "id": "as-add-sub-1000",
+          "unitId": "unit-add-sub",
+          "title": "Add & Subtract within 1000",
+          "durationMin": 10,
+          "prerequisites": [
+            "as-add-fluency",
+            "as-sub-regroup"
+          ],
+          "skills": [
+            "add-3digit",
+            "sub-3digit"
+          ],
+          "einsteinIntro": "Big numbers, same tricks! Line up hundreds, tens and ones — then regroup when a place gets too full or too empty.",
+          "explain": {
+            "panels": [
+              {
+                "speech": "Add ones, then tens, then hundreds. 6 + 8 = 14 ones → write 4, carry 1 ten. 456 + 278 = 734!",
+                "visual": "add-1000-regroup",
+                "state": "explain"
+              },
+              {
+                "speech": "Not enough ones to take away? Trade 1 ten for 10 ones. Not enough tens? Trade 1 hundred for 10 tens. 532 − 187 = 345!",
+                "visual": "sub-1000-borrow",
+                "state": "think"
+              }
+            ]
+          },
+          "workedExample": {
+            "title": "Worked Example",
+            "speech": "Solve 368 + 254.",
+            "steps": [
+              "Ones: 8 + 4 = 12 → write 2, carry 1 ten",
+              "Tens: 6 + 5 + 1 = 12 → write 2, carry 1 hundred",
+              "Hundreds: 3 + 2 + 1 = 6 → 368 + 254 = 622"
+            ]
+          },
+          "practice": [
+            {
+              "id": "x28a-p1",
+              "type": "fill",
+              "prompt": "243 + 125 = ?",
+              "answer": "368",
+              "accept": [
+                "368"
+              ],
+              "hint": "No regrouping needed — add each place.",
+              "feedbackCorrect": "368!",
+              "feedbackWrong": "3 + 5 = 8 ones, 4 + 2 = 6 tens, 2 + 1 = 3 hundreds → 368."
+            },
+            {
+              "id": "x28a-p2",
+              "type": "mc",
+              "prompt": "456 + 278 = ?",
+              "choices": [
+                "734",
+                "624",
+                "634",
+                "724"
+              ],
+              "answer": "734",
+              "hint": "6 + 8 = 14 ones → carry 1 ten.",
+              "feedbackCorrect": "734 — great regrouping!",
+              "feedbackWrong": "Ones 14 → write 4 carry 1; tens 5 + 7 + 1 = 13 → write 3 carry 1; hundreds 4 + 2 + 1 = 7 → 734."
+            },
+            {
+              "id": "x28a-p3",
+              "type": "fill",
+              "prompt": "600 − 245 = ?",
+              "answer": "355",
+              "accept": [
+                "355"
+              ],
+              "hint": "No ones or tens in 600? Trade 1 hundred for 9 tens and 10 ones.",
+              "feedbackCorrect": "355!",
+              "feedbackWrong": "600 = 5 hundreds + 9 tens + 10 ones. 10 − 5 = 5, 9 − 4 = 5, 5 − 2 = 3 → 355."
+            },
+            {
+              "id": "x28a-p4",
+              "type": "mc",
+              "prompt": "532 − 187 = ?",
+              "choices": [
+                "345",
+                "455",
+                "355",
+                "445"
+              ],
+              "answer": "345",
+              "hint": "2 ones − 7 ones? Trade a ten first.",
+              "feedbackCorrect": "345!",
+              "feedbackWrong": "12 − 7 = 5 ones; 12 − 8 = 4 tens (after trading a hundred); 4 − 1 = 3 hundreds → 345."
+            },
+            {
+              "id": "x28a-p5",
+              "type": "fill",
+              "prompt": "The library has 385 books. It gets 147 more. How many books now?",
+              "answer": "532",
+              "accept": [
+                "532"
+              ],
+              "hint": "Add: 385 + 147.",
+              "feedbackCorrect": "532 books!",
+              "feedbackWrong": "385 + 147: 5 + 7 = 12, 8 + 4 + 1 = 13, 3 + 1 + 1 = 5 → 532."
+            },
+            {
+              "id": "x28a-p6",
+              "type": "mc",
+              "prompt": "In 368 + 254, the ones make 8 + 4 = 12. What do you do?",
+              "choices": [
+                "write 2, carry 1 ten",
+                "write 12 in the ones",
+                "write 1, carry 2 tens"
+              ],
+              "answer": "write 2, carry 1 ten",
+              "hint": "12 ones = 1 ten and 2 ones.",
+              "feedbackCorrect": "Yes — write 2, carry 1 ten!",
+              "feedbackWrong": "12 ones is 1 ten and 2 ones: write the 2, carry the ten."
+            }
+          ],
+          "quickCheck": [
+            {
+              "id": "x28a-q1",
+              "type": "fill",
+              "prompt": "309 + 491 = ?",
+              "answer": "800",
+              "accept": [
+                "800"
+              ]
+            },
+            {
+              "id": "x28a-q2",
+              "type": "fill",
+              "prompt": "703 − 268 = ?",
+              "answer": "435",
+              "accept": [
+                "435"
+              ]
+            },
+            {
+              "id": "x28a-q3",
+              "type": "mc",
+              "prompt": "A rocket must fly 900 km. It has flown 450 km. How many km are left?",
+              "choices": [
+                "450",
+                "550",
+                "350",
+                "1350"
+              ],
+              "answer": "450"
+            }
+          ]
+        },
+        "ns-skip-count-expanded": {
+          "id": "ns-skip-count-expanded",
+          "unitId": "unit-number-sense",
+          "title": "Skip-Count & Expanded Form",
+          "durationMin": 9,
+          "prerequisites": [
+            "ns-place-value-basics"
+          ],
+          "skills": [
+            "skip-count-5-10-100",
+            "expanded-form"
+          ],
+          "einsteinIntro": "Hop like a kangaroo! Skip-count by 5s, 10s and 100s — then stretch a number out to see what each digit is worth.",
+          "explain": {
+            "panels": [
+              {
+                "speech": "By 5s: 5, 10, 15, 20… By 10s: 340, 350, 360… By 100s: 200, 300, 400… Only one place changes when you hop by 10 or 100!",
+                "visual": "skip-count-5-10-100",
+                "state": "explain"
+              },
+              {
+                "speech": "Expanded form stretches a number: 482 = 400 + 80 + 2. Each digit shows its place value!",
+                "visual": "expanded-482",
+                "state": "cheer"
+              }
+            ]
+          },
+          "workedExample": {
+            "title": "Worked Example",
+            "speech": "Write 607 in expanded form.",
+            "steps": [
+              "6 is in the hundreds place → 600",
+              "0 tens → nothing to add for tens",
+              "7 ones → 7, so 607 = 600 + 7"
+            ]
+          },
+          "practice": [
+            {
+              "id": "x28b-p1",
+              "type": "fill",
+              "prompt": "Skip-count by 5: 15, 20, 25, ? — what comes next?",
+              "answer": "30",
+              "accept": [
+                "30"
+              ],
+              "hint": "Add 5 each hop.",
+              "feedbackCorrect": "30!",
+              "feedbackWrong": "25 + 5 = 30."
+            },
+            {
+              "id": "x28b-p2",
+              "type": "fill",
+              "prompt": "Skip-count by 10: 340, 350, 360, ? — what comes next?",
+              "answer": "370",
+              "accept": [
+                "370"
+              ],
+              "hint": "Only the tens digit changes.",
+              "feedbackCorrect": "370!",
+              "feedbackWrong": "360 + 10 = 370 — the tens go up by one."
+            },
+            {
+              "id": "x28b-p3",
+              "type": "mc",
+              "prompt": "Skip-count by 100: 200, 300, 400, ? — what comes next?",
+              "choices": [
+                "500",
+                "410",
+                "401",
+                "450"
+              ],
+              "answer": "500",
+              "hint": "Only the hundreds digit changes.",
+              "feedbackCorrect": "500!",
+              "feedbackWrong": "400 + 100 = 500."
+            },
+            {
+              "id": "x28b-p4",
+              "type": "fill",
+              "prompt": "Skip-count by 10: 970, 980, 990, ? — what comes next?",
+              "answer": "1000",
+              "accept": [
+                "1000",
+                "1,000"
+              ],
+              "hint": "10 tens make a hundred…",
+              "feedbackCorrect": "1000 — a thousand!",
+              "feedbackWrong": "990 + 10 = 1000."
+            },
+            {
+              "id": "x28b-p5",
+              "type": "mc",
+              "prompt": "Which shows 482 in expanded form?",
+              "choices": [
+                "400 + 80 + 2",
+                "4 + 8 + 2",
+                "400 + 8 + 2",
+                "40 + 80 + 2"
+              ],
+              "answer": "400 + 80 + 2",
+              "hint": "What is each digit worth?",
+              "feedbackCorrect": "400 + 80 + 2!",
+              "feedbackWrong": "4 hundreds = 400, 8 tens = 80, 2 ones = 2."
+            },
+            {
+              "id": "x28b-p6",
+              "type": "fill",
+              "prompt": "Write 600 + 7 as a number.",
+              "answer": "607",
+              "accept": [
+                "607"
+              ],
+              "hint": "There are 0 tens — keep a 0 in the tens place.",
+              "feedbackCorrect": "607!",
+              "feedbackWrong": "6 hundreds, 0 tens, 7 ones → 607."
+            }
+          ],
+          "quickCheck": [
+            {
+              "id": "x28b-q1",
+              "type": "fill",
+              "prompt": "Skip-count by 5: 85, 90, 95, ? — what comes next?",
+              "answer": "100",
+              "accept": [
+                "100"
+              ]
+            },
+            {
+              "id": "x28b-q2",
+              "type": "fill",
+              "prompt": "Write 300 + 50 + 9 as a number.",
+              "answer": "359",
+              "accept": [
+                "359"
+              ]
+            },
+            {
+              "id": "x28b-q3",
+              "type": "mc",
+              "prompt": "Which shows 705 in expanded form?",
+              "choices": [
+                "700 + 5",
+                "700 + 50",
+                "70 + 5",
+                "7 + 0 + 5"
+              ],
+              "answer": "700 + 5"
+            }
+          ]
+        },
+        "md-even-odd": {
+          "id": "md-even-odd",
+          "unitId": "unit-mult-div",
+          "title": "Even or Odd?",
+          "durationMin": 8,
+          "prerequisites": [
+            "as-add-within-100"
+          ],
+          "skills": [
+            "even-odd",
+            "doubles"
+          ],
+          "einsteinIntro": "Can everyone get a partner? Pair things up — if nobody is left over, the number is EVEN. One left over? ODD!",
+          "explain": {
+            "panels": [
+              {
+                "speech": "8 dots make 4 pairs with none left over → 8 is even. 7 dots make 3 pairs and 1 lonely dot → 7 is odd.",
+                "visual": "even-pairs-8-7",
+                "state": "explain"
+              },
+              {
+                "speech": "Even numbers are doubles: 6 = 3 + 3, 10 = 5 + 5. Odd numbers are a double plus one: 7 = 3 + 3 + 1.",
+                "visual": "even-doubles",
+                "state": "think"
+              }
+            ]
+          },
+          "workedExample": {
+            "title": "Worked Example",
+            "speech": "Is 14 even or odd?",
+            "steps": [
+              "Pair up 14 things: 7 pairs",
+              "Nobody is left over",
+              "14 = 7 + 7, a double → 14 is even"
+            ]
+          },
+          "practice": [
+            {
+              "id": "x28c-p1",
+              "type": "mc",
+              "prompt": "Is 14 even or odd?",
+              "choices": [
+                "even",
+                "odd"
+              ],
+              "answer": "even",
+              "hint": "Make pairs — is one left over?",
+              "feedbackCorrect": "Even — 7 pairs!",
+              "feedbackWrong": "14 makes 7 pairs with none left over, so it is even."
+            },
+            {
+              "id": "x28c-p2",
+              "type": "mc",
+              "prompt": "Is 9 even or odd?",
+              "choices": [
+                "even",
+                "odd"
+              ],
+              "answer": "odd",
+              "hint": "Make pairs — is one left over?",
+              "feedbackCorrect": "Odd!",
+              "feedbackWrong": "9 makes 4 pairs and 1 left over, so it is odd."
+            },
+            {
+              "id": "x28c-p3",
+              "type": "fill",
+              "prompt": "Write 8 as a double: 8 = 4 + ?",
+              "answer": "4",
+              "accept": [
+                "4"
+              ],
+              "hint": "A double adds a number to itself.",
+              "feedbackCorrect": "4 + 4 = 8!",
+              "feedbackWrong": "A double uses the same number twice: 8 = 4 + 4."
+            },
+            {
+              "id": "x28c-p4",
+              "type": "fill",
+              "prompt": "18 = ? + ? (a double). What number goes in both boxes?",
+              "answer": "9",
+              "accept": [
+                "9"
+              ],
+              "hint": "What number plus itself makes 18?",
+              "feedbackCorrect": "9 + 9 = 18!",
+              "feedbackWrong": "9 + 9 = 18, so 18 is even."
+            },
+            {
+              "id": "x28c-p5",
+              "type": "mc",
+              "prompt": "Which number is odd?",
+              "choices": [
+                "15",
+                "12",
+                "20",
+                "6"
+              ],
+              "answer": "15",
+              "hint": "Look at the ones digit: 1, 3, 5, 7 or 9 means odd.",
+              "feedbackCorrect": "15 is odd!",
+              "feedbackWrong": "15 makes 7 pairs and 1 left over. 12, 20 and 6 all pair up evenly."
+            },
+            {
+              "id": "x28c-p6",
+              "type": "mc",
+              "prompt": "Max has 13 socks. Can he put ALL of them into pairs?",
+              "choices": [
+                "no — one is left over",
+                "yes — every sock gets a partner"
+              ],
+              "answer": "no — one is left over",
+              "hint": "Is 13 even or odd?",
+              "feedbackCorrect": "Right — 13 is odd!",
+              "feedbackWrong": "13 = 6 + 6 + 1, so one sock has no partner."
+            }
+          ],
+          "quickCheck": [
+            {
+              "id": "x28c-q1",
+              "type": "mc",
+              "prompt": "Is 20 even or odd?",
+              "choices": [
+                "even",
+                "odd"
+              ],
+              "answer": "even"
+            },
+            {
+              "id": "x28c-q2",
+              "type": "mc",
+              "prompt": "Which number is even?",
+              "choices": [
+                "16",
+                "11",
+                "19",
+                "7"
+              ],
+              "answer": "16"
+            },
+            {
+              "id": "x28c-q3",
+              "type": "fill",
+              "prompt": "12 = ? + ? (a double). What number goes in both boxes?",
+              "answer": "6",
+              "accept": [
+                "6"
               ]
             }
           ]

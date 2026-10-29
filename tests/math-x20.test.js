@@ -22,7 +22,7 @@ const items = L => [...L.practice, ...L.quickCheck];
 t('1. 4 lessons exist, wired into unit-mult-div right after md-facts-2-5-10, old lessons untouched', () => {
   const i = unit.lessons.indexOf('md-facts-2-5-10');
   assert.deepStrictEqual(unit.lessons.slice(i + 1, i + 5), IDS);
-  assert.strictEqual(Object.keys(tr.lessons).length, 40); // +3 X25;
+  assert.strictEqual(Object.keys(tr.lessons).length, 43); // +3 X25, +3 X28
   IDS.forEach(id => { assert.ok(tr.lessons[id], id); assert.strictEqual(tr.lessons[id].unitId, 'unit-mult-div'); });
   ['md-equal-groups', 'md-arrays-div', 'md-facts-2-5-10', 'md-quotative', 'md-multiply-stories'].forEach(id => assert.ok(unit.lessons.includes(id), id));
 });

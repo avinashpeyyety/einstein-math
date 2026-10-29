@@ -57,12 +57,12 @@ function solve(prompt) {
   return null;
 }
 
-t('1. unit unit-area (after unit-mult-div) holds the 3 lessons in order; track has 40 lessons (X25 +3)', () => {
+t('1. unit unit-area (after unit-mult-div) holds the 3 lessons in order; track has 43 lessons (X25 +3, X28 +3)', () => {
   assert.ok(unit, 'unit exists');
   assert.deepStrictEqual(unit.lessons, IDS);
   const ids = tr.units.map(u => u.id);
   assert.strictEqual(ids.indexOf('unit-area'), ids.indexOf('unit-mult-div') + 1);
-  assert.strictEqual(Object.keys(tr.lessons).length, 40);
+  assert.strictEqual(Object.keys(tr.lessons).length, 43);
   IDS.forEach(id => assert.strictEqual(tr.lessons[id].unitId, 'unit-area', id));
   const all = tr.units.flatMap(u => u.lessons);
   assert.strictEqual(new Set(all).size, all.length);

@@ -33,7 +33,7 @@ async function t(name, fn) {
     const m = packFiles['data/subjects/math.json'];
     assert.deepStrictEqual(Object.keys(m.tracks).sort(), ['ages-5-6', 'ages-7-8', 'ages-9-10']);
     const n = Object.values(m.tracks).reduce((a, tr) => a + Object.keys(tr.lessons).length, 0);
-    assert.strictEqual(n, 113);
+    assert.strictEqual(n, 117);
     for (const tr of Object.values(m.tracks)) for (const u of tr.units) for (const id of u.lessons) assert.ok(tr.lessons[id], 'unit lesson ' + id);
     const p = packFiles['data/subjects/physics.json'];
     assert.strictEqual(p.meta.subject, 'physics');

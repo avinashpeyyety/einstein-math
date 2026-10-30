@@ -46,7 +46,7 @@ t('1. the 3 lessons sit in u4-geometry right after g4-coord-plane; track has 38 
   const i = unit.lessons.indexOf('g4-coord-plane');
   assert.ok(i >= 0);
   assert.deepStrictEqual(unit.lessons.slice(i + 1, i + 4), IDS);
-  assert.strictEqual(Object.keys(tr.lessons).length, 38); // +2 X24 cycle 2
+  assert.strictEqual(Object.keys(tr.lessons).length, 42); // +2 X24 cycle 2, +4 X26
   IDS.forEach(id => assert.strictEqual(tr.lessons[id].unitId, 'u4-geometry', id));
   assert.deepStrictEqual(tr.lessons['g4-coord-plane'].prerequisites, []);
   const all = tr.units.flatMap(u => u.lessons);

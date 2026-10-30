@@ -1586,6 +1586,87 @@
           <div style="font-family:Comic Neue,cursive;font-size:1rem;">Even numbers end in 0, 2, 4, 6 or 8!</div>
         </div>`,
 
+      // X26 — ages 9–10 thousandths & rounding, powers of 10, multiply & divide decimals (5.NBT.1–4, 5.NBT.7)
+      'decimal-thousandths-pv': `
+        <div class="viz-box">
+          <div class="place-blocks">
+            <div class="place-block ones">3<br>ones</div>
+            <div class="place-block tens">4<br>tenths<br>= 0.4</div>
+            <div class="place-block hundreds">7<br>hundredths<br>= 0.07</div>
+            <div class="place-block ones" style="border-color:#FF6B35;">2<br>thousandths<br>= 0.002</div>
+          </div>
+          <div style="margin-top:0.5rem;font-family:Bangers,Impact,sans-serif;font-size:1.3rem;">3.472 = 3 + 0.4 + 0.07 + 0.002</div>
+        </div>`,
+      'decimal-round-line': `
+        <div class="viz-box">
+          <svg viewBox="0 0 260 70" width="260" height="70" role="img" aria-label="Number line from 4.2 to 4.3 with 4.268 marked closer to 4.3">
+            <line x1="20" y1="35" x2="240" y2="35" stroke="#333" stroke-width="3"/>
+            <line x1="20" y1="25" x2="20" y2="45" stroke="#333" stroke-width="3"/>
+            <line x1="130" y1="28" x2="130" y2="42" stroke="#999" stroke-width="2"/>
+            <line x1="240" y1="25" x2="240" y2="45" stroke="#333" stroke-width="3"/>
+            <circle cx="169.6" cy="35" r="6" fill="#FF6B35"/>
+            <text x="8" y="62" font-size="13" font-family="Bangers,Impact,sans-serif">4.2</text>
+            <text x="117" y="62" font-size="11">4.25</text>
+            <text x="228" y="62" font-size="13" font-family="Bangers,Impact,sans-serif">4.3</text>
+            <text x="150" y="18" font-size="13" fill="#FF6B35" font-family="Bangers,Impact,sans-serif">4.268</text>
+          </svg>
+          <div style="font-family:Comic Neue,cursive;">Past the halfway mark → rounds to <strong>4.3</strong></div>
+        </div>`,
+      'pow10-shift': `
+        <div class="viz-box" style="font-family:monospace;font-size:1.2rem;line-height:1.6;">
+          &nbsp;&nbsp;&nbsp;&nbsp;3.6<br>
+          × 10 &nbsp;&nbsp;→ &nbsp;&nbsp;36<br>
+          × 100 &nbsp;→ &nbsp;360<br>
+          × 1000 → 3600
+          <div style="font-family:Comic Neue,cursive;font-size:1rem;">⬅ Digits hop left one place per zero. ÷ makes them hop right ➡</div>
+        </div>`,
+      'pow10-exponents': `
+        <div class="viz-box" style="font-family:Bangers,Impact,sans-serif;font-size:1.25rem;line-height:1.6;">
+          10¹ = 10<br>
+          10² = 10 × 10 = 100<br>
+          10³ = 10 × 10 × 10 = <span style="color:#FF6B35;">1000</span>
+          <div style="font-family:Comic Neue,cursive;font-size:1rem;">The little number = how many zeros!</div>
+        </div>`,
+      'decimal-mult-grid': `
+        <div class="viz-box">
+          <svg viewBox="0 0 110 110" width="130" height="130" role="img" aria-label="Hundred grid: 3 tenths shaded one way, 2 tenths the other, 6 squares overlap">
+            <rect x="5" y="5" width="30" height="100" fill="#4ECDC4" opacity="0.45"/>
+            <rect x="5" y="5" width="100" height="20" fill="#FFD93D" opacity="0.55"/>
+            <rect x="5" y="5" width="30" height="20" fill="#FF6B35"/>
+            <g stroke="#999" stroke-width="0.5">
+              <line x1="15" y1="5" x2="15" y2="105"/><line x1="25" y1="5" x2="25" y2="105"/><line x1="35" y1="5" x2="35" y2="105"/>
+              <line x1="45" y1="5" x2="45" y2="105"/><line x1="55" y1="5" x2="55" y2="105"/><line x1="65" y1="5" x2="65" y2="105"/>
+              <line x1="75" y1="5" x2="75" y2="105"/><line x1="85" y1="5" x2="85" y2="105"/><line x1="95" y1="5" x2="95" y2="105"/>
+              <line x1="5" y1="15" x2="105" y2="15"/><line x1="5" y1="25" x2="105" y2="25"/><line x1="5" y1="35" x2="105" y2="35"/>
+              <line x1="5" y1="45" x2="105" y2="45"/><line x1="5" y1="55" x2="105" y2="55"/><line x1="5" y1="65" x2="105" y2="65"/>
+              <line x1="5" y1="75" x2="105" y2="75"/><line x1="5" y1="85" x2="105" y2="85"/><line x1="5" y1="95" x2="105" y2="95"/>
+            </g>
+            <rect x="5" y="5" width="100" height="100" fill="none" stroke="#333" stroke-width="2"/>
+          </svg>
+          <div style="font-family:Bangers,Impact,sans-serif;font-size:1.2rem;">0.3 × 0.2 = <span style="color:#FF6B35;">0.06</span></div>
+          <div style="font-family:Comic Neue,cursive;font-size:0.95rem;">The overlap is 6 of 100 tiny squares</div>
+        </div>`,
+      'decimal-mult-places': `
+        <div class="viz-box" style="font-family:monospace;font-size:1.2rem;line-height:1.5;">
+          24 × 15 = 360<br>
+          2.<span style="color:#FF6B35;">4</span> × 1.<span style="color:#FF6B35;">5</span> → 1 + 1 = 2 places<br>
+          = 3.<span style="color:#FF6B35;">60</span> = 3.6
+          <div style="font-family:Comic Neue,cursive;font-size:1rem;">Multiply like whole numbers, then count the decimal places!</div>
+        </div>`,
+      'decimal-div-share': `
+        <div class="viz-box" style="font-family:Bangers,Impact,sans-serif;font-size:1.2rem;line-height:1.5;">
+          4.8 = 48 tenths<br>
+          48 tenths ÷ 4 = 12 tenths each<br>
+          4.8 ÷ 4 = <span style="color:#FF6B35;">1.2</span>
+          <div style="font-family:Comic Neue,cursive;font-size:1rem;">Check: 1.2 × 4 = 4.8 ★</div>
+        </div>`,
+      'decimal-div-halves': `
+        <div class="viz-box" style="font-size:1.3rem;line-height:1.5;">
+          <div>[◐◑] [◐◑] [◐◑]</div>
+          <div style="font-family:Bangers,Impact,sans-serif;">3 wholes = 6 halves → 3 ÷ 0.5 = <span style="color:#FF6B35;">6</span></div>
+          <div style="font-family:Comic Neue,cursive;font-size:1rem;">Dividing by a number less than 1 makes it BIGGER!</div>
+        </div>`,
+
       // X21 — ages 7–8 area (3.MD) unit-square grids
       'area-grid-3x4': unitSquareGrid({
         rows: 3, cols: 4,

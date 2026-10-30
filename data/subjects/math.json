@@ -9731,6 +9731,10 @@
             "g4-volume-wp",
             "g4-decimal-add",
             "g4-decimal-sub",
+            "g5-thousandths-round",
+            "g5-powers-of-ten",
+            "g5-decimal-multiply",
+            "g5-decimal-divide",
             "g4-volume-rect",
             "g4-area-rect"
           ]
@@ -14569,6 +14573,628 @@
                 "3"
               ],
               "answer": "0"
+            }
+          ]
+        },
+        "g5-thousandths-round": {
+          "id": "g5-thousandths-round",
+          "unitId": "u4-decimals-area",
+          "title": "Thousandths & Rounding Decimals",
+          "durationMin": 9,
+          "prerequisites": [
+            "g4-decimal-compare"
+          ],
+          "skills": [
+            "decimal-thousandths",
+            "decimal-rounding"
+          ],
+          "einsteinIntro": "Tenths, hundredths… and now THOUSANDTHS! Each place to the right is 10 times smaller. Let's read, compare and round them.",
+          "explain": {
+            "panels": [
+              {
+                "speech": "3.472 = 3 ones + 4 tenths + 7 hundredths + 2 thousandths. The 2 is worth only 0.002!",
+                "visual": "decimal-thousandths-pv",
+                "state": "explain"
+              },
+              {
+                "speech": "4.268 sits between 4.2 and 4.3 — and it's closer to 4.3. Look one place to the right: 6 is 5 or more, so round UP!",
+                "visual": "decimal-round-line",
+                "state": "think"
+              }
+            ]
+          },
+          "workedExample": {
+            "title": "Worked Example",
+            "speech": "Round 3.476 to the nearest hundredth.",
+            "steps": [
+              "Hundredths place: 3.476 is between 3.47 and 3.48",
+              "Look at the thousandths digit: 6 is 5 or more → round up",
+              "3.476 → 3.48"
+            ]
+          },
+          "practice": [
+            {
+              "id": "x26a-p1",
+              "type": "fill",
+              "prompt": "Write 3 + 0.4 + 0.07 + 0.002 as a decimal.",
+              "answer": "3.472",
+              "accept": [
+                "3.472"
+              ],
+              "hint": "Put each part in its place: ones . tenths hundredths thousandths.",
+              "feedbackCorrect": "3.472!",
+              "feedbackWrong": "3 ones, 4 tenths, 7 hundredths, 2 thousandths → 3.472."
+            },
+            {
+              "id": "x26a-p2",
+              "type": "mc",
+              "prompt": "Which is greater: 0.457 or 0.46?",
+              "choices": [
+                "0.46",
+                "0.457",
+                "they are equal"
+              ],
+              "answer": "0.46",
+              "hint": "Write both with 3 places: 0.457 and 0.460.",
+              "feedbackCorrect": "0.46 is greater!",
+              "feedbackWrong": "0.460 vs 0.457 → 460 thousandths beats 457 thousandths. More digits doesn't mean bigger!"
+            },
+            {
+              "id": "x26a-p3",
+              "type": "fill",
+              "prompt": "Round 4.268 to the nearest tenth.",
+              "answer": "4.3",
+              "accept": [
+                "4.3",
+                "4.30"
+              ],
+              "hint": "Look at the hundredths digit.",
+              "feedbackCorrect": "4.3!",
+              "feedbackWrong": "The hundredths digit is 6 (5 or more), so 4.2 rounds up to 4.3."
+            },
+            {
+              "id": "x26a-p4",
+              "type": "mc",
+              "prompt": "Round 7.352 to the nearest hundredth.",
+              "choices": [
+                "7.35",
+                "7.36",
+                "7.4",
+                "7.3"
+              ],
+              "answer": "7.35",
+              "hint": "Look at the thousandths digit.",
+              "feedbackCorrect": "7.35!",
+              "feedbackWrong": "The thousandths digit is 2 (less than 5), so keep 7.35."
+            },
+            {
+              "id": "x26a-p5",
+              "type": "fill",
+              "prompt": "Round 12.5 to the nearest whole number.",
+              "answer": "13",
+              "accept": [
+                "13"
+              ],
+              "hint": "Look at the tenths digit.",
+              "feedbackCorrect": "13!",
+              "feedbackWrong": "The tenths digit is 5, so round up: 12.5 → 13."
+            },
+            {
+              "id": "x26a-p6",
+              "type": "mc",
+              "prompt": "In 5.384, what is the value of the 4?",
+              "choices": [
+                "4 thousandths",
+                "4 hundredths",
+                "4 tenths",
+                "4 ones"
+              ],
+              "answer": "4 thousandths",
+              "hint": "Count places after the dot: tenths, hundredths, thousandths.",
+              "feedbackCorrect": "4 thousandths = 0.004!",
+              "feedbackWrong": "5.384: 3 is tenths, 8 is hundredths, 4 is thousandths."
+            }
+          ],
+          "quickCheck": [
+            {
+              "id": "x26a-q1",
+              "type": "mc",
+              "prompt": "Which is greater: 0.309 or 0.31?",
+              "choices": [
+                "0.31",
+                "0.309",
+                "they are equal"
+              ],
+              "answer": "0.31"
+            },
+            {
+              "id": "x26a-q2",
+              "type": "fill",
+              "prompt": "Round 2.746 to the nearest hundredth.",
+              "answer": "2.75",
+              "accept": [
+                "2.75"
+              ]
+            },
+            {
+              "id": "x26a-q3",
+              "type": "fill",
+              "prompt": "Write 6 + 0.2 + 0.005 as a decimal.",
+              "answer": "6.205",
+              "accept": [
+                "6.205"
+              ]
+            }
+          ]
+        },
+        "g5-powers-of-ten": {
+          "id": "g5-powers-of-ten",
+          "unitId": "u4-decimals-area",
+          "title": "Powers of 10",
+          "durationMin": 8,
+          "prerequisites": [
+            "g4-decimal-pv"
+          ],
+          "skills": [
+            "powers-of-ten",
+            "decimal-place-value"
+          ],
+          "einsteinIntro": "Multiply by 10 and every digit jumps one place to the LEFT. Divide by 10 and they slide one place to the RIGHT. Let's play!",
+          "explain": {
+            "panels": [
+              {
+                "speech": "3.6 × 10 = 36 — each digit moves one place left. × 100 moves two places, × 1000 moves three!",
+                "visual": "pow10-shift",
+                "state": "explain"
+              },
+              {
+                "speech": "10² means 10 × 10 = 100. 10³ = 10 × 10 × 10 = 1000. The little number counts the zeros!",
+                "visual": "pow10-exponents",
+                "state": "think"
+              }
+            ]
+          },
+          "workedExample": {
+            "title": "Worked Example",
+            "speech": "Solve 4.27 × 100.",
+            "steps": [
+              "100 has 2 zeros → digits move 2 places left",
+              "4.27 → 42.7 → 427",
+              "4.27 × 100 = 427"
+            ]
+          },
+          "practice": [
+            {
+              "id": "x26b-p1",
+              "type": "fill",
+              "prompt": "3.6 × 10 = ?",
+              "answer": "36",
+              "accept": [
+                "36",
+                "36.0"
+              ],
+              "hint": "× 10 → one place left.",
+              "feedbackCorrect": "36!",
+              "feedbackWrong": "3.6 × 10: the 3 becomes 3 tens and the 6 becomes 6 ones → 36."
+            },
+            {
+              "id": "x26b-p2",
+              "type": "mc",
+              "prompt": "0.45 × 100 = ?",
+              "choices": [
+                "45",
+                "4.5",
+                "450",
+                "0.045"
+              ],
+              "answer": "45",
+              "hint": "× 100 → two places left.",
+              "feedbackCorrect": "45!",
+              "feedbackWrong": "0.45 → 4.5 → 45."
+            },
+            {
+              "id": "x26b-p3",
+              "type": "fill",
+              "prompt": "720 ÷ 100 = ?",
+              "answer": "7.2",
+              "accept": [
+                "7.2",
+                "7.20"
+              ],
+              "hint": "÷ 100 → two places right.",
+              "feedbackCorrect": "7.2!",
+              "feedbackWrong": "720 → 72 → 7.2."
+            },
+            {
+              "id": "x26b-p4",
+              "type": "mc",
+              "prompt": "5.8 ÷ 10 = ?",
+              "choices": [
+                "0.58",
+                "58",
+                "0.058",
+                "5.08"
+              ],
+              "answer": "0.58",
+              "hint": "÷ 10 → one place right.",
+              "feedbackCorrect": "0.58!",
+              "feedbackWrong": "5.8 ÷ 10: 5 ones become 5 tenths, 8 tenths become 8 hundredths → 0.58."
+            },
+            {
+              "id": "x26b-p5",
+              "type": "fill",
+              "prompt": "10³ = ?",
+              "answer": "1000",
+              "accept": [
+                "1000",
+                "1,000"
+              ],
+              "hint": "10 × 10 × 10.",
+              "feedbackCorrect": "1000!",
+              "feedbackWrong": "10³ = 10 × 10 × 10 = 1000 (3 zeros)."
+            },
+            {
+              "id": "x26b-p6",
+              "type": "mc",
+              "prompt": "How many zeros are in 10⁴ written out?",
+              "choices": [
+                "4",
+                "3",
+                "5",
+                "10"
+              ],
+              "answer": "4",
+              "hint": "The little number counts the zeros.",
+              "feedbackCorrect": "4 zeros — 10,000!",
+              "feedbackWrong": "10⁴ = 10 × 10 × 10 × 10 = 10,000."
+            }
+          ],
+          "quickCheck": [
+            {
+              "id": "x26b-q1",
+              "type": "fill",
+              "prompt": "2.5 × 1000 = ?",
+              "answer": "2500",
+              "accept": [
+                "2500",
+                "2,500"
+              ]
+            },
+            {
+              "id": "x26b-q2",
+              "type": "mc",
+              "prompt": "64 ÷ 1000 = ?",
+              "choices": [
+                "0.064",
+                "0.64",
+                "6.4",
+                "0.0064"
+              ],
+              "answer": "0.064"
+            },
+            {
+              "id": "x26b-q3",
+              "type": "fill",
+              "prompt": "10² = ?",
+              "answer": "100",
+              "accept": [
+                "100"
+              ]
+            }
+          ]
+        },
+        "g5-decimal-multiply": {
+          "id": "g5-decimal-multiply",
+          "unitId": "u4-decimals-area",
+          "title": "Multiply Decimals",
+          "durationMin": 10,
+          "prerequisites": [
+            "g5-powers-of-ten",
+            "g4-multi-mult"
+          ],
+          "skills": [
+            "decimal-multiply"
+          ],
+          "einsteinIntro": "Multiplying decimals is a secret mission: multiply like whole numbers, then put the dot back in the right place!",
+          "explain": {
+            "panels": [
+              {
+                "speech": "0.3 × 0.2: 3 tenths of 2 tenths is 6 HUNDREDTHS. 0.3 × 0.2 = 0.06 — smaller than both!",
+                "visual": "decimal-mult-grid",
+                "state": "explain"
+              },
+              {
+                "speech": "2.4 × 1.5: do 24 × 15 = 360. One decimal place + one decimal place = two places → 3.60 = 3.6!",
+                "visual": "decimal-mult-places",
+                "state": "think"
+              }
+            ]
+          },
+          "workedExample": {
+            "title": "Worked Example",
+            "speech": "Solve 1.25 × 3.",
+            "steps": [
+              "Ignore the dot: 125 × 3 = 375",
+              "1.25 has 2 decimal places → 3.75",
+              "Estimate check: about 1 × 3 = 3, and 3.75 is close ✓"
+            ]
+          },
+          "practice": [
+            {
+              "id": "x26c-p1",
+              "type": "fill",
+              "prompt": "0.6 × 4 = ?",
+              "answer": "2.4",
+              "accept": [
+                "2.4",
+                "2.40"
+              ],
+              "hint": "6 tenths × 4 = 24 tenths.",
+              "feedbackCorrect": "2.4!",
+              "feedbackWrong": "6 × 4 = 24, one decimal place → 2.4."
+            },
+            {
+              "id": "x26c-p2",
+              "type": "mc",
+              "prompt": "1.25 × 3 = ?",
+              "choices": [
+                "3.75",
+                "37.5",
+                "0.375",
+                "3.65"
+              ],
+              "answer": "3.75",
+              "hint": "125 × 3, then count decimal places.",
+              "feedbackCorrect": "3.75!",
+              "feedbackWrong": "125 × 3 = 375; 2 decimal places → 3.75."
+            },
+            {
+              "id": "x26c-p3",
+              "type": "fill",
+              "prompt": "0.3 × 0.2 = ?",
+              "answer": "0.06",
+              "accept": [
+                "0.06",
+                ".06"
+              ],
+              "hint": "Tenths × tenths = hundredths.",
+              "feedbackCorrect": "0.06!",
+              "feedbackWrong": "3 × 2 = 6; 1 + 1 = 2 decimal places → 0.06."
+            },
+            {
+              "id": "x26c-p4",
+              "type": "mc",
+              "prompt": "2.4 × 1.5 = ?",
+              "choices": [
+                "3.6",
+                "36",
+                "0.36",
+                "3.9"
+              ],
+              "answer": "3.6",
+              "hint": "24 × 15 = 360. How many decimal places in all?",
+              "feedbackCorrect": "3.6!",
+              "feedbackWrong": "24 × 15 = 360; 1 + 1 = 2 decimal places → 3.60 = 3.6."
+            },
+            {
+              "id": "x26c-p5",
+              "type": "fill",
+              "prompt": "A notebook costs $1.75. How much do 4 notebooks cost, in dollars?",
+              "answer": "7",
+              "accept": [
+                "7",
+                "7.00",
+                "7.0",
+                "$7",
+                "$7.00"
+              ],
+              "hint": "Multiply 1.75 × 4.",
+              "feedbackCorrect": "$7.00!",
+              "feedbackWrong": "175 × 4 = 700; 2 decimal places → 7.00 dollars."
+            },
+            {
+              "id": "x26c-p6",
+              "type": "mc",
+              "prompt": "Estimate first: 3.9 × 5 is close to…",
+              "choices": [
+                "20",
+                "2",
+                "200",
+                "15"
+              ],
+              "answer": "20",
+              "hint": "Round 3.9 to the nearest whole number.",
+              "feedbackCorrect": "About 20!",
+              "feedbackWrong": "3.9 is about 4, and 4 × 5 = 20 (the exact answer is 19.5)."
+            }
+          ],
+          "quickCheck": [
+            {
+              "id": "x26c-q1",
+              "type": "fill",
+              "prompt": "0.8 × 6 = ?",
+              "answer": "4.8",
+              "accept": [
+                "4.8",
+                "4.80"
+              ]
+            },
+            {
+              "id": "x26c-q2",
+              "type": "mc",
+              "prompt": "0.4 × 0.5 = ?",
+              "choices": [
+                "0.2",
+                "2",
+                "0.02",
+                "0.9"
+              ],
+              "answer": "0.2"
+            },
+            {
+              "id": "x26c-q3",
+              "type": "fill",
+              "prompt": "1.2 × 0.3 = ?",
+              "answer": "0.36",
+              "accept": [
+                "0.36",
+                ".36"
+              ]
+            }
+          ]
+        },
+        "g5-decimal-divide": {
+          "id": "g5-decimal-divide",
+          "unitId": "u4-decimals-area",
+          "title": "Divide Decimals",
+          "durationMin": 10,
+          "prerequisites": [
+            "g5-decimal-multiply",
+            "g4-multi-div"
+          ],
+          "skills": [
+            "decimal-divide"
+          ],
+          "einsteinIntro": "Sharing money, cutting ribbon, counting halves — dividing decimals is everywhere. Let's crack it!",
+          "explain": {
+            "panels": [
+              {
+                "speech": "4.8 ÷ 4: 48 tenths shared by 4 is 12 tenths each. 4.8 ÷ 4 = 1.2!",
+                "visual": "decimal-div-share",
+                "state": "explain"
+              },
+              {
+                "speech": "3 ÷ 0.5 asks: how many halves fit in 3? Each whole has 2 halves → 6 halves. So 3 ÷ 0.5 = 6 — BIGGER than 3!",
+                "visual": "decimal-div-halves",
+                "state": "think"
+              }
+            ]
+          },
+          "workedExample": {
+            "title": "Worked Example",
+            "speech": "Solve 1.44 ÷ 1.2.",
+            "steps": [
+              "Make the divisor whole: × 10 on both → 14.4 ÷ 12",
+              "144 ÷ 12 = 12 → 14.4 ÷ 12 = 1.2",
+              "Check: 1.2 × 1.2 = 1.44 ✓"
+            ]
+          },
+          "practice": [
+            {
+              "id": "x26d-p1",
+              "type": "fill",
+              "prompt": "4.8 ÷ 4 = ?",
+              "answer": "1.2",
+              "accept": [
+                "1.2",
+                "1.20"
+              ],
+              "hint": "48 tenths ÷ 4.",
+              "feedbackCorrect": "1.2!",
+              "feedbackWrong": "48 ÷ 4 = 12 tenths → 1.2. Check: 1.2 × 4 = 4.8."
+            },
+            {
+              "id": "x26d-p2",
+              "type": "mc",
+              "prompt": "3 ÷ 0.5 = ?",
+              "choices": [
+                "6",
+                "1.5",
+                "0.6",
+                "15"
+              ],
+              "answer": "6",
+              "hint": "How many halves fit in 3?",
+              "feedbackCorrect": "6 halves!",
+              "feedbackWrong": "Each whole has 2 halves, so 3 wholes have 6. Check: 6 × 0.5 = 3."
+            },
+            {
+              "id": "x26d-p3",
+              "type": "fill",
+              "prompt": "2 ÷ 0.1 = ?",
+              "answer": "20",
+              "accept": [
+                "20"
+              ],
+              "hint": "How many tenths fit in 2?",
+              "feedbackCorrect": "20!",
+              "feedbackWrong": "Each whole has 10 tenths, so 2 wholes have 20. Check: 20 × 0.1 = 2."
+            },
+            {
+              "id": "x26d-p4",
+              "type": "mc",
+              "prompt": "1.44 ÷ 1.2 = ?",
+              "choices": [
+                "1.2",
+                "12",
+                "0.12",
+                "1.02"
+              ],
+              "answer": "1.2",
+              "hint": "Multiply both by 10: 14.4 ÷ 12.",
+              "feedbackCorrect": "1.2!",
+              "feedbackWrong": "14.4 ÷ 12 = 1.2. Check: 1.2 × 1.2 = 1.44."
+            },
+            {
+              "id": "x26d-p5",
+              "type": "fill",
+              "prompt": "Four friends share $10.60 equally. How much does each friend get, in dollars?",
+              "answer": "2.65",
+              "accept": [
+                "2.65",
+                "$2.65"
+              ],
+              "hint": "Divide 10.60 ÷ 4.",
+              "feedbackCorrect": "$2.65 each!",
+              "feedbackWrong": "1060 cents ÷ 4 = 265 cents = $2.65. Check: 2.65 × 4 = 10.60."
+            },
+            {
+              "id": "x26d-p6",
+              "type": "mc",
+              "prompt": "How many halves are in 3?",
+              "choices": [
+                "6",
+                "3",
+                "1.5",
+                "9"
+              ],
+              "answer": "6",
+              "hint": "Count 2 halves for every whole.",
+              "feedbackCorrect": "6!",
+              "feedbackWrong": "3 × 2 = 6 halves, so 3 ÷ 0.5 = 6."
+            }
+          ],
+          "quickCheck": [
+            {
+              "id": "x26d-q1",
+              "type": "fill",
+              "prompt": "6.3 ÷ 3 = ?",
+              "answer": "2.1",
+              "accept": [
+                "2.1",
+                "2.10"
+              ]
+            },
+            {
+              "id": "x26d-q2",
+              "type": "mc",
+              "prompt": "4 ÷ 0.5 = ?",
+              "choices": [
+                "8",
+                "2",
+                "0.8",
+                "20"
+              ],
+              "answer": "8"
+            },
+            {
+              "id": "x26d-q3",
+              "type": "fill",
+              "prompt": "0.9 ÷ 0.3 = ?",
+              "answer": "3",
+              "accept": [
+                "3"
+              ]
             }
           ]
         }

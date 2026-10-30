@@ -69,7 +69,7 @@ t('1. the 3 lessons sit in u4-fractions right after g4-mixed-sub; track has 38 l
   const i = unit.lessons.indexOf('g4-mixed-sub');
   assert.ok(i >= 0);
   assert.deepStrictEqual(unit.lessons.slice(i + 1, i + 4), IDS);
-  assert.strictEqual(Object.keys(tr.lessons).length, 38); // +5 X24
+  assert.strictEqual(Object.keys(tr.lessons).length, 42); // +5 X24, +4 X26
   IDS.forEach(id => assert.strictEqual(tr.lessons[id].unitId, 'u4-fractions', id));
   ['g4-frac-equiv', 'g4-frac-compare', 'g4-frac-add-same', 'g4-mixed-intro', 'g4-frac-times-whole', 'g4-mixed-add', 'g4-frac-sub-same']
     .forEach(id => assert.ok(unit.lessons.includes(id), id));

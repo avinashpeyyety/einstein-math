@@ -55,7 +55,7 @@ t('1. the 2 lessons sit in u4-geometry right after g4-parallel-perp; track has 3
   const i = unit.lessons.indexOf('g4-parallel-perp');
   assert.ok(i >= 0);
   assert.deepStrictEqual(unit.lessons.slice(i + 1, i + 3), IDS);
-  assert.strictEqual(Object.keys(tr.lessons).length, 38);
+  assert.strictEqual(Object.keys(tr.lessons).length, 42);
   IDS.forEach(id => assert.strictEqual(tr.lessons[id].unitId, 'u4-geometry', id));
   ['g4-coord-plane', 'g4-lines-rays-angles', 'g4-measure-angles', 'g4-parallel-perp'].forEach(id => assert.ok(unit.lessons.includes(id), id));
   const all = tr.units.flatMap(u => u.lessons);

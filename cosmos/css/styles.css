@@ -1142,6 +1142,16 @@ body.stars-mode.stars-high .life-fork-low { opacity: 0.35; }
 .earth-mission.em-soon{opacity:.55;cursor:not-allowed;border-style:dashed}
 .earth-mission.em-soon::after{content:" · coming soon";font-size:.85em;opacity:.85}
 
+/* C1b: on phones, while a launch/landing plays, drop the long mission caption, the "missions at site" label and the
+   schematic note so the bar leaves room to see the vehicle land; site and mission chips stay usable */
+@media (max-width: 560px) {
+  .earth-bar.is-ascent .earth-caption,
+  .earth-bar.is-ascent .earth-missions-label,
+  .earth-bar.is-ascent .ascent-disclaimer {
+    display: none;
+  }
+}
+
 /* C3: LEO catalog toggles (reuse .earth-mission chips + .meta-chip readouts) */
 .leo-toggles { display: none; margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255, 255, 255, 0.06); }
 body.leo-mode .leo-toggles { display: block; }

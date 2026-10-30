@@ -154,3 +154,22 @@ export function boosterRecovery(u, target = "lz") {
     armClose,
   };
 }
+
+/** C1b: room left around vehicle + pad, as a multiple of their bounding-sphere radius. */
+export const LANDING_FIT_PAD = 1.35;
+
+/**
+ * C1b: distance and look-point lift (in world units, along screen-up) that fit a bounding sphere of `radius`
+ * inside the screen band left free by the top bar (topInset) and the bottom dock (bottomInset), both 0..1 of
+ * the viewport height, with LANDING_FIT_PAD of margin. Pure, so the framing can be asserted in Node.
+ */
+export function landingFit({ radius, aspect = 16 / 9, fovDeg = 50, topInset = 0, bottomInset = 0 }) {
+  const c01 = (x) => Math.min(1, Math.max(0, x || 0));
+  const top = c01(topInset);
+  const bottom = c01(bottomInset);
+  const free = Math.max(0.2, 1 - top - bottom);
+  const tanV = Math.tan(((fovDeg / 2) * Math.PI) / 180);
+  const tanFit = Math.min(tanV * free, tanV * aspect); // usable half-height vs half-width
+  const dist = (radius * LANDING_FIT_PAD) / tanFit + radius;
+  return { dist, lift: dist * tanV * (top - bottom) }; // lift centres the sphere in the free band
+}

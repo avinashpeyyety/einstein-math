@@ -7,7 +7,7 @@
  *   leo      — clean LEO orbital theater (stations, shells)
  */
 import * as THREE from "three";
-import { boosterRecovery, DRONESHIP_DOWNRANGE } from "./recovery.js";
+import { boosterRecovery, DRONESHIP_DOWNRANGE, landingFit } from "./recovery.js";
 
 // C2: tower-catch geometry (pad-local units; the pad stage is scaled ×0.42 in the scene)
 const TOWER_ARM_Y = 3.3; // chopstick height on the tower
@@ -1998,6 +1998,33 @@ export function towerScreenBox(api, camera, width, height) {
   return { x0, y0, x1, y1, behind, armClose: api.pad.userData.armClose ?? 0 };
 }
 
+/** C1b: screen boxes (CSS px) of the returning booster and its landing target (LZ pad, droneship or catch tower),
+ * from visible meshes only, for smoke checks. null when no recovery is running. */
+export function landingScreenBox(api, camera, width, height) {
+  const rec = api.recovery;
+  if (!rec?.booster || !rec.targetObj) return null;
+  const boxOf = (root) => {
+    root.updateMatrixWorld(true);
+    let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity, behind = false;
+    const shown = (o) => { for (let n = o; n; n = n.parent) if (!n.visible) return false; return true; };
+    root.traverse((m) => {
+      if (!m.isMesh || !shown(m)) return;
+      for (let n = m; n && n !== root.parent; n = n.parent) if (n === root.userData.plume) return; // flame isn't the vehicle
+      if (!m.geometry.boundingBox) m.geometry.computeBoundingBox();
+      const b = m.geometry.boundingBox;
+      for (let i = 0; i < 8; i++) {
+        const v = new THREE.Vector3(i & 1 ? b.max.x : b.min.x, i & 2 ? b.max.y : b.min.y, i & 4 ? b.max.z : b.min.z).applyMatrix4(m.matrixWorld);
+        if (v.clone().applyMatrix4(camera.matrixWorldInverse).z > 0) behind = true;
+        v.project(camera);
+        const sx = (v.x * 0.5 + 0.5) * width, sy = (1 - (v.y * 0.5 + 0.5)) * height;
+        x0 = Math.min(x0, sx); x1 = Math.max(x1, sx); y0 = Math.min(y0, sy); y1 = Math.max(y1, sy);
+      }
+    });
+    return x0 === Infinity ? null : { x0, y0, x1, y1, behind };
+  };
+  return { kind: rec.kind, u: rec.u, vehicle: boxOf(rec.booster), target: boxOf(rec.targetObj) };
+}
+
 /** Chopstick pose: 0 = wide open, 1 = closed around the booster. */
 function setChopsticks(pad, close) {
   const { armL, armR } = pad.userData;
@@ -2022,7 +2049,7 @@ function animateTowerCatch(api, booster, mission, t, padWorld, up, east) {
   const sepDown = sepRel.dot(east);
   const u = clamp01((t - RECOVERY_T0) / (1 - RECOVERY_T0));
   const st = boosterRecovery(u, "tower");
-  api.recovery = { active: true, u, state: st, kind: "tower" };
+  api.recovery = { active: true, u, state: st, kind: "tower", booster, targetObj: api.pad?.userData.tower };
 
   // flat (pad tangent plane) track from separation back to the catch point; curvature is negligible this close
   const along = sepRel.clone().sub(up.clone().multiplyScalar(sepAlt));
@@ -2086,7 +2113,7 @@ function animateBoosterRecovery(api, booster, mission, t, padWorld, up, east) {
   const u = clamp01((t - RECOVERY_T0) / (1 - RECOVERY_T0));
   const kind = mission.recovery === "droneship" ? "droneship" : "lz";
   const st = boosterRecovery(u, kind);
-  api.recovery = { active: true, u, state: st, kind };
+  api.recovery = { active: true, u, state: st, kind, booster, targetObj: kind === "droneship" ? api.droneship : api.landingZone };
 
   const target = recoveryTargetWorld(padWorld, up, east, north, sepDown, kind);
   const targetUp = target.clone().normalize();
@@ -2130,7 +2157,39 @@ function animateBoosterRecovery(api, booster, mission, t, padWorld, up, east) {
     .add(localUp.clone().multiplyScalar(dist * 0.35))
     .add(north.clone().multiplyScalar(-dist * 0.85))
     .add(east.clone().multiplyScalar(-dist * 0.4));
+  // C1b: over the last part of the descent, ease from the chase onto a framing that fits the whole booster AND
+  // its pad/droneship inside the screen band left free by the Earth bar and the time dock, with a margin
+  const fin = smootherstep(clamp01((u - 0.7) / 0.3));
+  if (fin > 0 && marker) {
+    const fit = fitLandingCam(api, [booster, marker], position.clone().sub(look).normalize(), localUp);
+    position.lerp(fit.position, fin);
+    look.lerp(fit.target, fin);
+  }
   return { position, target: look, minDist: 0.6, maxDist: EARTH_R * 8 };
+}
+
+/** World box of the visible meshes under the given roots (the engine plume doesn't count). */
+function visibleWorldBox(roots) {
+  const box = new THREE.Box3();
+  const shown = (o) => { for (let n = o; n; n = n.parent) if (!n.visible) return false; return true; };
+  for (const root of roots) {
+    root.updateMatrixWorld(true);
+    root.traverse((m) => {
+      if (!m.isMesh || !shown(m)) return;
+      for (let n = m; n && n !== root.parent; n = n.parent) if (n === root.userData.plume) return;
+      if (!m.geometry.boundingBox) m.geometry.computeBoundingBox();
+      box.union(m.geometry.boundingBox.clone().applyMatrix4(m.matrixWorld));
+    });
+  }
+  return box;
+}
+
+/** C1b: camera that fits `roots` (vehicle + pad) in the free screen band between the Earth bar and the dock. */
+function fitLandingCam(api, roots, dir, up) {
+  const sphere = visibleWorldBox(roots).getBoundingSphere(new THREE.Sphere());
+  const { dist, lift } = landingFit({ radius: sphere.radius, ...(api.view || {}) });
+  const look = sphere.center.clone().add(up.clone().multiplyScalar(lift)); // centre in the free band
+  return { position: look.clone().add(dir.multiplyScalar(dist)), target: look };
 }
 
 /**

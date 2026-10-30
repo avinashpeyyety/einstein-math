@@ -25,7 +25,7 @@ import {
   initLeoCatalog,
   setLeoToggle,
   leoCatalogDrawn,
-  towerScreenBox,
+  towerScreenBox, landingScreenBox,
 } from "./earth.js";
 import { LEO_TOGGLES, leoChips, createLeoToggleState } from "./leo.js";
 import {
@@ -1732,5 +1732,6 @@ init();
 
 window.__spaceLab = Object.freeze({
   towerBox: () => (earthTheater ? towerScreenBox(earthTheater, camera, window.innerWidth, window.innerHeight) : null),
+  landingBox: () => (earthTheater ? landingScreenBox(earthTheater, camera, window.innerWidth, window.innerHeight) : null),
   recovery: () => (earthTheater?.recovery ? { ...earthTheater.recovery.state, u: earthTheater.recovery.u } : null),
 });

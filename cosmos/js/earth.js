@@ -1866,6 +1866,58 @@ function makeHubble() {
   return g;
 }
 
+// C3b: screen-size halo + "HUBBLE" tag. Drawn over the globe (depthTest off) but dimmed while Hubble is behind it,
+// so you can always find it; the WebGL canvas sits under the HUD, so it can never cover the bar or info panel.
+const HUBBLE_HALO_SCALE = 0.05; // fraction of viewport height × cot(fov/2): ≈ 40 px tall at 800 px
+function spriteTex(draw, w, h) {
+  const c = document.createElement("canvas");
+  c.width = w; c.height = h;
+  draw(c.getContext("2d"), w, h);
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  return t;
+}
+function addHubbleMarker(craft, color) {
+  const css = "#" + new THREE.Color(color).getHexString();
+  const halo = new THREE.Sprite(new THREE.SpriteMaterial({
+    map: spriteTex((g, w, h) => {
+      g.strokeStyle = css; g.lineWidth = 10;
+      g.beginPath(); g.arc(w / 2, h / 2, w / 2 - 8, 0, Math.PI * 2); g.stroke();
+    }, 128, 128),
+    sizeAttenuation: false, depthTest: false, depthWrite: false, transparent: true,
+  }));
+  halo.scale.setScalar(HUBBLE_HALO_SCALE);
+  const tag = new THREE.Sprite(new THREE.SpriteMaterial({
+    map: spriteTex((g, w, h) => {
+      g.fillStyle = "rgba(2,6,23,0.78)";
+      g.beginPath(); g.roundRect(4, 4, w - 8, h - 8, 22); g.fill();
+      g.strokeStyle = css; g.lineWidth = 4; g.stroke();
+      g.fillStyle = "#fff"; g.font = "bold 40px system-ui, sans-serif"; g.textAlign = "center"; g.textBaseline = "middle";
+      g.fillText("HUBBLE", w / 2, h / 2 + 2);
+    }, 256, 72),
+    sizeAttenuation: false, depthTest: false, depthWrite: false, transparent: true,
+  }));
+  tag.scale.set(HUBBLE_HALO_SCALE * 2.2, HUBBLE_HALO_SCALE * 0.62, 1);
+  tag.center.set(0.5, -0.9); // sits just above the halo
+  const marker = new THREE.Group();
+  marker.add(halo, tag);
+  marker.renderOrder = 10; halo.renderOrder = 10; tag.renderOrder = 10;
+  marker.scale.setScalar(1 / 2.2); // undo the craft scale (sprites are screen-sized anyway)
+  craft.add(marker);
+  craft.userData.marker = marker;
+  craft.userData.markerScale = HUBBLE_HALO_SCALE;
+  const wp = new THREE.Vector3(), ray = new THREE.Vector3();
+  halo.onBeforeRender = (_r, _s, cam) => {
+    halo.getWorldPosition(wp);
+    ray.copy(wp).sub(cam.position);
+    const L = ray.length(); ray.divideScalar(L);
+    const b = cam.position.dot(ray), disc = b * b - (cam.position.lengthSq() - EARTH_R * EARTH_R);
+    const hit = disc > 0 ? -b - Math.sqrt(disc) : -1;
+    const op = hit > 0 && hit < L ? 0.5 : 1; // behind the globe → faint
+    halo.material.opacity = op; tag.material.opacity = op;
+  };
+}
+
 /** Build the toggle objects once; all start hidden. entries come from leo.js (LEO_TOGGLES). */
 export function initLeoCatalog(api, entries) {
   if (api.leoCatalog) return api.leoCatalog;
@@ -1901,6 +1953,7 @@ export function initLeoCatalog(api, entries) {
       craft.scale.setScalar(2.2);
       ring.add(craft);
       entry.craft = craft;
+      addHubbleMarker(craft, e.color); // C3b: halo + name tag so Hubble is easy to spot
     }
     api.root.add(group);
     cat.set(e.id, entry);
@@ -1960,6 +2013,33 @@ function updateLeoCatalog(api, nowMs) {
       entry.craft.rotation.set(0, th, 0);
     }
   }
+}
+
+/** C3b: Hubble's screen position (CSS px) + its highlight box, for smoke checks; null unless drawn in LEO. */
+export function hubbleScreenBox(api, camera, width, height) {
+  const entry = api.leoCatalog?.get("hubble");
+  if (!entry || !entry.group.visible || !entry.craft) return null;
+  api.root.updateMatrixWorld(true);
+  const w = entry.craft.getWorldPosition(new THREE.Vector3());
+  const ndc = w.clone().project(camera);
+  const x = (ndc.x + 1) / 2 * width, y = (1 - ndc.y) / 2 * height;
+  // hidden behind the globe? (ray camera→craft hits the Earth sphere first)
+  const o = camera.position, d = w.clone().sub(o), L = d.length(); d.divideScalar(L);
+  const b = o.dot(d), c = o.lengthSq() - EARTH_R * EARTH_R, disc = b * b - c;
+  const behindEarth = disc > 0 && (-b - Math.sqrt(disc)) > 0 && (-b - Math.sqrt(disc)) < L;
+  const box = new THREE.Box3().setFromObject(entry.craft.userData.marker || entry.craft);
+  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+  if (entry.craft.userData.marker) {
+    const s = entry.craft.userData.markerScale / Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * height / 2;
+    x0 = x - s / 2; x1 = x + s / 2; y0 = y - s / 2; y1 = y + s / 2;
+  } else {
+    for (let i = 0; i < 8; i++) {
+      const v = new THREE.Vector3(i & 1 ? box.max.x : box.min.x, i & 2 ? box.max.y : box.min.y, i & 4 ? box.max.z : box.min.z).project(camera);
+      const px = (v.x + 1) / 2 * width, py = (1 - v.y) / 2 * height;
+      x0 = Math.min(x0, px); x1 = Math.max(x1, px); y0 = Math.min(y0, py); y1 = Math.max(y1, py);
+    }
+  }
+  return { x, y, x0, y0, x1, y1, behindEarth, behindCam: ndc.z > 1 };
 }
 
 // ─── C1: Falcon 9 booster recovery (boostback → entry → landing burn) ───
@@ -2302,12 +2382,22 @@ export function getSurfaceCameraFrame() {
   };
 }
 
-export function getLeoCameraFrame() {
+export function getLeoCameraFrame(view) {
+  const position = new THREE.Vector3(EARTH_R * 2.0, EARTH_R * 0.9, EARTH_R * 2.2);
+  const target = new THREE.Vector3(0, 0, 0);
+  // C3b: on portrait screens (phones) pull back so Hubble's orbit (540 km) fits in the band between the bar and the dock
+  if (view && view.aspect < 1) {
+    const { dist, lift } = landingFit({ radius: (EARTH_R + 0.12 * EARTH_R * (540 / 420)) * 1.05, ...view });
+    const dir = position.clone().normalize();
+    const up = new THREE.Vector3(0, 1, 0).sub(dir.clone().multiplyScalar(dir.y)).normalize();
+    target.copy(up.multiplyScalar(lift));
+    position.copy(target).add(dir.multiplyScalar(dist));
+  }
   return {
-    position: new THREE.Vector3(EARTH_R * 2.0, EARTH_R * 0.9, EARTH_R * 2.2),
-    target: new THREE.Vector3(0, 0, 0),
+    position,
+    target,
     minDist: EARTH_R * 1.15,
-    maxDist: EARTH_R * 8,
+    maxDist: EARTH_R * 24, // C3b: room for the phone pull-back
   };
 }
 

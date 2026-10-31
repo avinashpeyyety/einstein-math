@@ -1166,5 +1166,10 @@ body.leo-mode .leo-toggles { display: block; }
   .leo-toggle-row .earth-mission { min-height: 44px; flex: 1 1 auto; }
   .leo-chip-group .meta-chip { padding: 3px 8px; }
   .leo-chip-group .meta-value { font-size: 0.75rem; }
+  /* C3b: shorter LEO bar on phones so Hubble's orbit has room below it (the toggle buttons carry the name + blurb) */
+  body.leo-mode .earth-bar .earth-phase,
+  body.leo-mode .earth-bar .earth-caption,
+  .leo-toggles .earth-missions-label,
+  .leo-chip-name { display: none; }
 }
 #earth-missions-wrap.hidden { display: none; } /* C3: the wrap carries .earth-missions, so .earth-missions-wrap.hidden never matched */

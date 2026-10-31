@@ -18,6 +18,7 @@ import {
   getSiteCameraFrame,
   getSurfaceCameraFrame,
   getLeoCameraFrame,
+  hubbleScreenBox,
   missionsForSite,
   LAUNCH_SITES,
   EARTH_R,
@@ -402,7 +403,7 @@ function enterLeoMode() {
   }
   if (state.timeScale > 30) setTimeScale(2);
   bloom.strength = 0.32;
-  applyCameraFrame(getLeoCameraFrame());
+  applyCameraFrame(getLeoCameraFrame(leoView()));
   detailName.textContent = "LEO";
   detailType.textContent = "Orbit theater";
   detailBlurb.textContent =
@@ -421,6 +422,15 @@ function enterLeoMode() {
 
 // —— C3: LEO catalog toggles (Hubble, Starlink 550 km shell) ——
 const leoToggles = createLeoToggleState(LEO_TOGGLES);
+
+/** C3b: screen share left free by the Earth/LEO bar and the dock, for the LEO camera on phones. */
+function leoView() {
+  const bar = $("earth-bar");
+  const dock = document.querySelector(".hud-bottom");
+  const top = bar && !bar.classList.contains("hidden") ? bar.getBoundingClientRect().bottom / window.innerHeight : 0;
+  const bottom = dock ? 1 - dock.getBoundingClientRect().top / window.innerHeight : 0;
+  return { aspect: camera.aspect, fovDeg: camera.fov, topInset: Math.min(0.7, Math.max(0, top)), bottomInset: Math.min(0.3, Math.max(0, bottom)) };
+}
 
 function renderLeoToggles() {
   const row = $("leo-toggle-row");
@@ -443,6 +453,7 @@ function renderLeoToggles() {
       const e = LEO_TOGGLES.find((x) => x.id === btn.dataset.id);
       $("earth-caption").textContent = on ? e.blurb : "Clean orbital theater — separate from surface launches";
       renderLeoToggles();
+      if (camera.aspect < 1 && state.viewMode === "leo") applyCameraFrame(getLeoCameraFrame(leoView())); // bar height changed
     });
   });
   $("leo-toggles").dataset.drawn = earthTheater ? leoCatalogDrawn(earthTheater).join(",") : "";
@@ -1731,6 +1742,7 @@ init();
 })();
 
 window.__spaceLab = Object.freeze({
+  hubbleBox: () => (earthTheater ? hubbleScreenBox(earthTheater, camera, window.innerWidth, window.innerHeight) : null),
   towerBox: () => (earthTheater ? towerScreenBox(earthTheater, camera, window.innerWidth, window.innerHeight) : null),
   landingBox: () => (earthTheater ? landingScreenBox(earthTheater, camera, window.innerWidth, window.innerHeight) : null),
   recovery: () => (earthTheater?.recovery ? { ...earthTheater.recovery.state, u: earthTheater.recovery.u } : null),

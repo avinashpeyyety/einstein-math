@@ -1,4 +1,4 @@
-/* X9 — procedural practice generators for the 10 most-practiced math skills (seeded, difficulty dial).
+/* X9 — procedural practice generators for the most-practiced math skills (10 since X9, +2 X10 ages 11–12) (seeded, difficulty dial).
  * Pure + DOM-free: Generators.generate(skillId, { seed, level, count }) returns questions in the same
  * shape as math.json practice items ({ id, type: 'mc'|'fill', prompt, choices?, answer, accept?, hint,
  * feedbackCorrect, feedbackWrong }), so the existing lesson player can grade them unchanged.
@@ -79,7 +79,7 @@
     return Array.from(forms);
   }
 
-  // ---- the 10 skills -------------------------------------------------------------------------
+  // ---- the skills -------------------------------------------------------------------------
   const SKILLS = [
     {
       id: 'add-within-20', label: 'Add within 20', track: 'ages-5-6', standard: 'K.OA.5, 1.OA.6',
@@ -300,6 +300,46 @@
           return Object.assign(base, { type: 'mc', choices: r.shuffle(choices), answer });
         }
         return Object.assign(base, { type: 'fill', answer, accept });
+      }
+    },
+    {
+      // X10 — ages 11–12
+      id: 'equivalent-ratios', label: 'Equivalent ratios', track: 'ages-11-12', standard: '6.RP.3a',
+      lessonIds: ['g6-ratios'],
+      make(r, level) {
+        let a, b, k;
+        if (level === 1) { a = r.int(1, 5); b = r.int(1, 5); k = r.int(2, 5); }
+        else if (level === 2) { a = r.int(2, 9); b = r.int(2, 9); k = r.int(3, 9); }
+        else { a = r.int(3, 12); b = r.int(3, 12); k = r.int(4, 12); }
+        if (a === b) b = a + 1;
+        const missingSecond = level < 3 || r() < 0.5;
+        const ans = missingSecond ? b * k : a * k;
+        const given = missingSecond ? a * k : b * k;
+        const prompt = missingSecond ? a + ':' + b + ' = ' + given + ':?' : a + ':' + b + ' = ?:' + given;
+        const from = missingSecond ? a : b;
+        return item(r, {
+          prompt, terms: [a, b, k, missingSecond ? 2 : 1],
+          hint: from + ' became ' + given + ' — multiply the other number by the same amount.',
+          feedbackCorrect: ans + '!',
+          feedbackWrong: from + ' × ' + k + ' = ' + given + ', so the missing number is ' + (missingSecond ? b : a) + ' × ' + k + ' = ' + ans + '.'
+        }, ans, [ (missingSecond ? b : a) + (given - from), ans + k, ans - k ]);
+      }
+    },
+    {
+      id: 'percent-of', label: 'Percent of a number', track: 'ages-11-12', standard: '6.RP.3c',
+      lessonIds: ['g6-percent-of', 'g6-percents'],
+      make(r, level) {
+        const P = level === 1 ? r.pick([10, 50]) : level === 2 ? r.pick([20, 25, 75]) : r.pick([15, 30, 35, 40, 60, 70, 90]);
+        const step = 100 / gcd(P, 100);
+        const N = step * r.int(level === 1 ? 1 : 2, level === 3 ? 12 : 10);
+        const ans = (P * N) / 100;
+        const tenth = N / 10;
+        return item(r, {
+          prompt: P + '% of ' + N + ' = ?', terms: [P, N],
+          hint: P % 10 === 0 ? 'Find 10% first (' + N + ' ÷ 10), then build ' + P + '%.' : P + '% = ' + P + '/100. Try 25% = one quarter or 5% = half of 10%.',
+          feedbackCorrect: ans + '!',
+          feedbackWrong: P + '% of ' + N + ' = ' + P + '/100 × ' + N + ' = ' + ans + '.'
+        }, ans, [N - ans, ans + (Number.isInteger(tenth) ? tenth : 1), P, ans * 2]);
       }
     }
   ];

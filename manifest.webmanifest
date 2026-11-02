@@ -1,7 +1,7 @@
 {
   "name": "Einstein Math",
   "short_name": "Einstein Math",
-  "description": "Cosmic comic-book math adventures for ages 5–10 — device-local, installable, playable offline after first visit.",
+  "description": "Cosmic comic-book math adventures for ages 5–12 — device-local, installable, playable offline after first visit.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",

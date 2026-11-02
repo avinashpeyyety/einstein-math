@@ -48,6 +48,9 @@ function solve(q) {
     return { num: v };
   }
   if ((m = p.match(/^\? × (\d+) = (\d+)$/))) return { num: +m[2] / +m[1] };
+  if ((m = p.match(/^(\d+):(\d+) = (\d+):\?$/))) return { num: +m[2] * +m[3] / +m[1] };
+  if ((m = p.match(/^(\d+):(\d+) = \?:(\d+)$/))) return { num: +m[1] * +m[3] / +m[2] };
+  if ((m = p.match(/^(\d+)% of (\d+) = \?$/))) return { num: +m[1] * +m[2] / 100 };
   if ((m = p.match(/(\d+) __ (\d+)$/))) { const a = +m[1], b = +m[2]; return { sign: a > b ? '>' : a < b ? '<' : '=' }; }
   if ((m = p.match(/has (\d+) rows of (\d+) unit squares/))) return { num: +m[1] * +m[2] };
   if ((m = p.match(/a (\d+) × (\d+) rectangle and a (\d+) × (\d+) rectangle/))) return { num: +m[1] * +m[2] + +m[3] * +m[4] };
@@ -65,8 +68,8 @@ for (const s of G.SKILLS) for (const level of [1, 2, 3]) for (const seed of SEED
   for (const q of G.generate(s.id, { seed, level, count: 8 })) all.push({ skill: s, level, seed, q });
 }
 
-t('10 skills, mapped to real math.json lessons on the declared track', () => {
-  assert.strictEqual(G.SKILLS.length, 10);
+t('12 skills (10 X9 + 2 X10), mapped to real math.json lessons on the declared track', () => {
+  assert.strictEqual(G.SKILLS.length, 12);
   for (const s of G.SKILLS) {
     const tr = MATH.tracks[s.track]; assert.ok(tr, s.track);
     for (const l of s.lessonIds) assert.ok(tr.lessons[l], s.id + ' → missing lesson ' + l);

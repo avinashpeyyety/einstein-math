@@ -3,8 +3,8 @@
     "title": "Einstein Math",
     "subtitle": "Cosmic Adventures in Numbers — Einstein teaches, you explore!",
     "version": "2.3.3",
-    "gradeBand": "Ages 5–10 (K–5)",
-    "audienceAge": "5–10",
+    "gradeBand": "Ages 5–12 (K–7)",
+    "audienceAge": "5–12",
     "defaultTrackId": "ages-7-8"
   },
   "tracks": {
@@ -15194,6 +15194,751 @@
               "answer": "3",
               "accept": [
                 "3"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "ages-11-12": {
+      "id": "ages-11-12",
+      "label": "Ages 11–12",
+      "ageRange": "11–12",
+      "gradeBand": "Grades 6–7",
+      "blurb": "Ratios & rates, percents, negative numbers and one-step equations — new track, growing!",
+      "units": [
+        {
+          "id": "u6-ratios",
+          "title": "Ratio Rockets",
+          "icon": "🚀",
+          "color": "#FF6B35",
+          "description": "Compare amounts with ratios, rates and unit rates!",
+          "lessons": [
+            "g6-ratios",
+            "g6-unit-rates"
+          ]
+        },
+        {
+          "id": "u6-percents",
+          "title": "Percent Power",
+          "icon": "💯",
+          "color": "#4ECDC4",
+          "description": "Percent means per 100 — find percents of anything!",
+          "lessons": [
+            "g6-percents",
+            "g6-percent-of"
+          ]
+        }
+      ],
+      "diagnostic": {
+        "id": "diag-ages-11-12",
+        "title": "Nebula Warm-Up",
+        "einsteinIntro": "Quick warm-up on ratios, rates and percents — let's see where your rocket starts!",
+        "questions": [
+          {
+            "id": "d1112-1",
+            "type": "mc",
+            "prompt": "3 red and 5 blue marbles. Ratio of red to blue?",
+            "choices": [
+              "3:5",
+              "5:3",
+              "3:8",
+              "8:3"
+            ],
+            "answer": "3:5",
+            "skill": "ratios",
+            "unitHint": "u6-ratios"
+          },
+          {
+            "id": "d1112-2",
+            "type": "mc",
+            "prompt": "2:3 = 6:?",
+            "choices": [
+              "9",
+              "6",
+              "7",
+              "12"
+            ],
+            "answer": "9",
+            "skill": "equivalent-ratios",
+            "unitHint": "u6-ratios"
+          },
+          {
+            "id": "d1112-3",
+            "type": "mc",
+            "prompt": "4 pens cost $2. Cost of 1 pen?",
+            "choices": [
+              "$0.50",
+              "$2",
+              "$8",
+              "$0.25"
+            ],
+            "answer": "$0.50",
+            "skill": "unit-rate",
+            "unitHint": "u6-ratios"
+          },
+          {
+            "id": "d1112-4",
+            "type": "mc",
+            "prompt": "1/2 as a percent?",
+            "choices": [
+              "50%",
+              "12%",
+              "20%",
+              "2%"
+            ],
+            "answer": "50%",
+            "skill": "percent-meaning",
+            "unitHint": "u6-percents"
+          },
+          {
+            "id": "d1112-5",
+            "type": "mc",
+            "prompt": "0.3 = ?",
+            "choices": [
+              "30%",
+              "3%",
+              "0.3%",
+              "300%"
+            ],
+            "answer": "30%",
+            "skill": "percent-decimal",
+            "unitHint": "u6-percents"
+          },
+          {
+            "id": "d1112-6",
+            "type": "mc",
+            "prompt": "10% of 50 = ?",
+            "choices": [
+              "5",
+              "10",
+              "50",
+              "0.5"
+            ],
+            "answer": "5",
+            "skill": "percent-of",
+            "unitHint": "u6-percents"
+          }
+        ]
+      },
+      "lessons": {
+        "g6-ratios": {
+          "id": "g6-ratios",
+          "unitId": "u6-ratios",
+          "title": "Ratios & Equivalent Ratios",
+          "durationMin": 9,
+          "prerequisites": [],
+          "skills": [
+            "ratios",
+            "equivalent-ratios"
+          ],
+          "einsteinIntro": "A ratio compares two amounts. 3 red for every 2 blue is written 3:2. Multiply both sides by the same number and the ratio stays the same!",
+          "explain": {
+            "panels": [
+              {
+                "speech": "3 red stars for every 2 blue stars → red : blue = 3 : 2. Red : ALL stars = 3 : 5.",
+                "visual": "ratio-tape",
+                "state": "explain"
+              },
+              {
+                "speech": "A ratio table: 2:3 → 4:6 → 6:9. Multiply BOTH numbers by the same amount — the ratio doesn't change!",
+                "visual": "ratio-table",
+                "state": "think"
+              }
+            ]
+          },
+          "workedExample": {
+            "title": "Worked Example",
+            "speech": "2 cups of flour for every 3 cups of milk. How much flour for 12 cups of milk?",
+            "steps": [
+              "Milk went from 3 to 12 → that's × 4",
+              "Do the same to the flour: 2 × 4 = 8",
+              "8 cups of flour (2:3 = 8:12)"
+            ]
+          },
+          "practice": [
+            {
+              "id": "x10a-p1",
+              "type": "mc",
+              "prompt": "A bag has 3 red marbles and 5 blue marbles. What is the ratio of red to blue?",
+              "choices": [
+                "3:5",
+                "5:3",
+                "3:8",
+                "5:8"
+              ],
+              "answer": "3:5",
+              "hint": "Red comes first.",
+              "feedbackCorrect": "3:5!",
+              "feedbackWrong": "Red to blue = 3 red : 5 blue = 3:5."
+            },
+            {
+              "id": "x10a-p2",
+              "type": "mc",
+              "prompt": "Same bag (3 red, 5 blue). What is the ratio of red to ALL marbles?",
+              "choices": [
+                "3:8",
+                "3:5",
+                "5:8",
+                "8:3"
+              ],
+              "answer": "3:8",
+              "hint": "All marbles = 3 + 5.",
+              "feedbackCorrect": "3:8!",
+              "feedbackWrong": "There are 3 + 5 = 8 marbles, so red : all = 3:8."
+            },
+            {
+              "id": "x10a-p3",
+              "type": "fill",
+              "prompt": "2:3 = 8:?",
+              "answer": "12",
+              "accept": [
+                "12"
+              ],
+              "hint": "2 became 8 — what did you multiply by?",
+              "feedbackCorrect": "12!",
+              "feedbackWrong": "2 × 4 = 8, so 3 × 4 = 12."
+            },
+            {
+              "id": "x10a-p4",
+              "type": "mc",
+              "prompt": "Which ratio is equivalent to 4:6?",
+              "choices": [
+                "2:3",
+                "3:2",
+                "4:9",
+                "6:8"
+              ],
+              "answer": "2:3",
+              "hint": "Divide both numbers by the same number.",
+              "feedbackCorrect": "2:3!",
+              "feedbackWrong": "4 ÷ 2 = 2 and 6 ÷ 2 = 3 → 2:3."
+            },
+            {
+              "id": "x10a-p5",
+              "type": "fill",
+              "prompt": "A recipe uses 2 cups of flour for every 3 cups of milk. How many cups of flour go with 12 cups of milk?",
+              "answer": "8",
+              "accept": [
+                "8"
+              ],
+              "hint": "3 × ? = 12",
+              "feedbackCorrect": "8 cups!",
+              "feedbackWrong": "3 × 4 = 12 cups of milk, so 2 × 4 = 8 cups of flour."
+            },
+            {
+              "id": "x10a-p6",
+              "type": "mc",
+              "prompt": "What is 10:15 in simplest form?",
+              "choices": [
+                "2:3",
+                "1:5",
+                "5:10",
+                "3:2"
+              ],
+              "answer": "2:3",
+              "hint": "Both numbers divide by 5.",
+              "feedbackCorrect": "2:3!",
+              "feedbackWrong": "10 ÷ 5 = 2 and 15 ÷ 5 = 3 → 2:3."
+            }
+          ],
+          "quickCheck": [
+            {
+              "id": "x10a-q1",
+              "type": "fill",
+              "prompt": "5:2 = ?:8",
+              "answer": "20",
+              "accept": [
+                "20"
+              ]
+            },
+            {
+              "id": "x10a-q2",
+              "type": "mc",
+              "prompt": "Boys to girls in a club is 4:5. There are 18 kids. How many boys?",
+              "choices": [
+                "8",
+                "4",
+                "10",
+                "9"
+              ],
+              "answer": "8"
+            },
+            {
+              "id": "x10a-q3",
+              "type": "mc",
+              "prompt": "Which ratio is NOT equivalent to 3:4?",
+              "choices": [
+                "9:16",
+                "6:8",
+                "9:12",
+                "15:20"
+              ],
+              "answer": "9:16"
+            }
+          ]
+        },
+        "g6-unit-rates": {
+          "id": "g6-unit-rates",
+          "unitId": "u6-ratios",
+          "title": "Rates & Unit Rates",
+          "durationMin": 9,
+          "prerequisites": [
+            "g6-ratios"
+          ],
+          "skills": [
+            "rates",
+            "unit-rate"
+          ],
+          "einsteinIntro": "A rate compares two different kinds of things — miles and hours, dollars and pencils. A UNIT rate tells you how much for just ONE!",
+          "explain": {
+            "panels": [
+              {
+                "speech": "120 miles in 3 hours → split into 3 equal parts: 40 miles in each hour. That's 40 miles per hour!",
+                "visual": "unit-rate-bar",
+                "state": "explain"
+              },
+              {
+                "speech": "6 stickers for $3 → $3 ÷ 6 = $0.50 for each sticker. Unit price helps you find the best deal!",
+                "visual": "unit-price",
+                "state": "think"
+              }
+            ]
+          },
+          "workedExample": {
+            "title": "Worked Example",
+            "speech": "Which is the better deal: 4 juice boxes for $6.00 or 6 juice boxes for $8.40?",
+            "steps": [
+              "$6.00 ÷ 4 = $1.50 per box",
+              "$8.40 ÷ 6 = $1.40 per box",
+              "$1.40 < $1.50 → 6 for $8.40 is the better deal"
+            ]
+          },
+          "practice": [
+            {
+              "id": "x10b-p1",
+              "type": "fill",
+              "prompt": "A car goes 150 miles in 3 hours at a steady speed. How many miles per hour?",
+              "answer": "50",
+              "accept": [
+                "50"
+              ],
+              "hint": "Divide miles by hours.",
+              "feedbackCorrect": "50 miles per hour!",
+              "feedbackWrong": "150 ÷ 3 = 50."
+            },
+            {
+              "id": "x10b-p2",
+              "type": "mc",
+              "prompt": "5 pencils cost $2.50. How much does 1 pencil cost?",
+              "choices": [
+                "$0.50",
+                "$0.25",
+                "$2.00",
+                "$5.00"
+              ],
+              "answer": "$0.50",
+              "hint": "Divide the cost by 5.",
+              "feedbackCorrect": "$0.50!",
+              "feedbackWrong": "$2.50 ÷ 5 = $0.50."
+            },
+            {
+              "id": "x10b-p3",
+              "type": "fill",
+              "prompt": "Maya reads 60 pages in 4 days at the same rate. How many pages per day?",
+              "answer": "15",
+              "accept": [
+                "15"
+              ],
+              "hint": "Pages ÷ days.",
+              "feedbackCorrect": "15 pages a day!",
+              "feedbackWrong": "60 ÷ 4 = 15."
+            },
+            {
+              "id": "x10b-p4",
+              "type": "mc",
+              "prompt": "Which is the better deal?",
+              "choices": [
+                "8 apples for $4",
+                "5 apples for $3",
+                "they cost the same"
+              ],
+              "answer": "8 apples for $4",
+              "hint": "Find the price of one apple each way.",
+              "feedbackCorrect": "Right — $0.50 beats $0.60!",
+              "feedbackWrong": "$4 ÷ 8 = $0.50 per apple; $3 ÷ 5 = $0.60 per apple. 8 for $4 is cheaper per apple."
+            },
+            {
+              "id": "x10b-p5",
+              "type": "fill",
+              "prompt": "A printer makes 12 pages per minute. How many pages in 7 minutes?",
+              "answer": "84",
+              "accept": [
+                "84"
+              ],
+              "hint": "Multiply the unit rate by the minutes.",
+              "feedbackCorrect": "84 pages!",
+              "feedbackWrong": "12 × 7 = 84."
+            },
+            {
+              "id": "x10b-p6",
+              "type": "mc",
+              "prompt": "A rocket burns 900 kg of fuel in 30 seconds. How much fuel per second?",
+              "choices": [
+                "30 kg",
+                "27 kg",
+                "300 kg",
+                "3 kg"
+              ],
+              "answer": "30 kg",
+              "hint": "900 ÷ 30.",
+              "feedbackCorrect": "30 kg each second!",
+              "feedbackWrong": "900 ÷ 30 = 30 kg per second."
+            }
+          ],
+          "quickCheck": [
+            {
+              "id": "x10b-q1",
+              "type": "fill",
+              "prompt": "You earn $45 for 5 hours of work. How many dollars per hour?",
+              "answer": "9",
+              "accept": [
+                "9",
+                "$9",
+                "9.00",
+                "$9.00"
+              ]
+            },
+            {
+              "id": "x10b-q2",
+              "type": "mc",
+              "prompt": "6 muffins cost $9. At the same price, how much do 10 muffins cost?",
+              "choices": [
+                "$15",
+                "$12",
+                "$18",
+                "$13.50"
+              ],
+              "answer": "$15"
+            },
+            {
+              "id": "x10b-q3",
+              "type": "fill",
+              "prompt": "You run 2 miles in 16 minutes at a steady pace. How many minutes per mile?",
+              "answer": "8",
+              "accept": [
+                "8"
+              ]
+            }
+          ]
+        },
+        "g6-percents": {
+          "id": "g6-percents",
+          "unitId": "u6-percents",
+          "title": "Percent Means per 100",
+          "durationMin": 9,
+          "prerequisites": [
+            "g6-ratios"
+          ],
+          "skills": [
+            "percent-meaning",
+            "percent-decimal"
+          ],
+          "einsteinIntro": "Per-CENT means per HUNDRED. 35% is 35 out of 100. Fractions, decimals and percents are three ways to say the same amount!",
+          "explain": {
+            "panels": [
+              {
+                "speech": "Shade 35 of the 100 squares → 35 out of 100 = 35% = 0.35.",
+                "visual": "percent-grid",
+                "state": "explain"
+              },
+              {
+                "speech": "1/2 = 0.5 = 50%. 1/4 = 0.25 = 25%. 3/4 = 0.75 = 75%. 1/10 = 0.1 = 10%. Same amount, three outfits!",
+                "visual": "percent-fdp",
+                "state": "think"
+              }
+            ]
+          },
+          "workedExample": {
+            "title": "Worked Example",
+            "speech": "Write 3/5 as a percent.",
+            "steps": [
+              "Make the bottom 100: 5 × 20 = 100",
+              "Do the same to the top: 3 × 20 = 60 → 60/100",
+              "60/100 = 60%"
+            ]
+          },
+          "practice": [
+            {
+              "id": "x10c-p1",
+              "type": "mc",
+              "prompt": "37 out of 100 squares are shaded. What percent is shaded?",
+              "choices": [
+                "37%",
+                "63%",
+                "3.7%",
+                "0.37%"
+              ],
+              "answer": "37%",
+              "hint": "Percent = out of 100.",
+              "feedbackCorrect": "37%!",
+              "feedbackWrong": "37 out of 100 = 37%."
+            },
+            {
+              "id": "x10c-p2",
+              "type": "fill",
+              "prompt": "Write 1/4 as a percent.",
+              "answer": "25%",
+              "accept": [
+                "25%",
+                "25"
+              ],
+              "hint": "1/4 = ?/100",
+              "feedbackCorrect": "25%!",
+              "feedbackWrong": "1/4 = 25/100 = 25%."
+            },
+            {
+              "id": "x10c-p3",
+              "type": "mc",
+              "prompt": "0.6 = ?",
+              "choices": [
+                "60%",
+                "6%",
+                "0.6%",
+                "600%"
+              ],
+              "answer": "60%",
+              "hint": "0.6 = 0.60 = 60 hundredths.",
+              "feedbackCorrect": "60%!",
+              "feedbackWrong": "0.6 = 60/100 = 60%."
+            },
+            {
+              "id": "x10c-p4",
+              "type": "fill",
+              "prompt": "Write 45% as a decimal.",
+              "answer": "0.45",
+              "accept": [
+                "0.45",
+                ".45"
+              ],
+              "hint": "45% = 45 hundredths.",
+              "feedbackCorrect": "0.45!",
+              "feedbackWrong": "45% = 45/100 = 0.45."
+            },
+            {
+              "id": "x10c-p5",
+              "type": "mc",
+              "prompt": "Which is largest?",
+              "choices": [
+                "3/4",
+                "70%",
+                "0.7",
+                "0.07"
+              ],
+              "answer": "3/4",
+              "hint": "Change them all to percents.",
+              "feedbackCorrect": "3/4 = 75% wins!",
+              "feedbackWrong": "3/4 = 75%, 70% = 70%, 0.7 = 70%, 0.07 = 7% → 3/4 is largest."
+            },
+            {
+              "id": "x10c-p6",
+              "type": "fill",
+              "prompt": "Write 7/20 as a percent.",
+              "answer": "35%",
+              "accept": [
+                "35%",
+                "35"
+              ],
+              "hint": "20 × 5 = 100.",
+              "feedbackCorrect": "35%!",
+              "feedbackWrong": "7/20 = 35/100 = 35%."
+            }
+          ],
+          "quickCheck": [
+            {
+              "id": "x10c-q1",
+              "type": "fill",
+              "prompt": "Write 9/10 as a percent.",
+              "answer": "90%",
+              "accept": [
+                "90%",
+                "90"
+              ]
+            },
+            {
+              "id": "x10c-q2",
+              "type": "mc",
+              "prompt": "50% is the same as…",
+              "choices": [
+                "1/2",
+                "1/5",
+                "1/50",
+                "5"
+              ],
+              "answer": "1/2"
+            },
+            {
+              "id": "x10c-q3",
+              "type": "mc",
+              "prompt": "Which one is NOT equal to 20%?",
+              "choices": [
+                "2/100",
+                "0.2",
+                "1/5",
+                "20/100"
+              ],
+              "answer": "2/100"
+            }
+          ]
+        },
+        "g6-percent-of": {
+          "id": "g6-percent-of",
+          "unitId": "u6-percents",
+          "title": "Percent of a Number",
+          "durationMin": 10,
+          "prerequisites": [
+            "g6-percents"
+          ],
+          "skills": [
+            "percent-of",
+            "percent-whole"
+          ],
+          "einsteinIntro": "What's 30% of 70? Find 10% first (just divide by 10), then build any percent you need!",
+          "explain": {
+            "panels": [
+              {
+                "speech": "A tape of 80 split into 4 equal parts: each part is 25% = 20.",
+                "visual": "percent-tape",
+                "state": "explain"
+              },
+              {
+                "speech": "10% of 70 = 7. So 30% = 3 × 7 = 21, and 50% = half = 35!",
+                "visual": "percent-tenths",
+                "state": "think"
+              }
+            ]
+          },
+          "workedExample": {
+            "title": "Worked Example",
+            "speech": "Find 30% of 70.",
+            "steps": [
+              "10% of 70 = 70 ÷ 10 = 7",
+              "30% = 3 × 10% = 3 × 7",
+              "30% of 70 = 21"
+            ]
+          },
+          "practice": [
+            {
+              "id": "x10d-p1",
+              "type": "fill",
+              "prompt": "10% of 80 = ?",
+              "answer": "8",
+              "accept": [
+                "8"
+              ],
+              "hint": "Divide by 10.",
+              "feedbackCorrect": "8!",
+              "feedbackWrong": "80 ÷ 10 = 8."
+            },
+            {
+              "id": "x10d-p2",
+              "type": "mc",
+              "prompt": "50% of 46 = ?",
+              "choices": [
+                "23",
+                "46",
+                "92",
+                "4.6"
+              ],
+              "answer": "23",
+              "hint": "50% is half.",
+              "feedbackCorrect": "23!",
+              "feedbackWrong": "Half of 46 is 23."
+            },
+            {
+              "id": "x10d-p3",
+              "type": "fill",
+              "prompt": "25% of 60 = ?",
+              "answer": "15",
+              "accept": [
+                "15"
+              ],
+              "hint": "25% is one quarter.",
+              "feedbackCorrect": "15!",
+              "feedbackWrong": "60 ÷ 4 = 15."
+            },
+            {
+              "id": "x10d-p4",
+              "type": "mc",
+              "prompt": "A $40 game is 20% off. How much money do you save?",
+              "choices": [
+                "$8",
+                "$20",
+                "$4",
+                "$32"
+              ],
+              "answer": "$8",
+              "hint": "10% of 40 is 4.",
+              "feedbackCorrect": "You save $8!",
+              "feedbackWrong": "10% of $40 = $4, so 20% = $8."
+            },
+            {
+              "id": "x10d-p5",
+              "type": "fill",
+              "prompt": "30% of 90 = ?",
+              "answer": "27",
+              "accept": [
+                "27"
+              ],
+              "hint": "10% of 90 first.",
+              "feedbackCorrect": "27!",
+              "feedbackWrong": "10% of 90 = 9, and 3 × 9 = 27."
+            },
+            {
+              "id": "x10d-p6",
+              "type": "mc",
+              "prompt": "12 is 50% of what number?",
+              "choices": [
+                "24",
+                "6",
+                "12",
+                "60"
+              ],
+              "answer": "24",
+              "hint": "12 is HALF of the number.",
+              "feedbackCorrect": "24!",
+              "feedbackWrong": "If half is 12, the whole is 12 × 2 = 24."
+            }
+          ],
+          "quickCheck": [
+            {
+              "id": "x10d-q1",
+              "type": "fill",
+              "prompt": "75% of 40 = ?",
+              "answer": "30",
+              "accept": [
+                "30"
+              ]
+            },
+            {
+              "id": "x10d-q2",
+              "type": "mc",
+              "prompt": "A $50 shirt is 10% off. What is the sale price?",
+              "choices": [
+                "$45",
+                "$5",
+                "$40",
+                "$55"
+              ],
+              "answer": "$45"
+            },
+            {
+              "id": "x10d-q3",
+              "type": "fill",
+              "prompt": "5 is 25% of what number?",
+              "answer": "20",
+              "accept": [
+                "20"
               ]
             }
           ]

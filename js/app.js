@@ -517,7 +517,7 @@
 
   function trackButtonsHtml(selectedId, namePrefix) {
     const tracks = ageTracks();
-    const order = ['ages-5-6', 'ages-7-8', 'ages-9-10'];
+    const order = ['ages-5-6', 'ages-7-8', 'ages-9-10', 'ages-11-12'];
     return order.map(id => {
       const t = tracks[id];
       if (!t) return '';
@@ -1665,6 +1665,74 @@
           <div>[◐◑] [◐◑] [◐◑]</div>
           <div style="font-family:Bangers,Impact,sans-serif;">3 wholes = 6 halves → 3 ÷ 0.5 = <span style="color:#FF6B35;">6</span></div>
           <div style="font-family:Comic Neue,cursive;font-size:1rem;">Dividing by a number less than 1 makes it BIGGER!</div>
+        </div>`,
+
+      // X10 — ages 11–12 ratios, rates & percents (6.RP)
+      'ratio-tape': `
+        <div class="viz-box" style="font-size:1.6rem;line-height:1.5;">
+          <div><span style="color:#FF6B35;">★★★</span> <span style="color:#3B82F6;">★★</span></div>
+          <div style="font-family:Bangers,Impact,sans-serif;font-size:1.2rem;">red : blue = 3 : 2 · red : all = 3 : 5</div>
+        </div>`,
+      'ratio-table': `
+        <div class="viz-box">
+          <table style="border-collapse:collapse;font-family:Bangers,Impact,sans-serif;font-size:1.15rem;margin:0 auto;" aria-label="Ratio table 2 to 3, 4 to 6, 6 to 9">
+            <tr><th style="border:2px solid #1a1a1a;padding:4px 10px;">flour</th><td style="border:2px solid #1a1a1a;padding:4px 10px;">2</td><td style="border:2px solid #1a1a1a;padding:4px 10px;">4</td><td style="border:2px solid #1a1a1a;padding:4px 10px;">6</td></tr>
+            <tr><th style="border:2px solid #1a1a1a;padding:4px 10px;">milk</th><td style="border:2px solid #1a1a1a;padding:4px 10px;">3</td><td style="border:2px solid #1a1a1a;padding:4px 10px;">6</td><td style="border:2px solid #1a1a1a;padding:4px 10px;">9</td></tr>
+          </table>
+          <div style="font-family:Comic Neue,cursive;">× 2, × 3 … same ratio!</div>
+        </div>`,
+      'unit-rate-bar': `
+        <div class="viz-box">
+          <svg viewBox="0 0 240 60" width="240" height="60" role="img" aria-label="120 miles split into 3 equal parts of 40">
+            <rect x="5" y="10" width="76" height="30" fill="#4ECDC4" stroke="#1a1a1a" stroke-width="2"/>
+            <rect x="81" y="10" width="76" height="30" fill="#4ECDC4" stroke="#1a1a1a" stroke-width="2"/>
+            <rect x="157" y="10" width="76" height="30" fill="#4ECDC4" stroke="#1a1a1a" stroke-width="2"/>
+            <text x="43" y="31" text-anchor="middle" font-size="12" font-family="Bangers,Impact,sans-serif">40 mi</text>
+            <text x="119" y="31" text-anchor="middle" font-size="12" font-family="Bangers,Impact,sans-serif">40 mi</text>
+            <text x="195" y="31" text-anchor="middle" font-size="12" font-family="Bangers,Impact,sans-serif">40 mi</text>
+            <text x="120" y="55" text-anchor="middle" font-size="10" font-family="Comic Neue,cursive">hour 1 · hour 2 · hour 3</text>
+          </svg>
+          <div style="font-family:Bangers,Impact,sans-serif;">120 ÷ 3 = <span style="color:#FF6B35;">40 miles per hour</span></div>
+        </div>`,
+      'unit-price': `
+        <div class="viz-box" style="font-size:1.3rem;line-height:1.5;">
+          <div>⭐⭐⭐⭐⭐⭐ = $3.00</div>
+          <div style="font-family:Bangers,Impact,sans-serif;">$3.00 ÷ 6 = <span style="color:#FF6B35;">$0.50 each</span></div>
+          <div style="font-family:Comic Neue,cursive;font-size:1rem;">Lowest price for ONE = best deal</div>
+        </div>`,
+      'percent-grid': `
+        <div class="viz-box">
+          <svg viewBox="0 0 110 110" width="130" height="130" role="img" aria-label="Hundred grid with 35 squares shaded"><rect x="5" y="5" width="10" height="10" fill="#FF6B35" stroke="#999" stroke-width="0.5"/><rect x="15" y="5" width="10" height="10" fill="#FF6B35" stroke="#999" stroke-width="0.5"/><rect x="25" y="5" width="10" height="10" fill="#FF6B35" stroke="#999" stroke-width="0.5"/><rect x="35" y="5" width="10" height="10" fill="#FF6B35" stroke="#999" stroke-width="0.5"/><rect x="45" y="5" width="10" height="10" fill="#FF6B35" stroke="#999" stroke-width="0.5"/><rect x="55" y="5" width="10" height="10" fill="#FF6B35" stroke="#999" stroke-width="0.5"/><rect x="65" y="5" width="10" height="10" fill="#FF6B35" stroke="#999" stroke-width="0.5"/><rect x="75" y="5" width="10" height="10" fill="#FF6B35" stroke="#999" stroke-width="0.5"/><rect x="85" y="5" width="10" height="10" fill="#FF6B35" stroke="#999" stroke-width="0.5"/><rect x="95" y="5" width="10" height="10" fill="#FF6B35" stroke="#999" stroke-width="0.5"/><rect x="5" y="15" width="10" height="10" fill="#FF6B35" stroke="#999" stroke-width="0.5"/><rect x="15" y="15" width="10" height="10" fill="#FF6B35" stroke="#999" stroke-width="0.5"/><rect x="25" y="15" width="10" height="10" fill="#FF6B35" stroke="#999" stroke-width="0.5"/><rect x="35" y="15" width="10" height="10" fill="#FF6B35" stroke="#999" stroke-width="0.5"/><rect x="45" y="15" width="10" height="10" fill="#FF6B35" stroke="#999" stroke-width="0.5"/><rect x="55" y="15" width="10" height="10" fill="#FF6B35" stroke="#999" stroke-width="0.5"/><rect x="65" y="15" width="10" height="10" fill="#FF6B35" stroke="#999" stroke-width="0.5"/><rect x="75" y="15" width="10" height="10" fill="#FF6B35" stroke="#999" stroke-width="0.5"/><rect x="85" y="15" width="10" height="10" fill="#FF6B35" stroke="#999" stroke-width="0.5"/><rect x="95" y="15" width="10" height="10" fill="#FF6B35" stroke="#999" stroke-width="0.5"/><rect x="5" y="25" width="10" height="10" fill="#FF6B35" stroke="#999" stroke-width="0.5"/><rect x="15" y="25" width="10" height="10" fill="#FF6B35" stroke="#999" stroke-width="0.5"/><rect x="25" y="25" width="10" height="10" fill="#FF6B35" stroke="#999" stroke-width="0.5"/><rect x="35" y="25" width="10" height="10" fill="#FF6B35" stroke="#999" stroke-width="0.5"/><rect x="45" y="25" width="10" height="10" fill="#FF6B35" stroke="#999" stroke-width="0.5"/><rect x="55" y="25" width="10" height="10" fill="#FF6B35" stroke="#999" stroke-width="0.5"/><rect x="65" y="25" width="10" height="10" fill="#FF6B35" stroke="#999" stroke-width="0.5"/><rect x="75" y="25" width="10" height="10" fill="#FF6B35" stroke="#999" stroke-width="0.5"/><rect x="85" y="25" width="10" height="10" fill="#FF6B35" stroke="#999" stroke-width="0.5"/><rect x="95" y="25" width="10" height="10" fill="#FF6B35" stroke="#999" stroke-width="0.5"/><rect x="5" y="35" width="10" height="10" fill="#FF6B35" stroke="#999" stroke-width="0.5"/><rect x="15" y="35" width="10" height="10" fill="#FF6B35" stroke="#999" stroke-width="0.5"/><rect x="25" y="35" width="10" height="10" fill="#FF6B35" stroke="#999" stroke-width="0.5"/><rect x="35" y="35" width="10" height="10" fill="#FF6B35" stroke="#999" stroke-width="0.5"/><rect x="45" y="35" width="10" height="10" fill="#FF6B35" stroke="#999" stroke-width="0.5"/><rect x="55" y="35" width="10" height="10" fill="#fff" stroke="#999" stroke-width="0.5"/><rect x="65" y="35" width="10" height="10" fill="#fff" stroke="#999" stroke-width="0.5"/><rect x="75" y="35" width="10" height="10" fill="#fff" stroke="#999" stroke-width="0.5"/><rect x="85" y="35" width="10" height="10" fill="#fff" stroke="#999" stroke-width="0.5"/><rect x="95" y="35" width="10" height="10" fill="#fff" stroke="#999" stroke-width="0.5"/><rect x="5" y="45" width="10" height="10" fill="#fff" stroke="#999" stroke-width="0.5"/><rect x="15" y="45" width="10" height="10" fill="#fff" stroke="#999" stroke-width="0.5"/><rect x="25" y="45" width="10" height="10" fill="#fff" stroke="#999" stroke-width="0.5"/><rect x="35" y="45" width="10" height="10" fill="#fff" stroke="#999" stroke-width="0.5"/><rect x="45" y="45" width="10" height="10" fill="#fff" stroke="#999" stroke-width="0.5"/><rect x="55" y="45" width="10" height="10" fill="#fff" stroke="#999" stroke-width="0.5"/><rect x="65" y="45" width="10" height="10" fill="#fff" stroke="#999" stroke-width="0.5"/><rect x="75" y="45" width="10" height="10" fill="#fff" stroke="#999" stroke-width="0.5"/><rect x="85" y="45" width="10" height="10" fill="#fff" stroke="#999" stroke-width="0.5"/><rect x="95" y="45" width="10" height="10" fill="#fff" stroke="#999" stroke-width="0.5"/><rect x="5" y="55" width="10" height="10" fill="#fff" stroke="#999" stroke-width="0.5"/><rect x="15" y="55" width="10" height="10" fill="#fff" stroke="#999" stroke-width="0.5"/><rect x="25" y="55" width="10" height="10" fill="#fff" stroke="#999" stroke-width="0.5"/><rect x="35" y="55" width="10" height="10" fill="#fff" stroke="#999" stroke-width="0.5"/><rect x="45" y="55" width="10" height="10" fill="#fff" stroke="#999" stroke-width="0.5"/><rect x="55" y="55" width="10" height="10" fill="#fff" stroke="#999" stroke-width="0.5"/><rect x="65" y="55" width="10" height="10" fill="#fff" stroke="#999" stroke-width="0.5"/><rect x="75" y="55" width="10" height="10" fill="#fff" stroke="#999" stroke-width="0.5"/><rect x="85" y="55" width="10" height="10" fill="#fff" stroke="#999" stroke-width="0.5"/><rect x="95" y="55" width="10" height="10" fill="#fff" stroke="#999" stroke-width="0.5"/><rect x="5" y="65" width="10" height="10" fill="#fff" stroke="#999" stroke-width="0.5"/><rect x="15" y="65" width="10" height="10" fill="#fff" stroke="#999" stroke-width="0.5"/><rect x="25" y="65" width="10" height="10" fill="#fff" stroke="#999" stroke-width="0.5"/><rect x="35" y="65" width="10" height="10" fill="#fff" stroke="#999" stroke-width="0.5"/><rect x="45" y="65" width="10" height="10" fill="#fff" stroke="#999" stroke-width="0.5"/><rect x="55" y="65" width="10" height="10" fill="#fff" stroke="#999" stroke-width="0.5"/><rect x="65" y="65" width="10" height="10" fill="#fff" stroke="#999" stroke-width="0.5"/><rect x="75" y="65" width="10" height="10" fill="#fff" stroke="#999" stroke-width="0.5"/><rect x="85" y="65" width="10" height="10" fill="#fff" stroke="#999" stroke-width="0.5"/><rect x="95" y="65" width="10" height="10" fill="#fff" stroke="#999" stroke-width="0.5"/><rect x="5" y="75" width="10" height="10" fill="#fff" stroke="#999" stroke-width="0.5"/><rect x="15" y="75" width="10" height="10" fill="#fff" stroke="#999" stroke-width="0.5"/><rect x="25" y="75" width="10" height="10" fill="#fff" stroke="#999" stroke-width="0.5"/><rect x="35" y="75" width="10" height="10" fill="#fff" stroke="#999" stroke-width="0.5"/><rect x="45" y="75" width="10" height="10" fill="#fff" stroke="#999" stroke-width="0.5"/><rect x="55" y="75" width="10" height="10" fill="#fff" stroke="#999" stroke-width="0.5"/><rect x="65" y="75" width="10" height="10" fill="#fff" stroke="#999" stroke-width="0.5"/><rect x="75" y="75" width="10" height="10" fill="#fff" stroke="#999" stroke-width="0.5"/><rect x="85" y="75" width="10" height="10" fill="#fff" stroke="#999" stroke-width="0.5"/><rect x="95" y="75" width="10" height="10" fill="#fff" stroke="#999" stroke-width="0.5"/><rect x="5" y="85" width="10" height="10" fill="#fff" stroke="#999" stroke-width="0.5"/><rect x="15" y="85" width="10" height="10" fill="#fff" stroke="#999" stroke-width="0.5"/><rect x="25" y="85" width="10" height="10" fill="#fff" stroke="#999" stroke-width="0.5"/><rect x="35" y="85" width="10" height="10" fill="#fff" stroke="#999" stroke-width="0.5"/><rect x="45" y="85" width="10" height="10" fill="#fff" stroke="#999" stroke-width="0.5"/><rect x="55" y="85" width="10" height="10" fill="#fff" stroke="#999" stroke-width="0.5"/><rect x="65" y="85" width="10" height="10" fill="#fff" stroke="#999" stroke-width="0.5"/><rect x="75" y="85" width="10" height="10" fill="#fff" stroke="#999" stroke-width="0.5"/><rect x="85" y="85" width="10" height="10" fill="#fff" stroke="#999" stroke-width="0.5"/><rect x="95" y="85" width="10" height="10" fill="#fff" stroke="#999" stroke-width="0.5"/><rect x="5" y="95" width="10" height="10" fill="#fff" stroke="#999" stroke-width="0.5"/><rect x="15" y="95" width="10" height="10" fill="#fff" stroke="#999" stroke-width="0.5"/><rect x="25" y="95" width="10" height="10" fill="#fff" stroke="#999" stroke-width="0.5"/><rect x="35" y="95" width="10" height="10" fill="#fff" stroke="#999" stroke-width="0.5"/><rect x="45" y="95" width="10" height="10" fill="#fff" stroke="#999" stroke-width="0.5"/><rect x="55" y="95" width="10" height="10" fill="#fff" stroke="#999" stroke-width="0.5"/><rect x="65" y="95" width="10" height="10" fill="#fff" stroke="#999" stroke-width="0.5"/><rect x="75" y="95" width="10" height="10" fill="#fff" stroke="#999" stroke-width="0.5"/><rect x="85" y="95" width="10" height="10" fill="#fff" stroke="#999" stroke-width="0.5"/><rect x="95" y="95" width="10" height="10" fill="#fff" stroke="#999" stroke-width="0.5"/></svg>
+          <div style="font-family:Bangers,Impact,sans-serif;">35 out of 100 = <span style="color:#FF6B35;">35%</span> = 0.35</div>
+        </div>`,
+      'percent-fdp': `
+        <div class="viz-box" style="font-family:Bangers,Impact,sans-serif;font-size:1.2rem;line-height:1.6;">
+          1/2 = 0.5 = <span style="color:#FF6B35;">50%</span><br>
+          1/4 = 0.25 = <span style="color:#FF6B35;">25%</span><br>
+          3/4 = 0.75 = <span style="color:#FF6B35;">75%</span><br>
+          1/10 = 0.1 = <span style="color:#FF6B35;">10%</span>
+        </div>`,
+      'percent-tape': `
+        <div class="viz-box">
+          <svg viewBox="0 0 240 64" width="240" height="64" role="img" aria-label="Tape of 80 split into four parts of 20, each 25 percent">
+            <rect x="5" y="8" width="57" height="30" fill="#FF6B35" stroke="#1a1a1a" stroke-width="2"/>
+            <rect x="62" y="8" width="57" height="30" fill="#FFE66D" stroke="#1a1a1a" stroke-width="2"/>
+            <rect x="119" y="8" width="57" height="30" fill="#FFE66D" stroke="#1a1a1a" stroke-width="2"/>
+            <rect x="176" y="8" width="57" height="30" fill="#FFE66D" stroke="#1a1a1a" stroke-width="2"/>
+            <text x="33" y="28" text-anchor="middle" font-size="12" font-family="Bangers,Impact,sans-serif">20</text>
+            <text x="90" y="28" text-anchor="middle" font-size="12" font-family="Bangers,Impact,sans-serif">20</text>
+            <text x="147" y="28" text-anchor="middle" font-size="12" font-family="Bangers,Impact,sans-serif">20</text>
+            <text x="204" y="28" text-anchor="middle" font-size="12" font-family="Bangers,Impact,sans-serif">20</text>
+            <text x="120" y="56" text-anchor="middle" font-size="10" font-family="Comic Neue,cursive">25% · 50% · 75% · 100% = 80</text>
+          </svg>
+          <div style="font-family:Bangers,Impact,sans-serif;">25% of 80 = <span style="color:#FF6B35;">20</span></div>
+        </div>`,
+      'percent-tenths': `
+        <div class="viz-box" style="font-family:Bangers,Impact,sans-serif;font-size:1.2rem;line-height:1.6;">
+          10% of 70 = 70 ÷ 10 = 7<br>
+          30% = 3 × 7 = <span style="color:#FF6B35;">21</span><br>
+          50% = half of 70 = 35
+          <div style="font-family:Comic Neue,cursive;font-size:1rem;">Find 10% first, then build!</div>
         </div>`,
 
       // X21 — ages 7–8 area (3.MD) unit-square grids

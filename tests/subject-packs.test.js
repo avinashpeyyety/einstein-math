@@ -29,11 +29,11 @@ async function t(name, fn) {
 }
 
 (async () => {
-  await t('1. packs exist: math has the 3 tracks (113 lessons), physics has sim lessons (ages 5–6 since X6, 7–8, 9–10); no data/curriculum.json', () => {
+  await t('1. packs exist: math has the 4 tracks (121 lessons), physics has sim lessons (ages 5–6 since X6, 7–8, 9–10); no data/curriculum.json', () => {
     const m = packFiles['data/subjects/math.json'];
-    assert.deepStrictEqual(Object.keys(m.tracks).sort(), ['ages-5-6', 'ages-7-8', 'ages-9-10']);
+    assert.deepStrictEqual(Object.keys(m.tracks).sort(), ['ages-11-12', 'ages-5-6', 'ages-7-8', 'ages-9-10']);
     const n = Object.values(m.tracks).reduce((a, tr) => a + Object.keys(tr.lessons).length, 0);
-    assert.strictEqual(n, 117);
+    assert.strictEqual(n, 121); // +4 X10 (ages 11–12)
     for (const tr of Object.values(m.tracks)) for (const u of tr.units) for (const id of u.lessons) assert.ok(tr.lessons[id], 'unit lesson ' + id);
     const p = packFiles['data/subjects/physics.json'];
     assert.strictEqual(p.meta.subject, 'physics');
@@ -50,7 +50,7 @@ async function t(name, fn) {
     const cur = await S.loadCurriculum('math', fakeFetch(log));
     assert.deepStrictEqual(log, ['data/subjects/math.json']);
     assert.strictEqual(cur.activeSubjectId, 'math');
-    assert.deepStrictEqual(Object.keys(cur.tracks).sort(), ['ages-5-6', 'ages-7-8', 'ages-9-10']);
+    assert.deepStrictEqual(Object.keys(cur.tracks).sort(), ['ages-11-12', 'ages-5-6', 'ages-7-8', 'ages-9-10']);
     assert.strictEqual(cur.meta.defaultTrackId, 'ages-7-8');
     assert.strictEqual(cur.subjects.math.packLoaded, true);
     assert.ok(!S.isPackLoaded(cur, 'physics'));
@@ -66,7 +66,7 @@ async function t(name, fn) {
     Object.values(cur.tracks).forEach(tr => Object.keys(tr.lessons).forEach(id => assert.ok(!mathIds.has(id), 'no math lesson under physics: ' + id)));
     const stub = S.applyPack(cur, 'physics', { meta: { subject: 'physics' }, tracks: {} }, 'physics');
     assert.deepStrictEqual(stub.tracks, {}, 'a stub physics pack never shows math tracks');
-    assert.strictEqual(Object.keys(cur.subjects.math.tracks).length, 3);
+    assert.strictEqual(Object.keys(cur.subjects.math.tracks).length, 4);
     const S2 = loadSubjects(), log2 = [];
     const cur2 = await S2.loadCurriculum('science', fakeFetch(log2));
     assert.deepStrictEqual(log2, ['data/subjects/math.json'], 'non-catalog subject ignored');
@@ -88,7 +88,7 @@ async function t(name, fn) {
     cur = S.applyPack(cur, 'physics', { meta: { subject: 'physics' }, tracks: { 'ages-7-8': { id: 'ages-7-8', units: [], lessons: { 'phy-1': {} } } } }, 'math');
     assert.ok(S.isPackLoaded(cur, 'physics'));
     assert.deepStrictEqual(Object.keys(cur.subjects.physics.tracks), ['ages-7-8']);
-    assert.strictEqual(Object.keys(cur.subjects.math.tracks).length, 3);
+    assert.strictEqual(Object.keys(cur.subjects.math.tracks).length, 4);
     assert.strictEqual(cur.tracks, cur.subjects.math.tracks, 'math stays active until the switcher picks physics');
     const sw = S.normalizeCurriculum(cur, 'physics');
     assert.strictEqual(sw.activeSubjectId, 'physics');

@@ -71,5 +71,27 @@ const read = (f) => fs.readFileSync(path.join(ROOT, f), 'utf8');
     assert.ok(!/Coming soon/.test(space.slice(space.indexOf("id: 'landings'"), space.indexOf('working()'))));
   });
 
+  // C2b (v2.6.14): phone framing of the catch — tower stays big while the booster is high; hover never tucks under the bar
+  const earthSrc = read('cosmos/js/earth.js');
+  const cam = earthSrc.slice(earthSrc.indexOf('function towerCatchCam'), earthSrc.indexOf('function animateBoosterRecovery'));
+  t('C2b: portrait caps the framed drop (PHONE_CATCH_SPAN) and aims toward the tower', () => {
+    const cap = +earthSrc.match(/const PHONE_CATCH_SPAN = ([\d.]+)/)[1];
+    assert.ok(cap >= 2 && cap <= 4, 'cap ' + cap);
+    assert.match(cam, /const span = aspect < 1 \? Math\.min\(fullSpan, PHONE_CATCH_SPAN\) : fullSpan;/);
+    assert.match(cam, /lerp\(towerMid, 1 - 0\.5 \* \(span \/ Math\.max\(fullSpan/);
+    // model: camera distance ∝ (2.2 + span·1.25); tower on-screen size ∝ 1/dist → ≥ 3× bigger when the booster is 20 units up
+    const d = (sp) => 2.2 + sp * 1.25;
+    assert.ok(d(20) / d(Math.min(20, cap)) >= 3);
+    assert.strictEqual(d(Math.min(1, cap)), d(1)); // at hover nothing changes
+  });
+  t('C2b: short phones nudge the hover scene down off the bar (squeeze only near the tower)', () => {
+    assert.match(cam, /const free = Math\.max\(0\.3, rawFree\);/);
+    assert.match(cam, /const w = 1 - smootherstep\(clamp01\(\(fullSpan - 1\.5\) \/ 3\)\);[^\n]*\n\s*const squeeze = \(free - rawFree\) \* w;/);
+    assert.match(cam, /top - bottom \+ 0\.04 \+ squeeze/);
+    // 360×640 hover: bar to 360px, dock from 513px → raw free 0.12 < 0.3 floor; the nudge is the shortfall
+    const top = 360 / 640, bottom = 127 / 640, raw = 1 - top - bottom - 0.08;
+    assert.ok(Math.max(0.3, raw) - raw > 0.1);
+  });
+
   console.log(`\n${pass} passed`);
 })().catch((e) => { console.error(e); process.exit(1); });

@@ -2155,6 +2155,8 @@ function animateTowerCatch(api, booster, mission, t, padWorld, up, east) {
   return towerCatchCam(api, booster.position, up, east);
 }
 
+const PHONE_CATCH_SPAN = 3; // C2b: world units of booster drop framed above the tower on portrait screens
+
 /** C2 camera: always frame BOTH the tower and the booster (pull back while the booster is far away). Accounts for
  * narrow (portrait) screens and the Earth bar covering the top of the view, so the tower is never hidden. */
 function towerCatchCam(api, boosterPos, up, east) {
@@ -2162,23 +2164,28 @@ function towerCatchCam(api, boosterPos, up, east) {
   const towerTop = api.siteStage.localToWorld(new THREE.Vector3(0.85, 4.2, 0));
   const towerBase = api.siteStage.localToWorld(new THREE.Vector3(0.85, 0, 0));
   const towerMid = towerBase.clone().lerp(towerTop, 0.5);
-  const span = boosterPos.distanceTo(towerBase);
-  const mid = boosterPos.clone().lerp(towerMid, 0.5);
   const view = api.view || {};
   const aspect = view.aspect || 16 / 9;
+  // C2b: on portrait phones, while the booster is still high, don't back off to fit it all — frame at most
+  // PHONE_CATCH_SPAN of the drop above the tower so the tower stays big; the booster flies down into the shot
+  const fullSpan = boosterPos.distanceTo(towerBase);
+  const span = aspect < 1 ? Math.min(fullSpan, PHONE_CATCH_SPAN) : fullSpan;
+  const mid = boosterPos.clone().lerp(towerMid, 1 - 0.5 * (span / Math.max(fullSpan, 1e-6)));
   const top = clamp01(view.topInset || 0);
   const bottom = clamp01(view.bottomInset || 0);
-  const free = Math.max(0.3, 1 - top - bottom - 0.08); // small safety margin so the tower top never tucks under the bar
+  const rawFree = 1 - top - bottom - 0.08; // small safety margin so the tower top never tucks under the bar
+  const free = Math.max(0.3, rawFree);
+  const w = 1 - smootherstep(clamp01((fullSpan - 1.5) / 3)); // 0 while the booster is high, 1 at hover
+  const squeeze = (free - rawFree) * w; // C2b: >0 on short phones at hover — scene taller than the band, nudge it down off the bar
   let dist = 2.2 + span * 1.25;
   if (aspect < 1) dist /= Math.pow(aspect, 0.85); // portrait: horizontal field of view is narrow
   dist /= free; // only the part between the Earth bar and the time dock is usable
   const halfH = dist * Math.tan(THREE.MathUtils.degToRad((view.fovDeg || 50) / 2));
-  const look = mid.clone().add(up.clone().multiplyScalar(halfH * (top - bottom + 0.04))); // centre the scene in the free area
+  const look = mid.clone().add(up.clone().multiplyScalar(halfH * (top - bottom + 0.04 + squeeze))); // centre the scene in the free area
   // far away: side-on view across the flight path; close in: look at the tower face so both chopsticks show
   // view from the south (no east component keeps the picture upright under the world-Y camera "up")
   const far = north.clone().multiplyScalar(-0.95).add(up.clone().multiplyScalar(0.3));
   const near = north.clone().multiplyScalar(-0.85).add(up.clone().multiplyScalar(0.55));
-  const w = 1 - smootherstep(clamp01((span - 1.5) / 3));
   const dir = far.normalize().lerp(near, w).normalize();
   const position = look.clone().add(dir.multiplyScalar(dist));
   return { position, target: look, minDist: 0.6, maxDist: EARTH_R * 12 };

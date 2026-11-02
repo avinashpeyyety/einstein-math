@@ -1735,6 +1735,68 @@
           <div style="font-family:Comic Neue,cursive;font-size:1rem;">Find 10% first, then build!</div>
         </div>`,
 
+      // X10 cycle 2 — ages 11–12 negatives (6.NS.5–7) & one-step equations (6.EE.5–7)
+      'int-number-line': `
+        <div class="viz-box">
+          <svg viewBox="0 0 240 70" width="260" height="76" role="img" aria-label="Number line from minus 5 to 5 with 3 and minus 3 marked as opposites"><line x1="10" y1="32" x2="230" y2="32" stroke="#1a1a1a" stroke-width="2"/><line x1="20" y1="26" x2="20" y2="38" stroke="#1a1a1a" stroke-width="2"/><text x="20" y="54" text-anchor="middle" font-size="11" font-family="Bangers,Impact,sans-serif" fill="#3B82F6">−5</text><line x1="40" y1="26" x2="40" y2="38" stroke="#1a1a1a" stroke-width="2"/><text x="40" y="54" text-anchor="middle" font-size="11" font-family="Bangers,Impact,sans-serif" fill="#3B82F6">−4</text><line x1="60" y1="26" x2="60" y2="38" stroke="#1a1a1a" stroke-width="2"/><text x="60" y="54" text-anchor="middle" font-size="11" font-family="Bangers,Impact,sans-serif" fill="#3B82F6">−3</text><line x1="80" y1="26" x2="80" y2="38" stroke="#1a1a1a" stroke-width="2"/><text x="80" y="54" text-anchor="middle" font-size="11" font-family="Bangers,Impact,sans-serif" fill="#3B82F6">−2</text><line x1="100" y1="26" x2="100" y2="38" stroke="#1a1a1a" stroke-width="2"/><text x="100" y="54" text-anchor="middle" font-size="11" font-family="Bangers,Impact,sans-serif" fill="#3B82F6">−1</text><line x1="120" y1="26" x2="120" y2="38" stroke="#1a1a1a" stroke-width="2"/><text x="120" y="54" text-anchor="middle" font-size="11" font-family="Bangers,Impact,sans-serif" fill="#1a1a1a">0</text><line x1="140" y1="26" x2="140" y2="38" stroke="#1a1a1a" stroke-width="2"/><text x="140" y="54" text-anchor="middle" font-size="11" font-family="Bangers,Impact,sans-serif" fill="#FF6B35">1</text><line x1="160" y1="26" x2="160" y2="38" stroke="#1a1a1a" stroke-width="2"/><text x="160" y="54" text-anchor="middle" font-size="11" font-family="Bangers,Impact,sans-serif" fill="#FF6B35">2</text><line x1="180" y1="26" x2="180" y2="38" stroke="#1a1a1a" stroke-width="2"/><text x="180" y="54" text-anchor="middle" font-size="11" font-family="Bangers,Impact,sans-serif" fill="#FF6B35">3</text><line x1="200" y1="26" x2="200" y2="38" stroke="#1a1a1a" stroke-width="2"/><text x="200" y="54" text-anchor="middle" font-size="11" font-family="Bangers,Impact,sans-serif" fill="#FF6B35">4</text><line x1="220" y1="26" x2="220" y2="38" stroke="#1a1a1a" stroke-width="2"/><text x="220" y="54" text-anchor="middle" font-size="11" font-family="Bangers,Impact,sans-serif" fill="#FF6B35">5</text><circle cx="60" cy="32" r="6" fill="#3B82F6"/><circle cx="180" cy="32" r="6" fill="#FF6B35"/><path d="M60 18 Q120 0 180 18" fill="none" stroke="#A855F7" stroke-width="2" stroke-dasharray="4 3"/></svg>
+          <div style="font-family:Bangers,Impact,sans-serif;"><span style="color:#3B82F6;">−3</span> and <span style="color:#FF6B35;">3</span> are opposites — 3 steps each side of 0</div>
+        </div>`,
+      'int-thermometer': `
+        <div class="viz-box">
+          <svg viewBox="0 0 120 150" width="110" height="140" role="img" aria-label="Thermometer showing 5 degrees above zero and minus 3 degrees below zero">
+            <rect x="50" y="10" width="20" height="110" rx="10" fill="#fff" stroke="#1a1a1a" stroke-width="2"/>
+            <circle cx="60" cy="128" r="14" fill="#FF6B35" stroke="#1a1a1a" stroke-width="2"/>
+            <rect x="54" y="40" width="12" height="88" fill="#FF6B35"/>
+            <line x1="40" y1="70" x2="80" y2="70" stroke="#1a1a1a" stroke-width="3"/>
+            <text x="86" y="74" font-size="12" font-family="Bangers,Impact,sans-serif">0°</text>
+            <text x="86" y="44" font-size="12" font-family="Bangers,Impact,sans-serif" fill="#FF6B35">5°</text>
+            <text x="4" y="92" font-size="12" font-family="Bangers,Impact,sans-serif" fill="#3B82F6">−3°</text>
+            <line x1="36" y1="88" x2="50" y2="88" stroke="#3B82F6" stroke-width="2"/>
+          </svg>
+          <div style="font-family:Comic Neue,cursive;">Below the 0 line = negative = colder</div>
+        </div>`,
+      'abs-distance': `
+        <div class="viz-box">
+          <svg viewBox="0 0 240 70" width="260" height="76" role="img" aria-label="Distance bars from 0: minus 5 is 5 steps away, 4 is 4 steps away"><line x1="10" y1="32" x2="230" y2="32" stroke="#1a1a1a" stroke-width="2"/><line x1="20" y1="26" x2="20" y2="38" stroke="#1a1a1a" stroke-width="2"/><text x="20" y="54" text-anchor="middle" font-size="11" font-family="Bangers,Impact,sans-serif" fill="#3B82F6">−5</text><line x1="40" y1="26" x2="40" y2="38" stroke="#1a1a1a" stroke-width="2"/><text x="40" y="54" text-anchor="middle" font-size="11" font-family="Bangers,Impact,sans-serif" fill="#3B82F6">−4</text><line x1="60" y1="26" x2="60" y2="38" stroke="#1a1a1a" stroke-width="2"/><text x="60" y="54" text-anchor="middle" font-size="11" font-family="Bangers,Impact,sans-serif" fill="#3B82F6">−3</text><line x1="80" y1="26" x2="80" y2="38" stroke="#1a1a1a" stroke-width="2"/><text x="80" y="54" text-anchor="middle" font-size="11" font-family="Bangers,Impact,sans-serif" fill="#3B82F6">−2</text><line x1="100" y1="26" x2="100" y2="38" stroke="#1a1a1a" stroke-width="2"/><text x="100" y="54" text-anchor="middle" font-size="11" font-family="Bangers,Impact,sans-serif" fill="#3B82F6">−1</text><line x1="120" y1="26" x2="120" y2="38" stroke="#1a1a1a" stroke-width="2"/><text x="120" y="54" text-anchor="middle" font-size="11" font-family="Bangers,Impact,sans-serif" fill="#1a1a1a">0</text><line x1="140" y1="26" x2="140" y2="38" stroke="#1a1a1a" stroke-width="2"/><text x="140" y="54" text-anchor="middle" font-size="11" font-family="Bangers,Impact,sans-serif" fill="#FF6B35">1</text><line x1="160" y1="26" x2="160" y2="38" stroke="#1a1a1a" stroke-width="2"/><text x="160" y="54" text-anchor="middle" font-size="11" font-family="Bangers,Impact,sans-serif" fill="#FF6B35">2</text><line x1="180" y1="26" x2="180" y2="38" stroke="#1a1a1a" stroke-width="2"/><text x="180" y="54" text-anchor="middle" font-size="11" font-family="Bangers,Impact,sans-serif" fill="#FF6B35">3</text><line x1="200" y1="26" x2="200" y2="38" stroke="#1a1a1a" stroke-width="2"/><text x="200" y="54" text-anchor="middle" font-size="11" font-family="Bangers,Impact,sans-serif" fill="#FF6B35">4</text><line x1="220" y1="26" x2="220" y2="38" stroke="#1a1a1a" stroke-width="2"/><text x="220" y="54" text-anchor="middle" font-size="11" font-family="Bangers,Impact,sans-serif" fill="#FF6B35">5</text><circle cx="20" cy="32" r="6" fill="#3B82F6"/><circle cx="200" cy="32" r="6" fill="#FF6B35"/><rect x="20" y="12" width="100" height="8" fill="#3B82F6" opacity="0.5"/><rect x="120" y="12" width="80" height="8" fill="#FF6B35" opacity="0.5"/></svg>
+          <div style="font-family:Bangers,Impact,sans-serif;">|−5| = <span style="color:#3B82F6;">5</span> · |4| = <span style="color:#FF6B35;">4</span> — steps back to 0</div>
+        </div>`,
+      'int-compare': `
+        <div class="viz-box">
+          <svg viewBox="0 0 240 70" width="260" height="76" role="img" aria-label="Minus 5 is left of minus 2 on the number line"><line x1="10" y1="32" x2="230" y2="32" stroke="#1a1a1a" stroke-width="2"/><line x1="20" y1="26" x2="20" y2="38" stroke="#1a1a1a" stroke-width="2"/><text x="20" y="54" text-anchor="middle" font-size="11" font-family="Bangers,Impact,sans-serif" fill="#3B82F6">−5</text><line x1="40" y1="26" x2="40" y2="38" stroke="#1a1a1a" stroke-width="2"/><text x="40" y="54" text-anchor="middle" font-size="11" font-family="Bangers,Impact,sans-serif" fill="#3B82F6">−4</text><line x1="60" y1="26" x2="60" y2="38" stroke="#1a1a1a" stroke-width="2"/><text x="60" y="54" text-anchor="middle" font-size="11" font-family="Bangers,Impact,sans-serif" fill="#3B82F6">−3</text><line x1="80" y1="26" x2="80" y2="38" stroke="#1a1a1a" stroke-width="2"/><text x="80" y="54" text-anchor="middle" font-size="11" font-family="Bangers,Impact,sans-serif" fill="#3B82F6">−2</text><line x1="100" y1="26" x2="100" y2="38" stroke="#1a1a1a" stroke-width="2"/><text x="100" y="54" text-anchor="middle" font-size="11" font-family="Bangers,Impact,sans-serif" fill="#3B82F6">−1</text><line x1="120" y1="26" x2="120" y2="38" stroke="#1a1a1a" stroke-width="2"/><text x="120" y="54" text-anchor="middle" font-size="11" font-family="Bangers,Impact,sans-serif" fill="#1a1a1a">0</text><line x1="140" y1="26" x2="140" y2="38" stroke="#1a1a1a" stroke-width="2"/><text x="140" y="54" text-anchor="middle" font-size="11" font-family="Bangers,Impact,sans-serif" fill="#FF6B35">1</text><line x1="160" y1="26" x2="160" y2="38" stroke="#1a1a1a" stroke-width="2"/><text x="160" y="54" text-anchor="middle" font-size="11" font-family="Bangers,Impact,sans-serif" fill="#FF6B35">2</text><line x1="180" y1="26" x2="180" y2="38" stroke="#1a1a1a" stroke-width="2"/><text x="180" y="54" text-anchor="middle" font-size="11" font-family="Bangers,Impact,sans-serif" fill="#FF6B35">3</text><line x1="200" y1="26" x2="200" y2="38" stroke="#1a1a1a" stroke-width="2"/><text x="200" y="54" text-anchor="middle" font-size="11" font-family="Bangers,Impact,sans-serif" fill="#FF6B35">4</text><line x1="220" y1="26" x2="220" y2="38" stroke="#1a1a1a" stroke-width="2"/><text x="220" y="54" text-anchor="middle" font-size="11" font-family="Bangers,Impact,sans-serif" fill="#FF6B35">5</text><circle cx="20" cy="32" r="6" fill="#3B82F6"/><circle cx="80" cy="32" r="6" fill="#4ECDC4"/></svg>
+          <div style="font-family:Bangers,Impact,sans-serif;">−5 &lt; −2 (farther left) · but |−5| &gt; |−2| (farther from 0)</div>
+        </div>`,
+      'eq-balance': `
+        <div class="viz-box">
+          <svg viewBox="0 0 240 110" width="240" height="110" role="img" aria-label="Balance scale with x plus 3 on the left and 8 on the right">
+            <polygon points="120,60 108,100 132,100" fill="#1a1a1a"/>
+            <line x1="30" y1="60" x2="210" y2="60" stroke="#1a1a1a" stroke-width="4"/>
+            <rect x="22" y="22" width="76" height="36" rx="6" fill="#A855F7" stroke="#1a1a1a" stroke-width="2"/>
+            <text x="60" y="46" text-anchor="middle" font-size="16" font-family="Bangers,Impact,sans-serif" fill="#fff">x + 3</text>
+            <rect x="142" y="22" width="76" height="36" rx="6" fill="#4ECDC4" stroke="#1a1a1a" stroke-width="2"/>
+            <text x="180" y="46" text-anchor="middle" font-size="16" font-family="Bangers,Impact,sans-serif">8</text>
+          </svg>
+          <div style="font-family:Bangers,Impact,sans-serif;">take 3 off both sides → <span style="color:#FF6B35;">x = 5</span></div>
+        </div>`,
+      'eq-undo': `
+        <div class="viz-box" style="font-family:Bangers,Impact,sans-serif;font-size:1.2rem;line-height:1.6;">
+          x − 4 = 10<br>
+          x − 4 <span style="color:#FF6B35;">+ 4</span> = 10 <span style="color:#FF6B35;">+ 4</span><br>
+          x = <span style="color:#FF6B35;">14</span>
+          <div style="font-family:Comic Neue,cursive;font-size:1rem;">+ undoes −, and − undoes +</div>
+        </div>`,
+      'eq-groups': `
+        <div class="viz-box">
+          <svg viewBox="0 0 240 64" width="240" height="64" role="img" aria-label="3 equal boxes holding 12 stars, 4 in each"><rect x="8" y="14" width="56" height="40" rx="6" fill="#FFE66D" stroke="#1a1a1a" stroke-width="2"/><text x="36" y="40" text-anchor="middle" font-size="13" font-family="Bangers,Impact,sans-serif">x = ★★★★</text><rect x="86" y="14" width="56" height="40" rx="6" fill="#FFE66D" stroke="#1a1a1a" stroke-width="2"/><text x="114" y="40" text-anchor="middle" font-size="13" font-family="Bangers,Impact,sans-serif">x = ★★★★</text><rect x="164" y="14" width="56" height="40" rx="6" fill="#FFE66D" stroke="#1a1a1a" stroke-width="2"/><text x="192" y="40" text-anchor="middle" font-size="13" font-family="Bangers,Impact,sans-serif">x = ★★★★</text></svg>
+          <div style="font-family:Bangers,Impact,sans-serif;">3x = 12 → 12 ÷ 3 = <span style="color:#FF6B35;">4</span></div>
+        </div>`,
+      'eq-inverse': `
+        <div class="viz-box" style="font-family:Bangers,Impact,sans-serif;font-size:1.2rem;line-height:1.6;">
+          x ÷ 5 = 6<br>
+          x ÷ 5 <span style="color:#FF6B35;">× 5</span> = 6 <span style="color:#FF6B35;">× 5</span><br>
+          x = <span style="color:#FF6B35;">30</span>
+          <div style="font-family:Comic Neue,cursive;font-size:1rem;">× undoes ÷, and ÷ undoes ×</div>
+        </div>`,
+
       // X21 — ages 7–8 area (3.MD) unit-square grids
       'area-grid-3x4': unitSquareGrid({
         rows: 3, cols: 4,

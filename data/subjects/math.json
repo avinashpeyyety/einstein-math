@@ -15205,7 +15205,7 @@
       "label": "Ages 11–12",
       "ageRange": "11–12",
       "gradeBand": "Grades 6–7",
-      "blurb": "Ratios & rates, percents, negative numbers and one-step equations — new track, growing!",
+      "blurb": "Ratios & rates, percents, negative numbers and one-step equations!",
       "units": [
         {
           "id": "u6-ratios",
@@ -15227,6 +15227,28 @@
           "lessons": [
             "g6-percents",
             "g6-percent-of"
+          ]
+        },
+        {
+          "id": "u6-integers",
+          "title": "Integer Orbit",
+          "icon": "🌡️",
+          "color": "#3B82F6",
+          "description": "Below zero! Negative numbers, opposites and absolute value.",
+          "lessons": [
+            "g6-negatives",
+            "g6-absolute-value"
+          ]
+        },
+        {
+          "id": "u6-equations",
+          "title": "Equation Engines",
+          "icon": "⚖️",
+          "color": "#A855F7",
+          "description": "Find the mystery number — solve one-step equations by undoing!",
+          "lessons": [
+            "g6-one-step-add",
+            "g6-one-step-mult"
           ]
         }
       ],
@@ -15318,6 +15340,34 @@
             "answer": "5",
             "skill": "percent-of",
             "unitHint": "u6-percents"
+          },
+          {
+            "id": "d1112-7",
+            "type": "mc",
+            "prompt": "Which temperature is coldest?",
+            "choices": [
+              "−5°C",
+              "−2°C",
+              "0°C",
+              "3°C"
+            ],
+            "answer": "−5°C",
+            "skill": "negatives",
+            "unitHint": "u6-integers"
+          },
+          {
+            "id": "d1112-8",
+            "type": "mc",
+            "prompt": "x + 4 = 10. What is x?",
+            "choices": [
+              "6",
+              "14",
+              "4",
+              "40"
+            ],
+            "answer": "6",
+            "skill": "one-step-equations",
+            "unitHint": "u6-equations"
           }
         ]
       },
@@ -15940,6 +15990,612 @@
               "accept": [
                 "20"
               ]
+            }
+          ]
+        },
+        "g6-negatives": {
+          "id": "g6-negatives",
+          "unitId": "u6-integers",
+          "title": "Negative Numbers & Opposites",
+          "durationMin": 9,
+          "prerequisites": [],
+          "skills": [
+            "negatives",
+            "opposites"
+          ],
+          "einsteinIntro": "Numbers keep going LEFT past zero! −3 means 3 below zero — colder than 0°, deeper than sea level, or money you owe.",
+          "explain": {
+            "panels": [
+              {
+                "speech": "On the number line, numbers to the LEFT of 0 are negative. 3 and −3 are opposites — same distance from 0, opposite sides!",
+                "visual": "int-number-line",
+                "state": "explain"
+              },
+              {
+                "speech": "A thermometer: 5°C is above zero, −3°C is below zero. Lower on the line = colder = smaller number.",
+                "visual": "int-thermometer",
+                "state": "think"
+              }
+            ]
+          },
+          "workedExample": {
+            "title": "Worked Example",
+            "speech": "At dawn it was −3°C. At noon it was 5°C. Which was colder, and how far apart are they?",
+            "steps": [
+              "−3 is to the LEFT of 5 on the number line, so −3 < 5 → dawn was colder",
+              "From −3 up to 0 is 3 degrees, from 0 up to 5 is 5 degrees",
+              "3 + 5 = 8 degrees apart"
+            ]
+          },
+          "practice": [
+            {
+              "id": "x10e-p1",
+              "type": "mc",
+              "prompt": "A diver is 20 m below sea level. Which number shows her position?",
+              "choices": [
+                "−20",
+                "20",
+                "0",
+                "−2"
+              ],
+              "answer": "−20",
+              "hint": "Below sea level means negative.",
+              "feedbackCorrect": "−20!",
+              "feedbackWrong": "Sea level is 0, and 20 m below it is −20."
+            },
+            {
+              "id": "x10e-p2",
+              "type": "fill",
+              "prompt": "What is the opposite of 7?",
+              "answer": "-7",
+              "accept": [
+                "-7",
+                "−7"
+              ],
+              "hint": "Same distance from 0, other side.",
+              "feedbackCorrect": "−7!",
+              "feedbackWrong": "7 is 7 steps right of 0, so its opposite is 7 steps left: −7."
+            },
+            {
+              "id": "x10e-p3",
+              "type": "mc",
+              "prompt": "Which number is greatest?",
+              "choices": [
+                "−2",
+                "−8",
+                "−5",
+                "−10"
+              ],
+              "answer": "−2",
+              "hint": "Closest to 0 on the left side is greatest.",
+              "feedbackCorrect": "−2!",
+              "feedbackWrong": "−2 is farthest RIGHT of these, so it is the greatest."
+            },
+            {
+              "id": "x10e-p4",
+              "type": "mc",
+              "prompt": "What is the opposite of the opposite of −4?",
+              "choices": [
+                "−4",
+                "4",
+                "0",
+                "−8"
+              ],
+              "answer": "−4",
+              "hint": "Flip across 0 twice.",
+              "feedbackCorrect": "−4!",
+              "feedbackWrong": "The opposite of −4 is 4, and the opposite of 4 is −4."
+            },
+            {
+              "id": "x10e-p5",
+              "type": "fill",
+              "prompt": "Put these in order from least to greatest: 3, −1, −6, 0. Which number comes first?",
+              "answer": "-6",
+              "accept": [
+                "-6",
+                "−6"
+              ],
+              "hint": "Least = farthest left.",
+              "feedbackCorrect": "−6!",
+              "feedbackWrong": "−6 is farthest left, then −1, 0, 3."
+            },
+            {
+              "id": "x10e-p6",
+              "type": "mc",
+              "prompt": "At midnight it was −9°C. In the morning it was −4°C. Did it get warmer or colder?",
+              "choices": [
+                "warmer",
+                "colder",
+                "stayed the same"
+              ],
+              "answer": "warmer",
+              "hint": "Is −4 to the right of −9?",
+              "feedbackCorrect": "Warmer!",
+              "feedbackWrong": "−4 is to the right of −9 (closer to 0), so the temperature went up."
+            }
+          ],
+          "quickCheck": [
+            {
+              "id": "x10e-q1",
+              "type": "fill",
+              "prompt": "What is the opposite of −15?",
+              "answer": "15",
+              "accept": [
+                "15"
+              ]
+            },
+            {
+              "id": "x10e-q2",
+              "type": "mc",
+              "prompt": "Which number is least?",
+              "choices": [
+                "−7",
+                "−3",
+                "0",
+                "2"
+              ],
+              "answer": "−7"
+            },
+            {
+              "id": "x10e-q3",
+              "type": "mc",
+              "prompt": "A bank account shows −$25. What does that mean?",
+              "choices": [
+                "You owe $25",
+                "You have $25",
+                "You have $0",
+                "You have $50"
+              ],
+              "answer": "You owe $25"
+            }
+          ]
+        },
+        "g6-absolute-value": {
+          "id": "g6-absolute-value",
+          "unitId": "u6-integers",
+          "title": "Absolute Value & Comparing",
+          "durationMin": 9,
+          "prerequisites": [
+            "g6-negatives"
+          ],
+          "skills": [
+            "absolute-value",
+            "compare-integers"
+          ],
+          "einsteinIntro": "Absolute value is a number's DISTANCE from 0 — always positive or zero. |−6| = 6 because −6 is 6 steps from 0!",
+          "explain": {
+            "panels": [
+              {
+                "speech": "|−6| = 6 and |4| = 4. Absolute value counts the steps back to 0 — the direction doesn't matter.",
+                "visual": "abs-distance",
+                "state": "explain"
+              },
+              {
+                "speech": "Comparing: −5 < −2 because −5 is farther LEFT. But |−5| > |−2| — −5 is farther from 0!",
+                "visual": "int-compare",
+                "state": "think"
+              }
+            ]
+          },
+          "workedExample": {
+            "title": "Worked Example",
+            "speech": "Ravi's account is at −$30 and Jo's is at −$45. Who owes more?",
+            "steps": [
+              "|−30| = 30 and |−45| = 45 — that's how much each owes",
+              "45 > 30, so Jo owes more",
+              "(As balances, −45 < −30: owing more means a LOWER balance)"
+            ]
+          },
+          "practice": [
+            {
+              "id": "x10f-p1",
+              "type": "fill",
+              "prompt": "|−9| = ?",
+              "answer": "9",
+              "accept": [
+                "9"
+              ],
+              "hint": "Distance from 0.",
+              "feedbackCorrect": "9!",
+              "feedbackWrong": "−9 is 9 steps from 0, so |−9| = 9."
+            },
+            {
+              "id": "x10f-p2",
+              "type": "fill",
+              "prompt": "|12| = ?",
+              "answer": "12",
+              "accept": [
+                "12"
+              ],
+              "hint": "Distance from 0.",
+              "feedbackCorrect": "12!",
+              "feedbackWrong": "12 is 12 steps from 0."
+            },
+            {
+              "id": "x10f-p3",
+              "type": "mc",
+              "prompt": "Which number is farthest from 0?",
+              "choices": [
+                "−8",
+                "5",
+                "−3",
+                "7"
+              ],
+              "answer": "−8",
+              "hint": "Compare absolute values.",
+              "feedbackCorrect": "−8!",
+              "feedbackWrong": "|−8| = 8 is bigger than 7, 5 and 3."
+            },
+            {
+              "id": "x10f-p4",
+              "type": "mc",
+              "prompt": "Which statement is true?",
+              "choices": [
+                "−5 < −2",
+                "−5 > −2",
+                "−2 < −5",
+                "−5 = −2"
+              ],
+              "answer": "−5 < −2",
+              "hint": "Farther left is smaller.",
+              "feedbackCorrect": "Yes!",
+              "feedbackWrong": "−5 is to the left of −2, so −5 < −2."
+            },
+            {
+              "id": "x10f-p5",
+              "type": "mc",
+              "prompt": "Sam's balance is −$30. Jo's balance is −$45. Who owes more money?",
+              "choices": [
+                "Jo",
+                "Sam",
+                "they owe the same"
+              ],
+              "answer": "Jo",
+              "hint": "Compare the absolute values.",
+              "feedbackCorrect": "Jo!",
+              "feedbackWrong": "|−45| = 45 > |−30| = 30, so Jo owes more."
+            },
+            {
+              "id": "x10f-p6",
+              "type": "fill",
+              "prompt": "A submarine is at −120 m. How many meters below the surface is it?",
+              "answer": "120",
+              "accept": [
+                "120"
+              ],
+              "hint": "Distance from 0.",
+              "feedbackCorrect": "120 m!",
+              "feedbackWrong": "|−120| = 120 meters below the surface."
+            }
+          ],
+          "quickCheck": [
+            {
+              "id": "x10f-q1",
+              "type": "fill",
+              "prompt": "|−25| = ?",
+              "answer": "25",
+              "accept": [
+                "25"
+              ]
+            },
+            {
+              "id": "x10f-q2",
+              "type": "mc",
+              "prompt": "Which number has an absolute value of 6?",
+              "choices": [
+                "−6",
+                "0",
+                "3",
+                "−3"
+              ],
+              "answer": "−6"
+            },
+            {
+              "id": "x10f-q3",
+              "type": "mc",
+              "prompt": "Which number is greatest?",
+              "choices": [
+                "−1",
+                "−10",
+                "−4",
+                "−100"
+              ],
+              "answer": "−1"
+            }
+          ]
+        },
+        "g6-one-step-add": {
+          "id": "g6-one-step-add",
+          "unitId": "u6-equations",
+          "title": "One-Step Equations: + and −",
+          "durationMin": 9,
+          "prerequisites": [],
+          "skills": [
+            "one-step-equations",
+            "inverse-add-sub"
+          ],
+          "einsteinIntro": "An equation is a balance — both sides weigh the same. To find the mystery number, UNDO what was done to it: undo + with −, undo − with +!",
+          "explain": {
+            "panels": [
+              {
+                "speech": "x + 3 = 8 is a balanced scale. Take 3 off BOTH sides and it stays balanced: x = 5!",
+                "visual": "eq-balance",
+                "state": "explain"
+              },
+              {
+                "speech": "Adding and subtracting undo each other. x − 4 = 10 → add 4 to both sides → x = 14.",
+                "visual": "eq-undo",
+                "state": "think"
+              }
+            ]
+          },
+          "workedExample": {
+            "title": "Worked Example",
+            "speech": "Solve x + 7 = 15.",
+            "steps": [
+              "7 was added to x, so subtract 7 from BOTH sides: x + 7 − 7 = 15 − 7",
+              "x = 8",
+              "Check: 8 + 7 = 15 ✓"
+            ]
+          },
+          "practice": [
+            {
+              "id": "x10g-p1",
+              "type": "fill",
+              "prompt": "x + 5 = 12. x = ?",
+              "answer": "7",
+              "accept": [
+                "7"
+              ],
+              "hint": "Subtract 5 from both sides.",
+              "feedbackCorrect": "x = 7!",
+              "feedbackWrong": "12 − 5 = 7. Check: 7 + 5 = 12."
+            },
+            {
+              "id": "x10g-p2",
+              "type": "fill",
+              "prompt": "x − 4 = 10. x = ?",
+              "answer": "14",
+              "accept": [
+                "14"
+              ],
+              "hint": "Add 4 to both sides.",
+              "feedbackCorrect": "x = 14!",
+              "feedbackWrong": "10 + 4 = 14. Check: 14 − 4 = 10."
+            },
+            {
+              "id": "x10g-p3",
+              "type": "mc",
+              "prompt": "Which value makes y + 9 = 20 true?",
+              "choices": [
+                "11",
+                "29",
+                "9",
+                "20"
+              ],
+              "answer": "11",
+              "hint": "What plus 9 makes 20?",
+              "feedbackCorrect": "11!",
+              "feedbackWrong": "20 − 9 = 11, and 11 + 9 = 20."
+            },
+            {
+              "id": "x10g-p4",
+              "type": "mc",
+              "prompt": "To solve n − 6 = 13, what do you do to both sides?",
+              "choices": [
+                "add 6",
+                "subtract 6",
+                "multiply by 6",
+                "divide by 6"
+              ],
+              "answer": "add 6",
+              "hint": "Undo the subtraction.",
+              "feedbackCorrect": "Add 6!",
+              "feedbackWrong": "6 was subtracted, so add 6: n = 19."
+            },
+            {
+              "id": "x10g-p5",
+              "type": "fill",
+              "prompt": "Ana had some stickers and got 8 more. Now she has 23. How many did she start with? (s + 8 = 23)",
+              "answer": "15",
+              "accept": [
+                "15"
+              ],
+              "hint": "Subtract 8 from both sides.",
+              "feedbackCorrect": "15 stickers!",
+              "feedbackWrong": "23 − 8 = 15. Check: 15 + 8 = 23."
+            },
+            {
+              "id": "x10g-p6",
+              "type": "fill",
+              "prompt": "25 = m + 18. m = ?",
+              "answer": "7",
+              "accept": [
+                "7"
+              ],
+              "hint": "The mystery number can be on the right side too.",
+              "feedbackCorrect": "m = 7!",
+              "feedbackWrong": "25 − 18 = 7. Check: 7 + 18 = 25."
+            }
+          ],
+          "quickCheck": [
+            {
+              "id": "x10g-q1",
+              "type": "fill",
+              "prompt": "x + 13 = 30. x = ?",
+              "answer": "17",
+              "accept": [
+                "17"
+              ]
+            },
+            {
+              "id": "x10g-q2",
+              "type": "fill",
+              "prompt": "k − 9 = 9. k = ?",
+              "answer": "18",
+              "accept": [
+                "18"
+              ]
+            },
+            {
+              "id": "x10g-q3",
+              "type": "mc",
+              "prompt": "Is x = 4 a solution of x + 6 = 11?",
+              "choices": [
+                "no",
+                "yes"
+              ],
+              "answer": "no"
+            }
+          ]
+        },
+        "g6-one-step-mult": {
+          "id": "g6-one-step-mult",
+          "unitId": "u6-equations",
+          "title": "One-Step Equations: × and ÷",
+          "durationMin": 10,
+          "prerequisites": [
+            "g6-one-step-add"
+          ],
+          "skills": [
+            "one-step-equations",
+            "inverse-mult-div"
+          ],
+          "einsteinIntro": "3x means 3 times x. Multiplying and dividing undo each other — divide to undo ×, multiply to undo ÷!",
+          "explain": {
+            "panels": [
+              {
+                "speech": "3x = 12: three equal boxes hold 12 stars in all. Share 12 into 3 boxes → each box (x) holds 4!",
+                "visual": "eq-groups",
+                "state": "explain"
+              },
+              {
+                "speech": "Undo × with ÷ and ÷ with ×. x ÷ 5 = 6 → multiply both sides by 5 → x = 30.",
+                "visual": "eq-inverse",
+                "state": "think"
+              }
+            ]
+          },
+          "workedExample": {
+            "title": "Worked Example",
+            "speech": "Solve 4x = 28.",
+            "steps": [
+              "x was multiplied by 4, so divide BOTH sides by 4",
+              "x = 28 ÷ 4 = 7",
+              "Check: 4 × 7 = 28 ✓"
+            ]
+          },
+          "practice": [
+            {
+              "id": "x10h-p1",
+              "type": "fill",
+              "prompt": "3x = 21. x = ?",
+              "answer": "7",
+              "accept": [
+                "7"
+              ],
+              "hint": "Divide both sides by 3.",
+              "feedbackCorrect": "x = 7!",
+              "feedbackWrong": "21 ÷ 3 = 7. Check: 3 × 7 = 21."
+            },
+            {
+              "id": "x10h-p2",
+              "type": "fill",
+              "prompt": "x ÷ 5 = 6. x = ?",
+              "answer": "30",
+              "accept": [
+                "30"
+              ],
+              "hint": "Multiply both sides by 5.",
+              "feedbackCorrect": "x = 30!",
+              "feedbackWrong": "6 × 5 = 30. Check: 30 ÷ 5 = 6."
+            },
+            {
+              "id": "x10h-p3",
+              "type": "mc",
+              "prompt": "To solve 8n = 56, what do you do to both sides?",
+              "choices": [
+                "divide by 8",
+                "multiply by 8",
+                "subtract 8",
+                "add 8"
+              ],
+              "answer": "divide by 8",
+              "hint": "Undo the multiplication.",
+              "feedbackCorrect": "Divide by 8!",
+              "feedbackWrong": "56 ÷ 8 = 7, so n = 7."
+            },
+            {
+              "id": "x10h-p4",
+              "type": "fill",
+              "prompt": "6 tickets cost $42 in all, each the same price. 6t = 42. t = ?",
+              "answer": "7",
+              "accept": [
+                "7",
+                "$7"
+              ],
+              "hint": "Divide both sides by 6.",
+              "feedbackCorrect": "$7 each!",
+              "feedbackWrong": "42 ÷ 6 = 7. Check: 6 × 7 = 42."
+            },
+            {
+              "id": "x10h-p5",
+              "type": "mc",
+              "prompt": "Which equation means “a number times 4 is 36”?",
+              "choices": [
+                "4n = 36",
+                "n + 4 = 36",
+                "n ÷ 4 = 36",
+                "36n = 4"
+              ],
+              "answer": "4n = 36",
+              "hint": "“Times” means multiply.",
+              "feedbackCorrect": "4n = 36!",
+              "feedbackWrong": "A number times 4 → 4n, and “is 36” → = 36. (n = 9)"
+            },
+            {
+              "id": "x10h-p6",
+              "type": "fill",
+              "prompt": "y ÷ 3 = 9. y = ?",
+              "answer": "27",
+              "accept": [
+                "27"
+              ],
+              "hint": "Multiply both sides by 3.",
+              "feedbackCorrect": "y = 27!",
+              "feedbackWrong": "9 × 3 = 27. Check: 27 ÷ 3 = 9."
+            }
+          ],
+          "quickCheck": [
+            {
+              "id": "x10h-q1",
+              "type": "fill",
+              "prompt": "9x = 72. x = ?",
+              "answer": "8",
+              "accept": [
+                "8"
+              ]
+            },
+            {
+              "id": "x10h-q2",
+              "type": "fill",
+              "prompt": "m ÷ 4 = 12. m = ?",
+              "answer": "48",
+              "accept": [
+                "48"
+              ]
+            },
+            {
+              "id": "x10h-q3",
+              "type": "mc",
+              "prompt": "Which value solves 7x = 49?",
+              "choices": [
+                "7",
+                "42",
+                "56",
+                "343"
+              ],
+              "answer": "7"
             }
           ]
         }

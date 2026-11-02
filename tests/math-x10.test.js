@@ -38,9 +38,9 @@ const val = s => { const x = String(s); if (x.endsWith('%')) return Number(x.sli
 t('track exists with label, 2 units, 4 lessons in unit order, picker lists it', () => {
   assert.ok(tr, 'ages-11-12 track');
   assert.strictEqual(tr.label, 'Ages 11–12');
-  assert.deepStrictEqual(tr.units.map(u => u.id), ['u6-ratios', 'u6-percents']);
-  assert.deepStrictEqual(tr.units.flatMap(u => u.lessons), IDS);
-  assert.strictEqual(Object.keys(tr.lessons).length, 4);
+  assert.deepStrictEqual(tr.units.slice(0, 2).map(u => u.id), ['u6-ratios', 'u6-percents']); // + X10 cycle 2 units after
+  assert.deepStrictEqual(tr.units.slice(0, 2).flatMap(u => u.lessons), IDS);
+  assert.strictEqual(Object.keys(tr.lessons).length, 8); // 4 cycle 1 + 4 cycle 2
   assert.ok(APP.includes("'ages-9-10', 'ages-11-12']"), 'trackButtonsHtml order includes ages-11-12');
 });
 t('prerequisites resolve and come earlier', () => {

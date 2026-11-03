@@ -4,6 +4,8 @@
   let store = Storage.loadStore();
   let progress = null; // active track progress blob
   let lessonCtx = null;
+  let arcadeSprint = null; // X11 Fact Arcade sprint in play
+  let arcadeTimer = null;
 
   const $ = (sel, root = document) => root.querySelector(sel);
   const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
@@ -225,6 +227,7 @@
   }
 
   function showScreen(id) {
+    if (id !== 'screen-arcade') stopArcadeTimer();
     $$('.screen').forEach(s => s.classList.remove('active'));
     const el = document.getElementById(id);
     if (el) el.classList.add('active');
@@ -2424,8 +2427,9 @@
               }).join('')}
             </ul>` : `<p style="opacity:0.6;font-weight:700;">More lessons coming soon!</p>`}
         </div>`;
-    }).join('') + (activeSubjectId() === 'physics' ? spaceUnitCardHtml() : '');
+    }).join('') + (activeSubjectId() === 'physics' ? spaceUnitCardHtml() : arcadeCardHtml());
     wireSpaceUnitCard(grid);
+    wireArcadeCard(grid);
 
     $$('.btn-lesson', grid).forEach(btn => {
       btn.addEventListener('click', (e) => {
@@ -2445,6 +2449,135 @@
     Einstein.speak($('#space-speech'), 'Welcome to my Space Lab! Pick a lab — orbit the planets, launch a rocket, or watch a star grow old. Some labs are still being built in my workshop.');
     const g = $('#space-grid');
     if (g && typeof SpaceLab !== 'undefined') g.innerHTML = SpaceLab.cardsHtml();
+  }
+
+  /* ——— X11: Fact Arcade — 60-second fact sprints, streaks and personal bests (logic in js/arcade.js) ——— */
+  function stopArcadeTimer() { if (arcadeTimer) { clearInterval(arcadeTimer); arcadeTimer = null; } }
+
+  function arcadeTrackId() {
+    const u = activeUser();
+    return (u && Storage.subjectTrackId(u, 'math')) || 'ages-7-8';
+  }
+
+  function arcadeCardHtml() {
+    if (typeof Arcade === 'undefined') return '';
+    return `<div class="unit-card arcade-unit" style="border-top: 8px solid #FFC93C" data-unit="fact-arcade">
+      <div class="unit-icon">⚡</div>
+      <h3>Fact Arcade</h3>
+      <p>60-second fact sprints. Build a streak and beat your best!</p>
+      <button type="button" class="btn btn-cyan btn-sm btn-arcade-open">Play a sprint</button>
+    </div>`;
+  }
+
+  function renderArcade() {
+    const u = activeUser();
+    if (!u) { showScreen('screen-landing'); renderLanding(); return; }
+    stopArcadeTimer();
+    arcadeSprint = null;
+    showScreen('screen-arcade');
+    const trackId = arcadeTrackId();
+    const age = ageTracks()[trackId];
+    const tl = $('#arcade-track-label');
+    if (tl) tl.textContent = age ? `Math · ${age.label}` : 'Math';
+    Einstein.mount($('#arcade-einstein'), 'explain');
+    Einstein.speak($('#arcade-speech'), 'Welcome to my Fact Arcade! Pick a game — you get 60 seconds. Every right answer in a row grows your streak. Ready, set, think fast!');
+    const body = $('#arcade-body');
+    body.innerHTML = `<div class="arcade-ops" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:.75rem;">
+      ${Arcade.opsFor(trackId).map(o => {
+        const b = Arcade.getBest(u, trackId, o.id);
+        return `<button type="button" class="unit-card arcade-op" data-op="${o.id}" style="text-align:left;font:inherit;">
+          <div class="unit-icon">${o.icon}</div>
+          <h3>${escapeHtml(o.label)}</h3>
+          <p class="arcade-best-line">${b.plays ? `Best ${b.best} · streak ${b.bestStreak}` : 'No sprints yet'}</p>
+        </button>`;
+      }).join('')}
+    </div>
+    <p class="muted" style="margin-top:.75rem;">Bests are saved on this device with your progress (💾 backup keeps them). Arcade play doesn't change stars or mastery.</p>`;
+    $$('.arcade-op', body).forEach(btn => btn.addEventListener('click', () => startArcadeSprint(btn.dataset.op)));
+  }
+
+  function startArcadeSprint(op) {
+    const trackId = arcadeTrackId();
+    stopArcadeTimer();
+    arcadeSprint = Arcade.newSprint(trackId, op, (Date.now() ^ Math.floor(Math.random() * 1e9)) >>> 0);
+    const endsAt = Date.now() + Arcade.SPRINT_SECONDS * 1000;
+    const opMeta = Arcade.OPS[op] || { label: op, icon: '' };
+    const body = $('#arcade-body');
+    body.innerHTML = `<div class="arcade-game" style="text-align:center;">
+      <div class="arcade-hud" style="display:flex;justify-content:space-between;gap:.5rem;font-weight:800;font-size:1.1rem;flex-wrap:wrap;">
+        <span>${opMeta.icon} ${escapeHtml(opMeta.label)}</span>
+        <span>⏱ <span id="arcade-time">${Arcade.SPRINT_SECONDS}</span>s</span>
+        <span>✅ <span id="arcade-score">0</span></span>
+        <span>🔥 <span id="arcade-streak">0</span></span>
+      </div>
+      <div id="arcade-fact" class="arcade-fact" style="font-size:2.6rem;font-weight:900;margin:1rem 0;" aria-live="polite"></div>
+      <form id="arcade-form" autocomplete="off" style="display:flex;gap:.5rem;justify-content:center;">
+        <input id="arcade-input" class="answer-input" inputmode="numeric" aria-label="Your answer" style="font-size:1.6rem;width:8rem;text-align:center;" />
+        <button type="submit" class="btn btn-cyan">Go</button>
+      </form>
+      <div id="arcade-flash" style="min-height:1.6rem;margin-top:.5rem;font-weight:700;"></div>
+      <button type="button" class="btn btn-ghost btn-sm" id="btn-arcade-quit" style="margin-top:.5rem;">Stop sprint</button>
+    </div>`;
+    const showFact = () => { $('#arcade-fact').textContent = `${Arcade.current(arcadeSprint).text} = ?`; };
+    showFact();
+    const input = $('#arcade-input');
+    input.focus();
+    $('#arcade-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (!arcadeSprint || arcadeSprint.done) return;
+      if (String(input.value).trim() === '') return;
+      const r = Arcade.answer(arcadeSprint, input.value);
+      const flash = $('#arcade-flash');
+      flash.textContent = r.ok ? 'Yes!' : `${r.fact.text} = ${String(r.fact.answer).replace('-', '−')}`;
+      flash.style.color = r.ok ? '#16a34a' : '#dc2626';
+      $('#arcade-score').textContent = arcadeSprint.correct;
+      $('#arcade-streak').textContent = arcadeSprint.streak;
+      input.value = '';
+      showFact();
+      input.focus();
+    });
+    $('#btn-arcade-quit').addEventListener('click', () => finishArcadeSprint(true));
+    arcadeTimer = setInterval(() => {
+      const left = Math.max(0, Math.ceil((endsAt - Date.now()) / 1000));
+      const el = $('#arcade-time');
+      if (el) el.textContent = left;
+      if (left <= 0) finishArcadeSprint(false);
+    }, 250);
+  }
+
+  function finishArcadeSprint(quit) {
+    stopArcadeTimer();
+    const sp = arcadeSprint;
+    if (!sp || sp.done) return;
+    sp.done = true;
+    const u = activeUser();
+    let res = { newBest: false, newStreak: false, record: Arcade.getBest(u, sp.trackId, sp.op) };
+    if (u && !quit && (sp.correct + sp.wrong) > 0) {
+      res = Arcade.recordResult(u, sp, new Date().toISOString());
+      Storage.saveStore(store);
+    }
+    const opMeta = Arcade.OPS[sp.op] || { label: sp.op };
+    Einstein.mount($('#arcade-einstein'), res.newBest || res.newStreak ? 'cheer' : 'think');
+    Einstein.speak($('#arcade-speech'), quit
+      ? 'Sprint stopped — no worries. Pick a game whenever you are ready!'
+      : res.newBest
+        ? `New personal best: ${sp.correct}! Your brain is moving at light speed!`
+        : `${sp.correct} right in 60 seconds! Your best is ${res.record.best} — every sprint makes the facts faster.`);
+    $('#arcade-body').innerHTML = `<div class="arcade-result" style="text-align:center;">
+      <h3 class="panel-title" style="font-size:1.5rem;">${escapeHtml(opMeta.label)} sprint ${quit ? 'stopped' : 'done'}</h3>
+      <p style="font-size:1.2rem;font-weight:800;">✅ ${sp.correct} right · ❌ ${sp.wrong} missed · 🔥 longest streak ${sp.bestStreak}</p>
+      <p class="arcade-bests">${res.newBest ? '🏆 New best score! ' : ''}${res.newStreak ? '🔥 New best streak! ' : ''}Best ${res.record.best} · best streak ${res.record.bestStreak} · ${res.record.plays} sprint${res.record.plays === 1 ? '' : 's'}</p>
+      <div style="display:flex;gap:.5rem;justify-content:center;flex-wrap:wrap;margin-top:.75rem;">
+        <button type="button" class="btn btn-cyan" id="btn-arcade-again">Play again</button>
+        <button type="button" class="btn btn-ghost" id="btn-arcade-menu">Pick another game</button>
+      </div>
+    </div>`;
+    $('#btn-arcade-again').addEventListener('click', () => startArcadeSprint(sp.op));
+    $('#btn-arcade-menu').addEventListener('click', () => renderArcade());
+  }
+
+  function wireArcadeCard(grid) {
+    $$('.btn-arcade-open', grid).forEach(b => b.addEventListener('click', (e) => { e.stopPropagation(); renderArcade(); }));
   }
 
   function spaceUnitCardHtml() {
@@ -3622,6 +3755,7 @@
         else if (t === 'hub') requireUserThen(renderHub);
         else if (t === 'progress') requireUserThen(renderProgress);
         else if (t === 'space') renderSpace();
+        else if (t === 'arcade') requireUserThen(renderArcade);
       });
     });
     $('#btn-reset')?.addEventListener('click', () => {

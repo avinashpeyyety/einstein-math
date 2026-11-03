@@ -978,6 +978,8 @@ const Storage = {
       progress: {}
     };
     if (out.trackId) out.trackBySubject[DEFAULT_SUBJECT] = out.trackId;
+    const arcade = this.mergeArcade(localU.arcade, incomingU.arcade);
+    if (arcade) out.arcade = arcade;
     const avSrc = preferIncoming ? (incomingU.avatarImage ? incomingU : localU) : (localU.avatarImage ? localU : incomingU);
     if (avSrc && avSrc.avatarImage) {
       out.avatarImage = avSrc.avatarImage;
@@ -992,6 +994,25 @@ const Storage = {
         (localU.progress || {})[key],
         (incomingU.progress || {})[key]
       );
+    });
+    return out;
+  },
+
+  /** X11: merge fact-arcade bests per "<track>:<op>" — higher best/streak/plays win, newer lastAt kept. */
+  mergeArcade(localA, incomingA) {
+    const a = (localA && typeof localA === 'object') ? localA : {};
+    const b = (incomingA && typeof incomingA === 'object') ? incomingA : {};
+    const keys = new Set([...Object.keys(a), ...Object.keys(b)]);
+    if (!keys.size) return null;
+    const out = {};
+    keys.forEach(k => {
+      const x = a[k] || {}, y = b[k] || {};
+      out[k] = {
+        best: Math.max(x.best | 0, y.best | 0),
+        bestStreak: Math.max(x.bestStreak | 0, y.bestStreak | 0),
+        plays: Math.max(x.plays | 0, y.plays | 0),
+        lastAt: this.isNewerISO(y.lastAt, x.lastAt) ? (y.lastAt || null) : (x.lastAt || y.lastAt || null)
+      };
     });
     return out;
   },

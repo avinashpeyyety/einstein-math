@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#080d1a" />
+  <title>Data Lab · PostgreSQL, SQL Server &amp; ETL — Einstein Math</title>
+  <link rel="icon" href="../assets/icons/icon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="css/datalab.css" />
+</head>
+<body>
+  <div class="wrap">
+
+    <!-- Top HUD -->
+    <header class="hud-top">
+      <div class="brand-left">
+        <a class="em-back" href="../" title="Back to Einstein Math">← Einstein Math</a>
+        <div class="brand-title">
+          <h1>🗄️ Data Engineering Lab <span class="em-tag">SQL · Python · SSIS</span></h1>
+          <p class="brand-sub">Interactive 4-Year ETL/ELT Mastery — SQL Server, PostgreSQL, SSIS &amp; Python (2018–2022 SMB Stack)</p>
+        </div>
+      </div>
+      <div class="hud-right">
+        <div class="xp-pill" title="Saved locally in your browser">
+          <div class="xp-bar-wrap"><div id="xp-bar" class="xp-bar-fill"></div></div>
+          <span id="xp-text" class="mono tabular" style="font-weight:700;">0/18 Mastered (0%)</span>
+        </div>
+        <button type="button" class="btn" id="theme-btn" onclick="toggleTheme()">☀️ Light</button>
+        <button type="button" class="btn" onclick="resetProgress()" title="Clear saved progress">↺ Reset</button>
+      </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <nav class="tab-bar" role="tablist">
+      <button type="button" id="tab-overview" class="tab-btn active" onclick="switchTab('overview')">1. 4-Year Arc &amp; Capacity Math</button>
+      <button type="button" id="tab-sql" class="tab-btn" onclick="switchTab('sql')">2. SQL Playground (T-SQL ↔ Postgres)</button>
+      <button type="button" id="tab-pipe" class="tab-btn" onclick="switchTab('pipe')">3. SSIS &amp; Python Pipeline Studio</button>
+      <button type="button" id="tab-pg" class="tab-btn" onclick="switchTab('pg')">4. Postgres Partitioning &amp; COPY</button>
+      <button type="button" id="tab-recon" class="tab-btn" onclick="switchTab('recon')">5. Cutover Incident Lab</button>
+      <button type="button" id="tab-quiz" class="tab-btn" onclick="switchTab('quiz')">6. Interview Grill</button>
+    </nav>
+
+    <!-- ============================================================
+         TAB 1: OVERVIEW & DUAL CAPACITY MATH SIMULATOR
+    ============================================================ -->
+    <section id="panel-overview" class="tab-panel stack">
+      <div class="grid-2">
+        <div class="card stack-sm">
+          <div class="row-between">
+            <span class="badge badge-sqlserver">Project 1 · Years 1–2 (Junior DE)</span>
+            <span class="muted">6 Months · 4-Person Team</span>
+          </div>
+          <h2>Retail: Multi-Store POS &amp; Inventory → SQL Server</h2>
+          <p class="muted">35-store specialty retailer (~$55M rev). Consolidating store-level POS exports and 100+ vendor CSVs into a centralized SQL Server star schema (<code class="mono">FactSales</code>, <code class="mono">FactInventory</code>, <code class="mono">DimProduct</code>, <code class="mono">DimStore</code>).</p>
+          <div class="grid-3">
+            <div class="subcard"><div class="muted">History</div><div class="mono tabular" style="font-weight:700;">~25 GB (44M)</div></div>
+            <div class="subcard"><div class="muted">Daily Load</div><div class="mono tabular" style="font-weight:700;">~920K rows</div></div>
+            <div class="subcard"><div class="muted">Nightly SLA</div><div class="mono tabular" style="font-weight:700;">~45 min</div></div>
+          </div>
+          <div class="row">
+            <span class="badge badge-sqlserver">SSIS</span>
+            <span class="badge badge-sqlserver">T-SQL</span>
+            <span class="badge badge-py">Python (pandas / pyodbc)</span>
+            <span class="badge">SQL Server Agent</span>
+          </div>
+        </div>
+
+        <div class="card stack-sm">
+          <div class="row-between">
+            <span class="badge badge-pg">Project 2 · Years 3–4 (Mid-Level DE)</span>
+            <span class="muted">9 Months · 3-Person Team</span>
+          </div>
+          <h2>Manufacturing: Legacy ERP &amp; Shop-Floor → PostgreSQL</h2>
+          <p class="muted">2-plant discrete manufacturer (~$95M rev). Moving 6 years of SQL Server ERP &amp; machine logs into PostgreSQL to cut SQL Server BI/CAL licensing costs while keeping 90-day BI queries under 3 seconds.</p>
+          <div class="grid-3">
+            <div class="subcard"><div class="muted">History</div><div class="mono tabular" style="font-weight:700;">~65 GB (50M)</div></div>
+            <div class="subcard"><div class="muted">Daily Load</div><div class="mono tabular" style="font-weight:700;">~200K rows</div></div>
+            <div class="subcard"><div class="muted">Backfill</div><div class="mono tabular" style="font-weight:700;color:var(--success);">14h → 2.5h</div></div>
+          </div>
+          <div class="row">
+            <span class="badge badge-pg">PostgreSQL (PL/pgSQL)</span>
+            <span class="badge badge-py">Python COPY Framework</span>
+            <span class="badge badge-sqlserver">T-SQL Refactor</span>
+            <span class="badge">Monthly Partitioning</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Interactive Capacity Simulator -->
+      <div class="card stack">
+        <div class="row-between">
+          <div>
+            <h3>Interactive Capacity, Storage &amp; SLA Simulator</h3>
+            <p class="muted">Verify why the GB, row-count, and batch runtime numbers in your resume are mathematically bulletproof.</p>
+          </div>
+          <select id="cap-mode" onchange="switchCapMode()" class="btn">
+            <option value="retail">Project 1: Retail POS + Inventory (SQL Server)</option>
+            <option value="mfg">Project 2: Manufacturing ERP + Shop-Floor (PostgreSQL)</option>
+          </select>
+        </div>
+
+        <div class="grid-3 text-xs">
+          <div>
+            <div class="row-between" style="margin-bottom:6px;"><span id="cap-label-1" class="muted">Number of Stores</span><span id="cap-v1" class="mono tabular" style="font-weight:700;">35 stores</span></div>
+            <input id="cap-s1" type="range" min="5" max="100" value="35" oninput="updateCapSim()" />
+          </div>
+          <div>
+            <div class="row-between" style="margin-bottom:6px;"><span id="cap-label-2" class="muted">Active SKUs</span><span id="cap-v2" class="mono tabular" style="font-weight:700;">25,000 SKUs</span></div>
+            <input id="cap-s2" type="range" min="5" max="60" value="25" oninput="updateCapSim()" />
+          </div>
+          <div>
+            <div class="row-between" style="margin-bottom:6px;"><span class="muted">Years of History</span><span id="cap-v3" class="mono tabular" style="font-weight:700;">3 yrs</span></div>
+            <input id="cap-s3" type="range" min="1" max="8" value="3" oninput="updateCapSim()" />
+          </div>
+        </div>
+
+        <div class="grid-4">
+          <div class="subcard"><div class="muted">Daily Throughput</div><div id="cap-daily" class="mono tabular" style="font-size:15px;font-weight:700;">—</div></div>
+          <div class="subcard"><div class="muted">Historical Rows</div><div id="cap-hist" class="mono tabular" style="font-size:15px;font-weight:700;">—</div></div>
+          <div class="subcard"><div class="muted">Est. DB Size</div><div id="cap-gb" class="mono tabular" style="font-size:15px;font-weight:700;">—</div></div>
+          <div class="subcard"><div class="muted">Est. Nightly Batch</div><div id="cap-sla" class="mono tabular" style="font-size:15px;font-weight:700;">—</div></div>
+        </div>
+        <div id="cap-note" class="subcard muted"></div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         TAB 2: INTERACTIVE SQL PLAYGROUND (T-SQL <-> POSTGRES)
+    ============================================================ -->
+    <section id="panel-sql" class="tab-panel hidden stack">
+      <div class="grid-2" style="grid-template-columns: minmax(260px, 1fr) minmax(360px, 2fr);">
+        <!-- Challenge Selector & Sample Table Viewer -->
+        <div class="stack">
+          <div class="card stack-sm">
+            <h3>6 Hands-On Migration SQL Challenges</h3>
+            <p class="muted">Solve real T-SQL &amp; PostgreSQL bugs from both projects.</p>
+            <div id="sql-challenge-list" class="stack-sm"></div>
+          </div>
+
+          <div class="card stack-sm">
+            <h3>Inspect Live Sample Tables</h3>
+            <div class="row">
+              <button type="button" class="btn" onclick="previewTable('stg_pos_sales')">stg_pos_sales</button>
+              <button type="button" class="btn" onclick="previewTable('dim_product')">dim_product</button>
+              <button type="button" class="btn" onclick="previewTable('pos_eod_summary')">pos_eod_summary</button>
+              <button type="button" class="btn" onclick="previewTable('stg_work_orders')">stg_work_orders</button>
+            </div>
+            <div id="table-preview-title" class="muted" style="font-weight:600;"></div>
+            <div id="table-preview-body"></div>
+          </div>
+        </div>
+
+        <!-- SQL Editor + Output -->
+        <div class="card stack">
+          <div>
+            <div id="sql-chal-meta" class="muted" style="font-weight:600;"></div>
+            <h2 id="sql-chal-title">Challenge</h2>
+            <p id="sql-chal-prompt" class="text-xs" style="margin-top:4px;"></p>
+          </div>
+
+          <textarea id="sql-editor" class="sql-editor" spellcheck="false"></textarea>
+
+          <div class="row-between">
+            <div class="row">
+              <button type="button" class="btn btn-primary" onclick="runUserSQL()">▶ Run Query</button>
+              <button type="button" class="btn" onclick="showSQLHint()">💡 Hint</button>
+              <button type="button" class="btn" onclick="fillSQLSolution()">✓ Show Solution</button>
+            </div>
+            <span class="muted">Runs against live in-memory tables</span>
+          </div>
+
+          <div id="sql-hint-box" class="subcard muted hidden"></div>
+          <div id="sql-feedback" class="hidden"></div>
+          <div id="sql-output"></div>
+        </div>
+      </div>
+
+      <!-- T-SQL <-> PostgreSQL Dialect Cheat Sheet -->
+      <div class="card stack-sm">
+        <h3>SQL Server (T-SQL) ↔ PostgreSQL (PL/pgSQL) Migration Cheat Sheet</h3>
+        <p class="muted">The 10 most common syntax &amp; behavior traps when migrating an SMB SQL Server ERP to PostgreSQL.</p>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Pattern</th>
+                <th>SQL Server (T-SQL)</th>
+                <th>PostgreSQL (PL/pgSQL)</th>
+                <th>Migration Gotcha</th>
+              </tr>
+            </thead>
+            <tbody id="dialect-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         TAB 3: SSIS & PYTHON PIPELINE STUDIO
+    ============================================================ -->
+    <section id="panel-pipe" class="tab-panel hidden stack">
+      <div class="card stack">
+        <div class="row-between">
+          <div>
+            <h2>Animated SSIS &amp; Python ETL Pipeline Studio</h2>
+            <p class="muted">Inject real production failures into either pipeline, run it to watch where it breaks, then toggle the production safeguard.</p>
+          </div>
+          <button type="button" class="btn btn-primary" onclick="runPipelineSim()">▶ Run Pipeline Simulation</button>
+        </div>
+
+        <div class="grid-3">
+          <div class="subcard stack-sm">
+            <label class="muted" for="pipe-project">Select Pipeline</label>
+            <select id="pipe-project" class="btn" style="width:100%;">
+              <option value="retail">Project 1: Retail (SSIS + Python → SQL Server)</option>
+              <option value="mfg">Project 2: Manufacturing (Python COPY → PostgreSQL)</option>
+            </select>
+          </div>
+          <div class="subcard stack-sm">
+            <label class="muted" for="pipe-fault">Inject Production Fault</label>
+            <select id="pipe-fault" class="btn" style="width:100%;">
+              <option value="none">None (Healthy Nightly Batch)</option>
+              <option value="encoding">Fault: Vendor #44 Latin-1 Encoding Crash</option>
+              <option value="dupsku">Fault: Duplicate SKU Join Fan-Out (+$18.4K)</option>
+              <option value="slowinsert">Fault: Row-by-Row INSERT Bottleneck (14h SLA Breach)</option>
+            </select>
+          </div>
+          <div class="subcard row" style="align-items:center;">
+            <label class="row" style="cursor:pointer;">
+              <input type="checkbox" id="pipe-fix" />
+              <div>
+                <div class="text-xs" style="font-weight:700;">Apply Production Fix</div>
+                <div class="muted">Encoding fallback / dedupe / COPY</div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <div id="pipe-track" class="pipeline-track">
+          <div class="subcard muted" style="grid-column:1/-1;">Click <strong>▶ Run Pipeline Simulation</strong> above to animate rows flowing through all 5 stages.</div>
+        </div>
+
+        <div class="stack-sm">
+          <div class="muted" style="font-weight:600;">Execution Log</div>
+          <pre id="pipe-log" class="code-box">[READY] Select a pipeline and optional fault, then click Run Pipeline Simulation.</pre>
+        </div>
+      </div>
+
+      <!-- Python Code Comparison -->
+      <div class="grid-2">
+        <div class="card stack-sm">
+          <h3>Project 1: Python Vendor Cleaner (<code class="mono">pandas</code> + <code class="mono">pyodbc</code>)</h3>
+          <pre class="code-box">import pandas as pd
+
+# Encoding-safe read for messy SMB vendor feeds
+try:
+    df = pd.read_csv(path, encoding="utf-8", dtype={"sku": str})
+except UnicodeDecodeError:
+    df = pd.read_csv(path, encoding="latin1", dtype={"sku": str})
+
+df.columns = [c.strip().lower().replace(" ", "_") for c in df.columns]
+df["sku"] = df["sku"].str.strip().str.upper()
+df = df.drop_duplicates(subset=["sku"], keep="last")
+df.to_csv(staged_csv, index=False, encoding="utf-8")</pre>
+        </div>
+        <div class="card stack-sm">
+          <h3>Project 2: Python Bulk Loader (<code class="mono">psycopg2</code> <code class="mono">COPY</code>)</h3>
+          <pre class="code-box">import io
+
+# Stream DataFrame directly into Postgres via COPY (~10x faster than INSERT)
+buf = io.StringIO()
+df.to_csv(buf, index=False, header=False, sep="\t", na_rep="\\N")
+buf.seek(0)
+
+with pg_conn.cursor() as cur:
+    cur.copy_expert(
+        "COPY stg.shop_floor_events FROM STDIN WITH (FORMAT text, NULL '\\N')",
+        buf
+    )
+pg_conn.commit()</pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         TAB 4: POSTGRESQL PARTITIONING & BACKFILL OPTIMIZER
+    ============================================================ -->
+    <section id="panel-pg" class="tab-panel hidden stack">
+      <div class="card stack">
+        <div class="row-between">
+          <div>
+            <h2>PostgreSQL 72-Month Partition Pruning Visualizer (42M Rows)</h2>
+            <p class="muted">See how monthly range partitioning on <code class="mono">fact_shop_floor_events</code> keeps 90-day plant dashboards under 3 seconds.</p>
+          </div>
+          <div class="row">
+            <label class="row text-xs" style="cursor:pointer;">
+              <input type="checkbox" id="pg-part" checked onchange="updatePGExplorer()" />
+              <span>Monthly Partitioning</span>
+            </label>
+            <label class="row text-xs" style="cursor:pointer;">
+              <input type="checkbox" id="pg-idx" checked onchange="updatePGExplorer()" />
+              <span>B-Tree Index</span>
+            </label>
+            <select id="pg-range" onchange="updatePGExplorer()" class="btn">
+              <option value="1">Query: Last 30 Days (1 mo)</option>
+              <option value="3" selected>Query: Last 90 Days (3 mos)</option>
+              <option value="12">Query: Last 1 Year (12 mos)</option>
+              <option value="72">Query: Full 6 Years (72 mos)</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="pg-part-grid" class="partition-grid"></div>
+
+        <div class="grid-3">
+          <div class="subcard"><div class="muted">Partitions Scanned</div><div id="pg-parts-scanned" class="mono tabular" style="font-size:15px;font-weight:700;">—</div></div>
+          <div class="subcard"><div class="muted">Est. Rows Touched</div><div id="pg-rows-scanned" class="mono tabular" style="font-size:15px;font-weight:700;">—</div></div>
+          <div class="subcard"><div class="muted">Est. Query Latency (SLA &lt; 3s)</div><div id="pg-latency" class="mono tabular" style="font-size:15px;font-weight:700;">—</div></div>
+        </div>
+
+        <div class="stack-sm">
+          <div class="muted" style="font-weight:600;">Simulated PostgreSQL <code class="mono">EXPLAIN ANALYZE</code></div>
+          <pre id="pg-explain" class="code-box"></pre>
+        </div>
+      </div>
+
+      <!-- Backfill Speed Optimizer -->
+      <div class="card stack">
+        <div class="row-between">
+          <div>
+            <h3>6-Year Historical Backfill Optimizer (50M Rows: 14.0h → 2.5h)</h3>
+            <p class="muted">Toggle the three engineering optimizations from Project 2.</p>
+          </div>
+          <div id="backfill-total" class="subcard mono tabular" style="font-size:15px;font-weight:700;color:var(--warning);">14.0 hrs</div>
+        </div>
+        <div class="grid-3 text-xs">
+          <label class="subcard row" style="align-items:flex-start;cursor:pointer;">
+            <input type="checkbox" id="opt-copy" onchange="updateBackfill()" />
+            <div><strong>PostgreSQL COPY Stream</strong><div class="muted">Replaces row-by-row inserts (-7.5 hrs)</div></div>
+          </label>
+          <label class="subcard row" style="align-items:flex-start;cursor:pointer;">
+            <input type="checkbox" id="opt-index" onchange="updateBackfill()" />
+            <div><strong>Drop &amp; Rebuild Indexes</strong><div class="muted">Load raw tables first, index once (-2.5 hrs)</div></div>
+          </label>
+          <label class="subcard row" style="align-items:flex-start;cursor:pointer;">
+            <input type="checkbox" id="opt-chunk" onchange="updateBackfill()" />
+            <div><strong>Parallel 4-Worker Chunking</strong><div class="muted">Stream 4 year-chunks concurrently (-1.5 hrs)</div></div>
+          </label>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         TAB 5: CUTOVER NIGHT INCIDENT LAB
+    ============================================================ -->
+    <section id="panel-recon" class="tab-panel hidden stack">
+      <div class="card stack">
+        <div class="row-between">
+          <div>
+            <h2>Cutover Night Incident Lab (11:30 PM Go-Live Gate)</h2>
+            <p class="muted">Resolve all 4 production data discrepancies flagged by your reconciliation suite to unlock Go-Live Sign-Off.</p>
+          </div>
+          <span id="recon-status" class="badge badge-warn">BLOCKED (4 Open Incidents)</span>
+        </div>
+        <div id="recon-cases" class="stack"></div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         TAB 6: INTERVIEW GRILL
+    ============================================================ -->
+    <section id="panel-quiz" class="tab-panel hidden stack">
+      <div class="card stack">
+        <div>
+          <h2>Senior Engineer &amp; Recruiter Interview Grill (8 Questions)</h2>
+          <p class="muted">Practice defending every architectural decision, dialect gotcha, and capacity metric across your 4-year tenure.</p>
+        </div>
+        <div id="quiz-container" class="stack"></div>
+      </div>
+    </section>
+
+  </div>
+
+  <script src="js/sql-engine.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

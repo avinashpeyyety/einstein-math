@@ -8,14 +8,14 @@ const state = {
   sqlSolved: {},
   reconSolved: {},
   activeChallenge: 0,
-  theme: 'dark'
+  theme: 'warm'
 };
 
 const TRACK_COLORS = {
-  postgres: '#a78bfa',
-  sqlserver: '#38bdf8',
-  ssis: '#34d399',
-  python: '#fbbf24'
+  postgres: '#A78BFA',
+  sqlserver: '#4ECDC4',
+  ssis: '#FF6B35',
+  python: '#FFE66D'
 };
 
 let pgBootPromise = null;
@@ -24,11 +24,19 @@ let lastRenderedCode = '';
 function loadState() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) Object.assign(state, JSON.parse(raw));
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      // Migrate older default 'dark' users to the new warm Einstein paper default unless they explicitly pick Cozy Dark
+      if (parsed.theme === 'dark' && !parsed.themeExplicit) parsed.theme = 'warm';
+      Object.assign(state, parsed);
+    }
   } catch (_) {}
-  if (state.theme === 'light') {
-    document.documentElement.classList.add('light');
-    document.getElementById('theme-btn').textContent = '🌙 Dark';
+  if (state.theme === 'dark') {
+    document.documentElement.classList.add('dark');
+    document.getElementById('theme-btn').textContent = '☀️ Warm Paper';
+  } else {
+    document.documentElement.classList.remove('dark');
+    document.getElementById('theme-btn').textContent = '🌙 Cozy Dark';
   }
 }
 
@@ -38,9 +46,10 @@ function saveState() {
 }
 
 function toggleTheme() {
-  const isLight = document.documentElement.classList.toggle('light');
-  state.theme = isLight ? 'light' : 'dark';
-  document.getElementById('theme-btn').textContent = isLight ? '🌙 Dark' : '☀️ Light';
+  const isDark = document.documentElement.classList.toggle('dark');
+  state.theme = isDark ? 'dark' : 'warm';
+  state.themeExplicit = true;
+  document.getElementById('theme-btn').textContent = isDark ? '☀️ Warm Paper' : '🌙 Cozy Dark';
   saveState();
 }
 
@@ -458,9 +467,9 @@ function fillSQLSolution() {
 function renderDialectTable() {
   document.getElementById('dialect-table-body').innerHTML = DataLabSQL.DIALECT_MAP.map(d => `
     <tr>
-      <td style="font-family:inherit;font-weight:600;color:var(--text);">${esc(d.topic)}</td>
-      <td style="color:#38bdf8;">${esc(d.tsql)}</td>
-      <td style="color:#a78bfa;">${esc(d.pg)}</td>
+      <td style="font-family:inherit;font-weight:700;color:var(--text);">${esc(d.topic)}</td>
+      <td class="dialect-tsql">${esc(d.tsql)}</td>
+      <td class="dialect-pg">${esc(d.pg)}</td>
       <td style="font-family:inherit;color:var(--muted);white-space:normal;">${esc(d.note)}</td>
     </tr>
   `).join('');

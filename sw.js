@@ -1,5 +1,5 @@
 /* Einstein Math service worker — caches app shell + curriculum + panels for offline play */
-const CACHE = 'einstein-math-v2.6.19';
+const CACHE = 'einstein-math-v2.6.20';
 // W1b: on-device comic-avatar model (~40 MB) is cached on first use only, and kept across app versions
 const MODEL_CACHE = 'einstein-math-models-v1';
 // X2: subject packs (data/subjects/<id>.json). math is precached (default subject, offline after first visit);
@@ -75,9 +75,9 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Standalone portal assets (cosmos/*, data-lab/*) + vendored Three.js (vendor/three/*, ~1.4 MB) are lazy like the sims —
+  // Standalone portal assets (cosmos/*, data-lab/*) + vendored Three.js / PGlite WASM are lazy like the sims —
   // not precached; cache-first in this version's cache on first use, replaced on the next version.
-  if (isPortal || url.pathname.includes('/vendor/three/')) {
+  if (isPortal || url.pathname.includes('/vendor/three/') || url.pathname.includes('/vendor/pglite/')) {
     event.respondWith(
       caches.open(CACHE).then((c) => c.match(req).then((hit) => hit || fetch(req).then((res) => {
         if (res && res.ok) c.put(req, res.clone());

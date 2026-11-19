@@ -23,7 +23,7 @@
       <div class="hud-right">
         <div class="xp-pill" title="Saved locally in your browser">
           <div class="xp-bar-wrap"><div id="xp-bar" class="xp-bar-fill"></div></div>
-          <span id="xp-text" class="mono tabular" style="font-weight:700;">0/26 Mastered (0%)</span>
+          <span id="xp-text" class="mono tabular" style="font-weight:700;">0/33 Mastered (0%)</span>
         </div>
         <button type="button" class="btn" id="theme-btn" onclick="toggleTheme()">☀️ Light</button>
         <button type="button" class="btn" onclick="resetProgress()" title="Clear saved progress">↺ Reset</button>
@@ -57,47 +57,63 @@
          TAB 2: LIVE SQL PLAYGROUND (POSTGRES <-> T-SQL)
     ============================================================ -->
     <section id="panel-sql" class="tab-panel hidden stack">
-      <div class="grid-2" style="grid-template-columns: minmax(260px, 1fr) minmax(360px, 2fr);">
+      <div class="card row-between" style="padding:12px 16px;">
+        <div class="row">
+          <span id="pg-engine-badge" class="badge badge-warn">⏳ Click Tab 2 or "Try in Postgres" to boot PostgreSQL 18 (WASM)…</span>
+          <span id="pg-exec-time" class="muted mono"></span>
+        </div>
+        <div class="row">
+          <button type="button" class="btn" onclick="resetPgDb()" title="Reset all tables to initial seed">↺ Reset Seed DB</button>
+        </div>
+      </div>
+
+      <div class="grid-2" style="grid-template-columns: minmax(270px, 1fr) minmax(380px, 2fr);">
         <div class="stack">
           <div class="card stack-sm">
-            <h3>6 Progressive Hands-On SQL Labs</h3>
-            <p class="muted">Practice real Beginner → Expert queries across SQL Server and PostgreSQL.</p>
-            <div id="sql-challenge-list" class="stack-sm"></div>
+            <div class="row-between">
+              <h3>13 Real PostgreSQL Labs</h3>
+              <span class="muted">Beginner → Expert</span>
+            </div>
+            <p class="muted">Graded against real PostgreSQL 18 result sets &amp; <code class="mono">EXPLAIN</code> plans.</p>
+            <div id="sql-challenge-list" class="stack-sm" style="max-height:340px;overflow-y:auto;padding-right:4px;"></div>
           </div>
 
           <div class="card stack-sm">
-            <h3>Inspect Live Sample Tables</h3>
-            <div class="row">
-              <button type="button" class="btn" onclick="previewTable('stg_pos_sales')">stg_pos_sales</button>
-              <button type="button" class="btn" onclick="previewTable('dim_product')">dim_product</button>
-              <button type="button" class="btn" onclick="previewTable('pos_eod_summary')">pos_eod_summary</button>
-              <button type="button" class="btn" onclick="previewTable('stg_work_orders')">stg_work_orders</button>
+            <h3>Live PostgreSQL Schema</h3>
+            <div id="pg-schema-list" class="stack-sm text-xs">
+              <div class="muted">Schema loads when PostgreSQL boots.</div>
             </div>
-            <div id="table-preview-title" class="muted" style="font-weight:600;"></div>
-            <div id="table-preview-body"></div>
           </div>
         </div>
 
         <div class="card stack">
-          <div>
-            <div id="sql-chal-meta" class="muted" style="font-weight:600;"></div>
-            <h2 id="sql-chal-title">Challenge</h2>
-            <p id="sql-chal-prompt" class="text-xs" style="margin-top:4px;"></p>
+          <div class="row-between">
+            <div>
+              <div id="sql-chal-meta" class="muted" style="font-weight:600;"></div>
+              <h2 id="sql-chal-title">Challenge</h2>
+            </div>
+            <span id="sql-chal-badge" class="badge badge-pg">PostgreSQL 18</span>
           </div>
+          <p id="sql-chal-prompt" class="text-xs"></p>
 
           <textarea id="sql-editor" class="sql-editor" spellcheck="false"></textarea>
 
           <div class="row-between">
             <div class="row">
-              <button type="button" class="btn btn-primary" onclick="runUserSQL()">▶ Run Query</button>
+              <button type="button" class="btn btn-primary" id="btn-run-sql" onclick="runUserSQL()">▶ Run &amp; Grade</button>
+              <button type="button" class="btn" onclick="runScratchSQL()">⚡ Run Only (Scratchpad)</button>
               <button type="button" class="btn" onclick="showSQLHint()">💡 Hint</button>
-              <button type="button" class="btn" onclick="fillSQLSolution()">✓ Show Solution</button>
+              <button type="button" class="btn" onclick="fillSQLSolution()">✓ Solution</button>
             </div>
-            <span class="muted">Executes against in-memory sample tables</span>
+            <span class="muted">Cmd/Ctrl+Enter to Run &amp; Grade</span>
           </div>
 
           <div id="sql-hint-box" class="subcard muted hidden"></div>
           <div id="sql-feedback" class="hidden"></div>
+          <div id="sql-plan-box" class="hidden stack-sm">
+            <div class="muted" style="font-weight:600;">Real PostgreSQL EXPLAIN Plan</div>
+            <pre id="sql-plan-pre" class="code-box"></pre>
+          </div>
           <div id="sql-output"></div>
         </div>
       </div>

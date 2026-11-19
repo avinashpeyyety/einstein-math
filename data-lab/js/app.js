@@ -1,4 +1,4 @@
-/* Data Engineering Academy — Beginner to Expert Interactive Controller (Einstein Math Portal) */
+/* Data Engineering Academy — Beginner to Expert Interactive Controller (with Real PostgreSQL 18 WASM) */
 const STORAGE_KEY = 'einstein-data-academy-v2';
 
 const state = {
@@ -10,6 +10,8 @@ const state = {
   activeChallenge: 0,
   theme: 'dark'
 };
+
+let pgBootPromise = null;
 
 function loadState() {
   try {
@@ -38,19 +40,25 @@ function esc(str) {
   return String(str).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
 
-function renderTableHtml(rows) {
-  if (!rows || !rows.length) return '<div class="muted">0 rows returned.</div>';
-  const cols = Object.keys(rows[0]);
-  return `<div class="table-wrap"><table class="data-table"><thead><tr>${cols.map(c => `<th>${esc(c)}</th>`).join('')}</tr></thead><tbody>${rows.map(r => `<tr>${cols.map(c => `<td>${esc(r[c] === null || r[c] === undefined ? 'NULL' : r[c])}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+function renderPgResultHtml(res) {
+  if (!res) return '<div class="muted">Query completed (no rows returned).</div>';
+  const fields = res.fields || [];
+  const rows = res.rows || [];
+  if (!fields.length) return '<div class="muted">Command executed successfully.</div>';
+  if (!rows.length) return `<div class="muted">0 rows returned (${fields.map(f => esc(f.name)).join(', ')}).</div>`;
+  return `<div class="table-wrap"><table class="data-table"><thead><tr>${fields.map(f => `<th>${esc(f.name)}</th>`).join('')}</tr></thead><tbody>${rows.map(r => `<tr>${r.map(v => {
+    const txt = v === null || v === undefined ? 'NULL' : (v instanceof Date ? v.toISOString() : (typeof v === 'object' ? JSON.stringify(v) : String(v)));
+    return `<td>${esc(txt)}</td>`;
+  }).join('')}</tr>`).join('')}</tbody></table></div>`;
 }
 
 function updateXP() {
   const totalLessons = DataLabCurriculum.TRACKS.reduce((a, t) => a + t.modules.length, 0);
   const lessonsDone = Object.values(state.lessonsMastered).filter(Boolean).length;
-  const sqlDone = Object.values(state.sqlSolved).filter(Boolean).length;
+  const sqlDone = PgLab.CHALLENGES.filter(c => state.sqlSolved[c.id]).length;
   const reconDone = Object.values(state.reconSolved).filter(Boolean).length;
 
-  const total = totalLessons + DataLabSQL.CHALLENGES.length + reconBugs.length;
+  const total = totalLessons + PgLab.CHALLENGES.length + reconBugs.length;
   const done = lessonsDone + sqlDone + reconDone;
   const pct = Math.round((done / total) * 100);
 
@@ -74,6 +82,70 @@ function switchTab(id) {
   document.getElementById('panel-' + id).classList.remove('hidden');
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('tab-' + id).classList.add('active');
+  if (id === 'sql') ensurePgBoot();
+}
+
+// ============================================================
+// REAL POSTGRESQL 18 (PGLITE WASM) LAZY BOOT & SCHEMA
+// ============================================================
+async function ensurePgBoot() {
+  if (PgLab.ready) return PgLab.version;
+  if (pgBootPromise) return pgBootPromise;
+
+  const badge = document.getElementById('pg-engine-badge');
+  badge.className = 'badge badge-warn';
+  badge.textContent = '⏳ Booting Real PostgreSQL 18 (WASM)…';
+
+  pgBootPromise = (async () => {
+    try {
+      const mod = await import('../vendor/pglite/index.js');
+      const ver = await PgLab.init(mod.PGlite);
+      badge.className = 'badge badge-ok';
+      badge.textContent = `✓ ${ver} Live (In-Browser WASM)`;
+      await renderPgSchema();
+      return ver;
+    } catch (err) {
+      badge.className = 'badge badge-err';
+      badge.textContent = '✗ Failed to load PostgreSQL WASM (serve via http/https)';
+      console.error(err);
+      pgBootPromise = null;
+      throw err;
+    }
+  })();
+
+  return pgBootPromise;
+}
+
+async function resetPgDb() {
+  const badge = document.getElementById('pg-engine-badge');
+  badge.className = 'badge badge-warn';
+  badge.textContent = '⏳ Resetting Seed DB…';
+  await ensurePgBoot();
+  const ver = await PgLab.reset();
+  badge.className = 'badge badge-ok';
+  badge.textContent = `✓ ${ver} Reset & Ready`;
+  await renderPgSchema();
+}
+
+async function renderPgSchema() {
+  if (!PgLab.ready) return;
+  const rows = await PgLab.schema();
+  document.getElementById('pg-schema-list').innerHTML = rows.map(r => `
+    <button type="button" onclick="inspectSchemaTable('${esc(r.table_name)}')" class="choice-btn" style="padding:8px 10px;">
+      <div class="row-between">
+        <span class="mono" style="font-weight:700;color:var(--primary);">${esc(r.table_name)}</span>
+        ${r.partitioned ? '<span class="badge badge-pg">Partitioned (12)</span>' : ''}
+      </div>
+      <div class="muted mono" style="margin-top:3px;font-size:11px;white-space:normal;">${esc(r.cols)}</div>
+    </button>
+  `).join('');
+}
+
+async function inspectSchemaTable(tbl) {
+  await ensurePgBoot();
+  const sql = `SELECT * FROM ${tbl} LIMIT 20;`;
+  document.getElementById('sql-editor').value = sql;
+  await runScratchSQL();
 }
 
 // ============================================================
@@ -106,11 +178,23 @@ function selectModule(idx) {
   renderModuleView();
 }
 
+async function tryLessonInPostgres(modId) {
+  const snip = PgLab.TRY_IT[modId];
+  if (!snip) return;
+  switchTab('sql');
+  document.getElementById('sql-chal-meta').textContent = 'Lesson Sandbox · Real PostgreSQL 18';
+  document.getElementById('sql-chal-title').textContent = snip.label;
+  document.getElementById('sql-chal-prompt').textContent = 'Experiment freely! Modify this query and click ⚡ Run Only (Scratchpad).';
+  document.getElementById('sql-editor').value = snip.sql;
+  document.getElementById('sql-feedback').classList.add('hidden');
+  document.getElementById('sql-plan-box').classList.add('hidden');
+  await runScratchSQL();
+}
+
 function renderModuleView() {
   const track = DataLabCurriculum.TRACKS.find(t => t.id === state.activeTrack) || DataLabCurriculum.TRACKS[0];
   const mod = track.modules[state.activeModuleIdx] || track.modules[0];
 
-  // Level stepper
   const stepper = document.getElementById('level-stepper');
   stepper.innerHTML = track.modules.map((m, idx) => {
     const done = !!state.lessonsMastered[m.id];
@@ -124,9 +208,10 @@ function renderModuleView() {
     </button>`;
   }).join('');
 
-  // Lesson body
   const done = !!state.lessonsMastered[mod.id];
   const nextExists = state.activeModuleIdx < track.modules.length - 1;
+  const tryIt = PgLab.TRY_IT[mod.id];
+
   document.getElementById('lesson-viewer').innerHTML = `
     <div class="grid-2">
       <div class="stack">
@@ -148,7 +233,10 @@ function renderModuleView() {
 
       <div class="stack">
         <div class="stack-sm">
-          <div class="muted" style="font-weight:600;">${esc(mod.codeLabel)}</div>
+          <div class="row-between">
+            <div class="muted" style="font-weight:600;">${esc(mod.codeLabel)}</div>
+            ${tryIt ? `<button type="button" class="btn btn-primary" onclick="tryLessonInPostgres('${mod.id}')">▶ ${esc(tryIt.label)}</button>` : ''}
+          </div>
           <pre class="code-box">${esc(mod.code)}</pre>
         </div>
 
@@ -192,17 +280,17 @@ function answerLessonCheck(modId, optIdx) {
 }
 
 // ============================================================
-// TAB 2: SQL PLAYGROUND & DIALECT TRANSLATOR
+// TAB 2: REAL POSTGRESQL 18 PLAYGROUND & DIALECT REFERENCE
 // ============================================================
 function renderChallengeList() {
   const el = document.getElementById('sql-challenge-list');
-  el.innerHTML = DataLabSQL.CHALLENGES.map((c, idx) => {
+  el.innerHTML = PgLab.CHALLENGES.map((c, idx) => {
     const solved = !!state.sqlSolved[c.id];
     const active = idx === state.activeChallenge;
     return `<button type="button" onclick="loadChallenge(${idx})" class="choice-btn ${active ? 'active' : ''}">
       <div class="row-between">
-        <span class="text-xs" style="font-weight:700;">${esc(c.title)}</span>
-        <span class="badge ${solved ? 'badge-ok' : (c.dialect === 'tsql' ? 'badge-sqlserver' : 'badge-pg')}">${solved ? '✓ Solved' : (c.dialect === 'tsql' ? 'T-SQL' : 'PostgreSQL')}</span>
+        <span class="text-xs" style="font-weight:700;">${idx + 1}. ${esc(c.title)}</span>
+        <span class="badge ${solved ? 'badge-ok' : 'badge-pg'}">${solved ? '✓' : esc(c.level)}</span>
       </div>
     </button>`;
   }).join('');
@@ -210,40 +298,89 @@ function renderChallengeList() {
 
 function loadChallenge(idx) {
   state.activeChallenge = idx;
-  const c = DataLabSQL.CHALLENGES[idx];
+  const c = PgLab.CHALLENGES[idx];
   renderChallengeList();
-  document.getElementById('sql-chal-meta').textContent = c.project;
+  document.getElementById('sql-chal-meta').textContent = `${c.level} · Lab ${idx + 1} of ${PgLab.CHALLENGES.length}`;
   document.getElementById('sql-chal-title').textContent = c.title;
+  document.getElementById('sql-chal-badge').textContent = c.planCheck ? 'Graded + EXPLAIN Plan' : (c.runTwice ? 'Graded + Idempotency Retry' : 'PostgreSQL 18');
   document.getElementById('sql-chal-prompt').textContent = c.prompt;
   document.getElementById('sql-editor').value = c.starter;
   document.getElementById('sql-hint-box').classList.add('hidden');
   document.getElementById('sql-hint-box').textContent = 'Hint: ' + c.hint;
   document.getElementById('sql-feedback').classList.add('hidden');
-  document.getElementById('sql-output').innerHTML = '<div class="muted">Click <strong>▶ Run Query</strong> to execute against the in-memory tables.</div>';
+  document.getElementById('sql-plan-box').classList.add('hidden');
+  document.getElementById('sql-output').innerHTML = '<div class="muted">Click <strong>▶ Run &amp; Grade</strong> (or <code class="mono">Cmd/Ctrl+Enter</code>) to execute on real PostgreSQL 18.</div>';
 }
 
-function runUserSQL() {
-  const c = DataLabSQL.CHALLENGES[state.activeChallenge];
-  const sql = document.getElementById('sql-editor').value;
-  const ok = c.validate(sql);
+async function runUserSQL() {
   const fb = document.getElementById('sql-feedback');
-  fb.classList.remove('hidden');
+  const planBox = document.getElementById('sql-plan-box');
+  planBox.classList.add('hidden');
+  try {
+    await ensurePgBoot();
+  } catch (_) { return; }
 
-  if (ok) {
+  const c = PgLab.CHALLENGES[state.activeChallenge];
+  const sql = document.getElementById('sql-editor').value;
+  const t0 = performance.now();
+  const res = await PgLab.grade(c, sql);
+  const ms = Math.round(performance.now() - t0);
+  document.getElementById('pg-exec-time').textContent = `${ms} ms`;
+
+  fb.classList.remove('hidden');
+  if (res.ok) {
     state.sqlSolved[c.id] = true;
     saveState();
     renderChallengeList();
     fb.className = 'subcard text-xs';
     fb.style.borderColor = 'var(--success)';
     fb.style.color = 'var(--success)';
-    fb.textContent = '✓ Passed! Your query satisfies the production SQL rule.';
-    document.getElementById('sql-output').innerHTML = renderTableHtml(c.run());
+    fb.textContent = res.message;
   } else {
     fb.className = 'subcard text-xs';
-    fb.style.borderColor = 'var(--warning)';
-    fb.style.color = 'var(--warning)';
-    fb.textContent = 'Not quite yet — inspect the output below (or click Hint) to see why the current query fails.';
-    document.getElementById('sql-output').innerHTML = renderTableHtml(c.badRun());
+    fb.style.borderColor = res.error ? 'var(--error)' : 'var(--warning)';
+    fb.style.color = res.error ? 'var(--error)' : 'var(--warning)';
+    fb.textContent = res.message;
+  }
+
+  if (res.plan) {
+    planBox.classList.remove('hidden');
+    document.getElementById('sql-plan-pre').textContent = res.plan;
+  }
+
+  if (res.user) {
+    document.getElementById('sql-output').innerHTML = renderPgResultHtml(res.user);
+  } else {
+    document.getElementById('sql-output').innerHTML = '';
+  }
+}
+
+async function runScratchSQL() {
+  const fb = document.getElementById('sql-feedback');
+  const planBox = document.getElementById('sql-plan-box');
+  planBox.classList.add('hidden');
+  try {
+    await ensurePgBoot();
+  } catch (_) { return; }
+
+  const sql = document.getElementById('sql-editor').value;
+  fb.classList.remove('hidden');
+  try {
+    const { results, ms } = await PgLab.run(sql);
+    document.getElementById('pg-exec-time').textContent = `${Math.round(ms)} ms`;
+    const last = PgLab.lastRowResult(results);
+    fb.className = 'subcard text-xs';
+    fb.style.borderColor = 'var(--primary)';
+    fb.style.color = 'var(--primary)';
+    fb.textContent = `Scratchpad executed (${results.length} statement(s), ${Math.round(ms)} ms).`;
+    document.getElementById('sql-output').innerHTML = renderPgResultHtml(last);
+    await renderPgSchema();
+  } catch (err) {
+    fb.className = 'subcard text-xs';
+    fb.style.borderColor = 'var(--error)';
+    fb.style.color = 'var(--error)';
+    fb.textContent = 'PostgreSQL error: ' + err.message;
+    document.getElementById('sql-output').innerHTML = '';
   }
 }
 
@@ -252,14 +389,9 @@ function showSQLHint() {
 }
 
 function fillSQLSolution() {
-  const c = DataLabSQL.CHALLENGES[state.activeChallenge];
+  const c = PgLab.CHALLENGES[state.activeChallenge];
   document.getElementById('sql-editor').value = c.solution;
   runUserSQL();
-}
-
-function previewTable(tblName) {
-  document.getElementById('table-preview-title').textContent = tblName + ' (sample rows)';
-  document.getElementById('table-preview-body').innerHTML = renderTableHtml(DataLabSQL.TABLES[tblName]);
 }
 
 function renderDialectTable() {
@@ -494,7 +626,7 @@ function checkRecon(bi, oi) {
 }
 
 function resetProgress() {
-  if (!confirm('Reset all Data Academy progress (lessons, SQL challenges, and debugging labs)?')) return;
+  if (!confirm('Reset all Data Academy progress (lessons, SQL labs, and debugging labs)?')) return;
   state.lessonsMastered = {};
   state.sqlSolved = {};
   state.reconSolved = {};
@@ -514,10 +646,16 @@ document.addEventListener('DOMContentLoaded', () => {
   renderModuleView();
   renderChallengeList();
   loadChallenge(0);
-  previewTable('stg_pos_sales');
   renderDialectTable();
   updatePGExplorer();
   updateBackfill();
   renderRecon();
   updateXP();
+
+  document.getElementById('sql-editor').addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+      e.preventDefault();
+      runUserSQL();
+    }
+  });
 });

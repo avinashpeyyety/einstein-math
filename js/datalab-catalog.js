@@ -6,9 +6,9 @@ const DataLabCatalog = {
 
   SECTIONS: [
     {
-      id: 'academy', icon: '🎓', title: 'Coaching Tracks (Beginner → Expert)', tab: 'academy', color: '#FF6B35',
-      blurb: '16 structured lessons across PostgreSQL, SQL Server (T-SQL), SSIS & Python — with mental models, real code, pitfalls & mastery checks.',
-      topics: ['PostgreSQL', 'T-SQL', 'SSIS', 'Python ETL']
+      id: 'factory', icon: '🏭', title: "Einstein's Data Factory & Skill Tree", tab: 'factory', color: '#FF6B35',
+      blurb: 'Live animated data-pipeline sandbox! Master each concept to physically upgrade stations—unlocking quarantine shields, an 85× COPY firehose, 12× partition pruning & 100% parity.',
+      topics: ['live canvas', '8-node skill tree', 'fault stress-tests', 'massive gains']
     },
     {
       id: 'sql', icon: '🐘', title: 'Live PostgreSQL 18 Playground', tab: 'sql', color: '#A78BFA',
@@ -16,9 +16,9 @@ const DataLabCatalog = {
       topics: ['real Postgres 18', '13 graded labs', 'T-SQL ↔ PG cheat sheet']
     },
     {
-      id: 'pipe', icon: '🔀', title: 'ETL Pipeline Studio (SSIS & Python)', tab: 'pipe', color: '#4ECDC4',
-      blurb: 'Watch rows flow through 5 animated stages, inject real production faults (encoding crashes, join fan-outs, slow inserts), and toggle fixes.',
-      topics: ['SSIS', 'pandas / pyodbc', 'psycopg2 COPY', 'fault recovery']
+      id: 'academy', icon: '🎓', title: '4-Tech Curriculum (Beginner → Expert)', tab: 'academy', color: '#4ECDC4',
+      blurb: '16 structured lessons across PostgreSQL, SQL Server (T-SQL), SSIS & Python — with mental models, real code, pitfalls & mastery checks.',
+      topics: ['PostgreSQL', 'T-SQL', 'SSIS', 'Python ETL']
     },
     {
       id: 'pg', icon: '⚡', title: 'Postgres Partitioning & COPY Lab', tab: 'pg', color: '#FFE66D',

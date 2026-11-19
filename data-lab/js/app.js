@@ -7,6 +7,9 @@ const state = {
   lessonsMastered: {},
   sqlSolved: {},
   reconSolved: {},
+  milestonesDone: {},
+  activeMilestone: 'm1-profile',
+  sandboxMode: false,
   activeChallenge: 0,
   theme: 'warm'
 };
@@ -134,11 +137,177 @@ function updateXP() {
 }
 
 function switchTab(id) {
+  if (id === 'pipe') id = 'factory';
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
-  document.getElementById('panel-' + id).classList.remove('hidden');
+  const panel = document.getElementById('panel-' + id);
+  if (panel) panel.classList.remove('hidden');
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('tab-' + id).classList.add('active');
+  const btn = document.getElementById('tab-' + id);
+  if (btn) btn.classList.add('active');
   if (id === 'sql') ensurePgBoot();
+  if (id === 'factory') renderFactoryUI();
+}
+
+// ============================================================
+// TAB 1: EINSTEIN'S DATA FACTORY & UNLOCKABLE SKILL TREE
+// ============================================================
+function syncMilestonesFromSQL() {
+  if (typeof DataFactory === 'undefined') return;
+  DataFactory.MILESTONES.forEach(m => {
+    if (m.pgChallengeId && state.sqlSolved[m.pgChallengeId]) {
+      state.milestonesDone[m.id] = true;
+    }
+  });
+}
+
+function toggleSandboxMode() {
+  state.sandboxMode = !!document.getElementById('toggle-sandbox')?.checked;
+  saveState();
+  renderFactoryUI();
+}
+
+function triggerFactoryFault(kind) {
+  if (typeof DataFactory === 'undefined') return;
+  DataFactory.injectFault(kind);
+  if (kind === 'encoding') {
+    const ok = !!state.milestonesDone['m2-python'];
+    setEinsteinMood(ok ? 'cheer' : 'think', ok
+      ? 'Python Shield active! Dirty Latin-1 rows were diverted safely into Quarantine.'
+      : 'Latin-1 crash wave injected! Master Milestone #2 (Python Shield) to divert dirty rows.');
+  } else if (kind === 'orphan') {
+    const ok = !!state.milestonesDone['m3-star'];
+    setEinsteinMood(ok ? 'cheer' : 'think', ok
+      ? 'Unknown (-1) safety net caught every orphan SKU—zero revenue dropped!'
+      : 'Unknown SKUs are dropping into the void! Master Milestone #3 (Star Schema) to rescue them.');
+  }
+}
+
+function renderFactoryUI() {
+  if (typeof DataFactory === 'undefined') return;
+  syncMilestonesFromSQL();
+  DataFactory.syncState(state.milestonesDone, state.sandboxMode);
+  const tel = DataFactory.computeTelemetry(state.milestonesDone);
+
+  const sb = document.getElementById('toggle-sandbox');
+  if (sb) sb.checked = !!state.sandboxMode;
+
+  document.getElementById('factory-rank-badge').textContent = `${tel.rank.badge} · ${tel.rank.title}`;
+  document.getElementById('tel-throughput').textContent = `${tel.throughput.toLocaleString()} rows/s`;
+  document.getElementById('tel-throughput-sub').textContent = tel.throughput >= 85000 ? '🚀 COPY / Fast Load Active' : 'Slow Row-by-Row INSERT';
+  document.getElementById('tel-backfill').textContent = `${tel.backfill.toFixed(1)} hrs`;
+  document.getElementById('tel-backfill-sub').textContent = tel.backfill <= 2.5 ? '✓ 5.6× Faster Backfill!' : 'Target: ≤ 2.5 hrs';
+  document.getElementById('tel-latency').textContent = `${tel.latency.toFixed(1)} s`;
+  document.getElementById('tel-latency-sub').textContent = tel.latency <= 3.0 ? '✓ 12× Partition Pruning!' : 'Unpartitioned Full Scan';
+  document.getElementById('tel-parity').textContent = `${tel.parity.toFixed(2)}%`;
+  document.getElementById('tel-parity-sub').textContent = tel.parity >= 99.9 ? '✓ Cutover Parity Locked' : 'Target: 99.98%+';
+  document.getElementById('tree-progress-badge').textContent = `${tel.count} / ${tel.total} Mastered`;
+
+  // Render 5-tier Skill Tree
+  const tiers = [1, 2, 3, 4, 5];
+  const host = document.getElementById('skill-tree-host');
+  host.innerHTML = tiers.map((tier, tIdx) => {
+    const nodes = DataFactory.MILESTONES.filter(m => m.tier === tier);
+    const arrow = tIdx > 0 ? '<div class="tree-connector">▼ UNLOCKS NEXT STAGE ▼</div>' : '';
+    return arrow + `<div class="tree-tier">${nodes.map(m => {
+      const done = !!state.milestonesDone[m.id];
+      const unlocked = DataFactory.isUnlocked(m.id, state.milestonesDone);
+      const active = state.activeMilestone === m.id;
+      const cls = `skill-node ${done ? 'done' : ''} ${!unlocked ? 'locked' : ''} ${active ? 'active' : ''}`;
+      const badgeText = done ? '✓ Mastered' : (unlocked ? 'Ready' : '🔒 Locked');
+      return `<button type="button" class="${cls}" onclick="selectMilestone('${m.id}')" ${!unlocked ? 'disabled' : ''}>
+        <div class="row-between">
+          <span class="text-xs" style="font-weight:800;">${m.icon} ${esc(m.title)}</span>
+          <span class="badge ${done ? 'badge-ok' : (unlocked ? 'badge-warn' : '')}">${badgeText}</span>
+        </div>
+        <div class="muted" style="margin-top:3px;">${esc(m.tech)}</div>
+        <span class="skill-gain-pill">${esc(m.gainLabel)}</span>
+      </button>`;
+    }).join('')}</div>`;
+  }).join('');
+
+  renderMilestoneDrawer();
+}
+
+function selectMilestone(id) {
+  if (!DataFactory.isUnlocked(id, state.milestonesDone)) return;
+  state.activeMilestone = id;
+  renderFactoryUI();
+}
+
+function launchMilestoneLab(id) {
+  const m = DataFactory.MILESTONES.find(x => x.id === id);
+  if (!m || !m.pgChallengeId) return;
+  const idx = PgLab.CHALLENGES.findIndex(c => c.id === m.pgChallengeId);
+  if (idx >= 0) {
+    loadChallenge(idx);
+    switchTab('sql');
+    setEinsteinMood('explain', `Pass "${m.title}" in real PostgreSQL 18 to upgrade your Data Factory!`);
+  }
+}
+
+function answerMilestoneAssessment(id, optIdx) {
+  const m = DataFactory.MILESTONES.find(x => x.id === id);
+  if (!m || !m.assessment) return;
+  const ok = optIdx === m.assessment.ans;
+  const fb = document.getElementById('ms-assess-fb');
+  if (fb) {
+    fb.classList.remove('hidden');
+    fb.textContent = (ok ? '✓ Milestone Mastered! ' : '✗ Not quite: ') + m.assessment.exp;
+    fb.style.color = ok ? 'var(--success)' : 'var(--error)';
+    fb.style.borderColor = ok ? 'var(--success)' : 'var(--error)';
+  }
+  if (ok) {
+    state.milestonesDone[m.id] = true;
+    saveState();
+    DataFactory.celebrate(m.station);
+    setEinsteinMood('cheer', `Factory upgraded! ${m.title} unlocked downstream nodes (${m.gainLabel}).`);
+    renderFactoryUI();
+  } else {
+    setEinsteinMood('think', m.assessment.exp);
+  }
+}
+
+function renderMilestoneDrawer() {
+  const m = DataFactory.MILESTONES.find(x => x.id === state.activeMilestone) || DataFactory.MILESTONES[0];
+  const done = !!state.milestonesDone[m.id];
+  const drawer = document.getElementById('milestone-drawer');
+  if (!drawer) return;
+
+  const actionHtml = m.pgChallengeId
+    ? `<div class="subcard stack-sm">
+        <div class="text-xs" style="font-weight:700;">🐘 Graded Real PostgreSQL 18 Assessment</div>
+        <p class="muted">Solve the live SQL lab in PostgreSQL 18 to prove mastery, upgrade Station #${m.station + 1}, and unlock the next tier.</p>
+        <button type="button" class="btn btn-primary" onclick="launchMilestoneLab('${m.id}')">▶ ${done ? 'Re-open PostgreSQL 18 Lab' : 'Launch Graded PostgreSQL 18 Lab'}</button>
+      </div>`
+    : `<div class="subcard stack-sm">
+        <div class="text-xs" style="font-weight:700;">✅ Graded Pipeline Assessment: ${esc(m.assessment.q)}</div>
+        <div class="stack-sm">
+          ${m.assessment.opts.map((o, oi) => `<button type="button" class="choice-btn" onclick="answerMilestoneAssessment('${m.id}', ${oi})">${esc(o)}</button>`).join('')}
+        </div>
+        <div id="ms-assess-fb" class="card text-xs hidden" style="padding:9px 11px;"></div>
+      </div>`;
+
+  drawer.innerHTML = `
+    <div class="row-between">
+      <span class="badge ${done ? 'badge-ok' : 'badge-pg'}">Tier ${m.tier} · ${esc(m.tech)}</span>
+      <span class="badge ${done ? 'badge-ok' : 'badge-warn'}">${done ? '✓ Factory Upgraded' : 'Pending Mastery'}</span>
+    </div>
+    <h2>${m.icon} ${esc(m.title)}</h2>
+    <div class="skill-gain-pill" style="align-self:flex-start;">${esc(m.gainLabel)}</div>
+    <p class="text-xs" style="line-height:1.62;">${esc(m.concept)}</p>
+    <div class="subcard">
+      <div class="text-xs" style="font-weight:700;color:var(--primary);margin-bottom:3px;">🧠 Mental Model</div>
+      <div class="muted" style="color:var(--text);">${esc(m.mentalModel)}</div>
+    </div>
+    <div class="code-window">
+      <div class="code-window-bar">
+        <span class="window-dots"><span></span><span></span><span></span></span>
+        <span class="mono">${esc(m.tech)} Pattern</span>
+      </div>
+      <pre class="code-box">${highlightCode(m.code)}</pre>
+    </div>
+    ${actionHtml}
+  `;
 }
 
 // ============================================================
@@ -398,13 +567,24 @@ async function runUserSQL() {
   fb.classList.remove('hidden');
   if (res.ok) {
     state.sqlSolved[c.id] = true;
-    setEinsteinMood('cheer', `Brilliant SQL! Lab #${state.activeChallenge + 1} (${c.title}) passed against real PostgreSQL 18 in ${ms} ms.`);
+    const unlockedMs = typeof DataFactory !== 'undefined'
+      ? DataFactory.MILESTONES.find(m => m.pgChallengeId === c.id)
+      : null;
+    if (unlockedMs) {
+      state.milestonesDone[unlockedMs.id] = true;
+      DataFactory.celebrate(unlockedMs.station);
+    }
+    setEinsteinMood('cheer', unlockedMs
+      ? `Factory Upgraded! "${unlockedMs.title}" mastered (${unlockedMs.gainLabel}).`
+      : `Brilliant SQL! Lab #${state.activeChallenge + 1} (${c.title}) passed against real PostgreSQL 18 in ${ms} ms.`);
     saveState();
     renderChallengeList();
     fb.className = 'subcard text-xs';
     fb.style.borderColor = 'var(--success)';
     fb.style.color = 'var(--success)';
-    fb.textContent = res.message;
+    fb.innerHTML = esc(res.message) + (unlockedMs
+      ? ` <button type="button" class="btn btn-primary" style="margin-left:8px;padding:3px 10px;" onclick="switchTab('factory')">🏭 View Factory Upgrade →</button>`
+      : '');
   } else {
     setEinsteinMood('think', res.message);
     fb.className = 'subcard text-xs';
@@ -701,11 +881,13 @@ function checkRecon(bi, oi) {
 }
 
 function resetProgress() {
-  if (!confirm('Reset all Data Academy progress (lessons, SQL labs, and debugging labs)?')) return;
+  if (!confirm('Reset all Data Academy progress (Factory skill tree, lessons, SQL labs, and debugging labs)?')) return;
   state.lessonsMastered = {};
   state.sqlSolved = {};
   state.reconSolved = {};
+  state.milestonesDone = {};
   saveState();
+  renderFactoryUI();
   renderTrackCards();
   renderModuleView();
   renderChallengeList();
@@ -717,6 +899,10 @@ function resetProgress() {
 // ============================================================
 document.addEventListener('DOMContentLoaded', () => {
   loadState();
+  if (typeof DataFactory !== 'undefined') {
+    DataFactory.mountCanvas(document.getElementById('factory-canvas'));
+    renderFactoryUI();
+  }
   renderTrackCards();
   renderModuleView();
   renderChallengeList();
@@ -732,9 +918,9 @@ document.addEventListener('DOMContentLoaded', () => {
     el.innerHTML = highlightCode(el.textContent);
   });
 
-  // Honor deep-link ?tab=academy|sql|pipe|pg|recon from Einstein Math #screen-data cards
+  // Honor deep-link ?tab=factory|sql|academy|pg|recon (or legacy pipe -> factory)
   const tabParam = new URLSearchParams(location.search).get('tab');
-  if (['academy', 'sql', 'pipe', 'pg', 'recon'].includes(tabParam)) {
+  if (['factory', 'academy', 'sql', 'pipe', 'pg', 'recon'].includes(tabParam)) {
     switchTab(tabParam);
   }
 

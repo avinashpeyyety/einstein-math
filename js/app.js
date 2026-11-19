@@ -234,6 +234,7 @@
     else if (activeScreen === 'screen-hub' || activeScreen === 'screen-lesson' || activeScreen === 'screen-diagnostic' || activeScreen === 'screen-diag-result') activeKey = sub;
     else if (activeScreen === 'screen-arcade') activeKey = 'arcade';
     else if (activeScreen === 'screen-space') activeKey = 'space';
+    else if (activeScreen === 'screen-data') activeKey = 'data';
     else if (activeScreen === 'screen-progress') activeKey = 'progress';
     $$('.nav-btns [data-nav]').forEach(btn => {
       btn.classList.toggle('nav-active', btn.dataset.nav === activeKey);
@@ -246,6 +247,7 @@
     const el = document.getElementById(id);
     if (el) el.classList.add('active');
     if (id !== 'screen-space' && location.hash === '#space') history.replaceState(null, '', location.pathname + location.search);
+    if (id !== 'screen-data' && location.hash === '#data') history.replaceState(null, '', location.pathname + location.search);
     window.scrollTo({ top: 0, behavior: 'smooth' });
     updateHeaderUser();
     updateSubjectChip();
@@ -2468,6 +2470,15 @@
     if (g && typeof SpaceLab !== 'undefined') g.innerHTML = SpaceLab.cardsHtml();
   }
 
+  function renderDataLab() {
+    showScreen('screen-data');
+    if (location.hash !== '#data') history.replaceState(null, '', '#data');
+    Einstein.mount($('#data-einstein'), 'explain');
+    Einstein.speak($('#data-speech'), 'Welcome to Data Lab! Pick a workbench — climb from Beginner to Expert in PostgreSQL 18, SQL Server, SSIS & Python, or fire up a live SQL query.');
+    const g = $('#data-grid');
+    if (g && typeof DataLabCatalog !== 'undefined') g.innerHTML = DataLabCatalog.cardsHtml();
+  }
+
   /* ——— X11: Fact Arcade — 60-second fact sprints, streaks and personal bests (logic in js/arcade.js) ——— */
   function stopArcadeTimer() { if (arcadeTimer) { clearInterval(arcadeTimer); arcadeTimer = null; } }
 
@@ -3784,6 +3795,7 @@
     $('#btn-open-physics')?.addEventListener('click', () => openSubjectLab('physics'));
     $('#btn-open-arcade')?.addEventListener('click', () => requireUserThen(renderArcade));
     $('#btn-open-space')?.addEventListener('click', () => renderSpace());
+    $('#btn-open-data-lab')?.addEventListener('click', () => renderDataLab());
     $$('[data-progress-subject]').forEach(btn => {
       btn.addEventListener('click', () => switchSubject(btn.dataset.progressSubject));
     });
@@ -3796,6 +3808,7 @@
         else if (t === 'hub') requireUserThen(renderHub);
         else if (t === 'progress') requireUserThen(renderProgress);
         else if (t === 'space') renderSpace();
+        else if (t === 'data') renderDataLab();
         else if (t === 'arcade') requireUserThen(renderArcade);
       });
     });
@@ -3918,6 +3931,7 @@
 
   async function boot() {
     const wantSpace = location.hash === '#space'; // back link from cosmos/ (read before showScreen clears it)
+    const wantData = location.hash === '#data';   // back link from data-lab/
     try {
       // X2: lazy subject packs — only data/subjects/math.json (+ the active subject's pack) is fetched
       store = Storage.loadStore();
@@ -3942,6 +3956,7 @@
     renderLanding();
     showScreen('screen-landing');
     if (wantSpace) renderSpace();
+    else if (wantData) renderDataLab();
   }
 
   document.addEventListener('DOMContentLoaded', boot);

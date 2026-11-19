@@ -52,7 +52,7 @@
           <button type="button" class="btn btn-ghost btn-sm" data-nav="physics" title="Physics Lab — push, float, friction &amp; machine sims">⚛️ Physics</button>
           <button type="button" class="btn btn-ghost btn-sm" data-nav="arcade" title="Fact Arcade — 60-second fact sprints">⚡ Arcade</button>
           <button type="button" class="btn btn-ghost btn-sm" data-nav="space" title="Space Lab — solar system, launches, stars">🔭 Space</button>
-          <a class="btn btn-ghost btn-sm" href="data-lab/" title="Data Lab — PostgreSQL, SQL Server, SSIS &amp; Python">🗄️ Data Lab</a>
+          <button type="button" class="btn btn-ghost btn-sm" data-nav="data" title="Data Lab — PostgreSQL, SQL Server, SSIS &amp; Python">🗄️ Data Lab</button>
           <button type="button" class="btn btn-pink btn-sm" data-nav="progress">Progress</button>
         </nav>
       </div>
@@ -126,7 +126,7 @@
           <div class="lab-card" style="border-top-color:#4ECDC4;">
             <h3>🗄️ Data Lab</h3>
             <p>Beginner-to-Expert interactive coaching for PostgreSQL 18, SQL Server (T-SQL), SSIS &amp; Python ETL.</p>
-            <a class="btn btn-cyan btn-sm" href="data-lab/" id="btn-open-data-lab">Open Data Lab</a>
+            <button type="button" class="btn btn-cyan btn-sm" id="btn-open-data-lab">Open Data Lab</button>
           </div>
         </div>
       </div>
@@ -222,6 +222,21 @@
       <h2 class="panel-title">🔭 Space Lab <span class="hub-track">Physics · 3D labs</span></h2>
       <div class="unit-grid" id="space-grid"></div>
       <p class="privacy-note">Space Lab is a 3D view (WebGL). Distances and sizes are squeezed so everything fits on screen — schematic, not to scale. Works offline after you open each lab once.</p>
+    </section>
+
+    <!-- DATA LAB (v2.6.24: seamless in-app section hub mirroring Space Lab, deep-linking into data-lab/) -->
+    <section id="screen-data" class="screen">
+      <div class="comic-panel">
+        <div class="teacher-row">
+          <div class="cast-duo">
+            <div class="einstein-stage" id="data-einstein" style="width:120px;height:150px;"></div>
+          </div>
+          <div class="speech-wrap"><div class="speech-bubble" id="data-speech"></div></div>
+        </div>
+      </div>
+      <h2 class="panel-title">🗄️ Data Lab <span class="hub-track">PostgreSQL 18 · SQL Server · SSIS · Python</span></h2>
+      <div class="unit-grid" id="data-grid"></div>
+      <p class="privacy-note">Data Lab runs real PostgreSQL 18 (WASM) locally in your browser — no server or account needed. Progress stays on this device and works offline after your first visit.</p>
     </section>
 
     <!-- PROGRESS -->
@@ -371,6 +386,7 @@
   <script src="js/backup.js"></script>
   <script src="js/subjects.js"></script>
   <script src="js/space.js"></script>
+  <script src="js/datalab-catalog.js"></script>
   <script src="js/comicify.js"></script>
   <script src="js/einstein.js"></script>
   <script src="js/student.js"></script>

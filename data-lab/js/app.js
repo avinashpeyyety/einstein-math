@@ -732,6 +732,12 @@ document.addEventListener('DOMContentLoaded', () => {
     el.innerHTML = highlightCode(el.textContent);
   });
 
+  // Honor deep-link ?tab=academy|sql|pipe|pg|recon from Einstein Math #screen-data cards
+  const tabParam = new URLSearchParams(location.search).get('tab');
+  if (['academy', 'sql', 'pipe', 'pg', 'recon'].includes(tabParam)) {
+    switchTab(tabParam);
+  }
+
   document.getElementById('sql-editor').addEventListener('keydown', (e) => {
     if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
       e.preventDefault();

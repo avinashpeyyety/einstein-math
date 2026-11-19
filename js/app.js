@@ -226,6 +226,20 @@
     renderHub();
   }
 
+  function updateActiveNav(screenId) {
+    const activeScreen = screenId || ($('.screen.active') && $('.screen.active').id) || 'screen-landing';
+    const sub = activeSubjectId();
+    let activeKey = '';
+    if (activeScreen === 'screen-landing') activeKey = 'landing';
+    else if (activeScreen === 'screen-hub' || activeScreen === 'screen-lesson' || activeScreen === 'screen-diagnostic' || activeScreen === 'screen-diag-result') activeKey = sub;
+    else if (activeScreen === 'screen-arcade') activeKey = 'arcade';
+    else if (activeScreen === 'screen-space') activeKey = 'space';
+    else if (activeScreen === 'screen-progress') activeKey = 'progress';
+    $$('.nav-btns [data-nav]').forEach(btn => {
+      btn.classList.toggle('nav-active', btn.dataset.nav === activeKey);
+    });
+  }
+
   function showScreen(id) {
     if (id !== 'screen-arcade') stopArcadeTimer();
     $$('.screen').forEach(s => s.classList.remove('active'));
@@ -235,6 +249,7 @@
     window.scrollTo({ top: 0, behavior: 'smooth' });
     updateHeaderUser();
     updateSubjectChip();
+    updateActiveNav(id);
   }
 
   function updateHeaderUser() {
@@ -2340,6 +2355,8 @@
     }
     syncProgressFromStore();
     const track = activeTrack();
+    const hubTitle = $('#hub-subject-title');
+    if (hubTitle) hubTitle.textContent = activeSubjectId() === 'physics' ? '⚛️ Physics Lab' : '🔢 Math Lab';
     showScreen('screen-hub');
     if (!track) {
       const sub = Subjects.get(activeSubjectId());
@@ -2702,6 +2719,11 @@
     const track = activeTrack() || { label: (ageTracks()[activeTrackId()] || {}).label || '', lessons: {}, units: [] };
     const sub = Subjects.get(activeSubjectId());
     showScreen('screen-progress');
+    $$('[data-progress-subject]').forEach(btn => {
+      const isAct = btn.dataset.progressSubject === activeSubjectId();
+      btn.classList.toggle('active', isAct);
+      btn.setAttribute('aria-pressed', isAct ? 'true' : 'false');
+    });
     const allIds = Object.keys(track.lessons);
     const done = allIds.filter(id => progress.lessons[id]?.status === 'done').length;
     const pct = allIds.length ? Math.round((done / allIds.length) * 100) : 0;
@@ -3510,7 +3532,7 @@
 
   /** X3: switch the active subject — loads its pack on first use (X2), then progress / Today's path / summary
    *  read and write `<subject>:<track>`. The choice persists in prefs.activeSubject. */
-  async function switchSubject(id) {
+  async function switchSubject(id, opts) {
     if (!Subjects.isSelectable(id)) return false;
     try {
       curriculum = Subjects.isPackLoaded(curriculum, id)
@@ -3524,10 +3546,21 @@
     store = Storage.loadStore();
     syncProgressFromStore();
     updateSubjectChip();
-    if ($('#screen-progress')?.classList.contains('active')) renderProgress();
+    if (opts && opts.openHub) renderHub();
+    else if ($('#screen-progress')?.classList.contains('active')) renderProgress();
     else if ($('#screen-hub')?.classList.contains('active')) renderHub();
     else { showScreen('screen-landing'); renderLanding(); }
     return true;
+  }
+
+  function openSubjectLab(subjectId) {
+    requireUserThen(async () => {
+      if (activeSubjectId() !== subjectId || !Subjects.isPackLoaded(curriculum, subjectId)) {
+        await switchSubject(subjectId, { openHub: true });
+      } else {
+        renderHub();
+      }
+    });
   }
 
   function openSubjectModal() {
@@ -3747,11 +3780,19 @@
     $('#btn-parent-json')?.addEventListener('click', () => downloadParentJson());
 
     $('#btn-diag-to-hub')?.addEventListener('click', () => requireUserThen(renderHub));
+    $('#btn-open-math')?.addEventListener('click', () => openSubjectLab('math'));
+    $('#btn-open-physics')?.addEventListener('click', () => openSubjectLab('physics'));
+    $('#btn-open-arcade')?.addEventListener('click', () => requireUserThen(renderArcade));
     $('#btn-open-space')?.addEventListener('click', () => renderSpace());
+    $$('[data-progress-subject]').forEach(btn => {
+      btn.addEventListener('click', () => switchSubject(btn.dataset.progressSubject));
+    });
     $$('[data-nav]').forEach(btn => {
       btn.addEventListener('click', () => {
         const t = btn.dataset.nav;
         if (t === 'landing') { showScreen('screen-landing'); renderLanding(); }
+        else if (t === 'math') openSubjectLab('math');
+        else if (t === 'physics') openSubjectLab('physics');
         else if (t === 'hub') requireUserThen(renderHub);
         else if (t === 'progress') requireUserThen(renderProgress);
         else if (t === 'space') renderSpace();

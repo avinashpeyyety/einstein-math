@@ -1230,3 +1230,53 @@ a.unit-card.space-card:focus-visible { outline: 4px solid #7C5CFF; outline-offse
 .space-list a.badge.space-go { text-decoration: none; }
 .space-list .space-soon { opacity: 0.7; }
 .space-teaser { border-color: #7C5CFF; }
+
+/* Unified Labs Grid & Section Nav Highlight */
+.labs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 0.9rem;
+  margin-top: 0.5rem;
+}
+.lab-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  background: var(--paper);
+  border: 3px solid var(--ink);
+  border-top-width: 8px;
+  border-radius: 8px;
+  padding: 0.9rem 1rem;
+  box-shadow: 3px 3px 0 var(--ink);
+}
+.lab-card h3 {
+  font-size: 1.3rem;
+  margin: 0;
+}
+.lab-card p {
+  font-size: 0.88rem;
+  margin: 0;
+  flex: 1;
+}
+.lab-card .btn {
+  align-self: flex-start;
+  margin-top: 0.3rem;
+  text-decoration: none;
+}
+.nav-btns .btn.nav-active {
+  background: var(--burst-yellow);
+  color: var(--ink);
+  border-color: var(--ink);
+  box-shadow: 2px 2px 0 var(--ink);
+}
+.progress-subject-tabs {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.85rem;
+}
+.progress-subject-tabs .btn.active {
+  background: var(--burst-cyan);
+  color: var(--ink);
+  box-shadow: 2px 2px 0 var(--ink);
+}

@@ -1,5 +1,5 @@
 /* Einstein Math service worker — caches app shell + curriculum + panels for offline play */
-const CACHE = 'einstein-math-v2.6.22';
+const CACHE = 'einstein-math-v2.6.23';
 // W1b: on-device comic-avatar model (~40 MB) is cached on first use only, and kept across app versions
 const MODEL_CACHE = 'einstein-math-models-v1';
 // X2: subject packs (data/subjects/<id>.json). math is precached (default subject, offline after first visit);
@@ -60,24 +60,24 @@ self.addEventListener('fetch', (event) => {
   const isNav = req.mode === 'navigate' || (req.headers.get('accept') || '').includes('text/html');
   // v2.5.0+: Standalone portal pages (cosmos/, data-lab/) are their own HTML documents — cache them under their own path
   // (query stripped, so ?mode= deep links share one entry) and never let them overwrite the app shell's ./index.html.
-  const isPortal = url.pathname.includes('/cosmos/') || url.pathname.includes('/data-lab/');
+  const isSpace = url.pathname.includes('/cosmos/') || url.pathname.includes('/data-lab/');
   if (isNav) {
-    const portalKey = isPortal ? new Request(url.origin + url.pathname) : null;
+    const spaceKey = isSpace ? new Request(url.origin + url.pathname) : null;
     event.respondWith(
       fetch(req)
         .then((res) => {
           const copy = res.clone();
-          if (res && res.ok) caches.open(CACHE).then((c) => c.put(isPortal ? portalKey : './index.html', copy));
+          if (res && res.ok) caches.open(CACHE).then((c) => c.put(isSpace ? spaceKey : './index.html', copy));
           return res;
         })
-        .catch(() => (isPortal ? caches.match(portalKey) : caches.match('./index.html')))
+        .catch(() => (isSpace ? caches.match(spaceKey) : caches.match('./index.html')))
     );
     return;
   }
 
   // Standalone portal assets (cosmos/*, data-lab/*) + vendored Three.js / PGlite WASM are lazy like the sims —
   // not precached; cache-first in this version's cache on first use, replaced on the next version.
-  if (isPortal || url.pathname.includes('/vendor/three/') || url.pathname.includes('/vendor/pglite/')) {
+  if (isSpace || url.pathname.includes('/vendor/three/') || url.pathname.includes('/vendor/pglite/')) {
     event.respondWith(
       caches.open(CACHE).then((c) => c.match(req).then((hit) => hit || fetch(req).then((res) => {
         if (res && res.ok) c.put(req, res.clone());

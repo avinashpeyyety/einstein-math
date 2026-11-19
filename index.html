@@ -33,10 +33,6 @@
     <header class="top-bar">
       <div class="logo" title="Home">Einstein <span>Math</span></div>
       <div class="top-bar-right">
-        <button type="button" class="subject-chip" id="btn-subject-chip" title="Switch subject">
-          <span class="subject-chip-label" id="subject-chip-label">Math</span>
-          <span class="muted subject-chip-hint">subject</span>
-        </button>
         <button type="button" class="btn btn-ghost btn-sm speech-toggle" id="btn-speech-toggle" title="Read Einstein aloud">
           🔇 Read aloud
         </button>
@@ -52,11 +48,12 @@
         </button>
         <nav class="nav-btns">
           <button type="button" class="btn btn-ghost btn-sm" data-nav="landing">Home</button>
-          <button type="button" class="btn btn-cyan btn-sm" data-nav="hub">Mission Map</button>
-          <button type="button" class="btn btn-pink btn-sm" data-nav="progress">Progress</button>
+          <button type="button" class="btn btn-ghost btn-sm" data-nav="math" title="Math Lab — cosmic math lessons &amp; mission map">🔢 Math</button>
+          <button type="button" class="btn btn-ghost btn-sm" data-nav="physics" title="Physics Lab — push, float, friction &amp; machine sims">⚛️ Physics</button>
           <button type="button" class="btn btn-ghost btn-sm" data-nav="arcade" title="Fact Arcade — 60-second fact sprints">⚡ Arcade</button>
           <button type="button" class="btn btn-ghost btn-sm" data-nav="space" title="Space Lab — solar system, launches, stars">🔭 Space</button>
-          <a class="btn btn-ghost btn-sm" href="data-lab/" title="Data Lab — PostgreSQL, SQL Server, SSIS &amp; Python ETL">🗄️ Data Lab</a>
+          <a class="btn btn-ghost btn-sm" href="data-lab/" title="Data Lab — PostgreSQL, SQL Server, SSIS &amp; Python">🗄️ Data Lab</a>
+          <button type="button" class="btn btn-pink btn-sm" data-nav="progress">Progress</button>
         </nav>
       </div>
     </header>
@@ -103,16 +100,35 @@
         <p class="privacy-note">Profiles &amp; progress stay on this device only (localStorage) — no accounts, no passwords, no cloud sync. Rename, upload or clear a comic photo, or delete from each Home card; optional photo on Create / + New Explorer (comicified on-device). Use Parent / Progress export &amp; import to hand off between devices. Progress also has <strong>Remove All Explorers</strong> (double confirm).</p>
       </div>
 
-      <div class="comic-panel space-teaser">
-        <h2 class="panel-title">🔭 Space Lab</h2>
-        <p>Fly through the solar system, launch historic rockets from real launch sites, circle Earth with the ISS, and watch a star live and die — Einstein's 3D space lab.</p>
-        <button type="button" class="btn btn-cyan" id="btn-open-space">Open Space Lab</button>
-      </div>
-
-      <div class="comic-panel space-teaser">
-        <h2 class="panel-title">🗄️ Data Engineering Academy</h2>
-        <p>Complete Beginner-to-Expert interactive coaching for PostgreSQL, SQL Server (T-SQL), SSIS &amp; Python — 16 guided lessons, live SQL playground, dialect translator, animated ETL studio, and partition pruning lab.</p>
-        <a class="btn btn-cyan" href="data-lab/" id="btn-open-data-lab">Open Data Lab</a>
+      <div class="comic-panel labs-hub-panel">
+        <h2 class="panel-title">🧪 Explore Einstein&rsquo;s Labs</h2>
+        <div class="labs-grid">
+          <div class="lab-card" style="border-top-color:#FF6B35;">
+            <h3>🔢 Math Lab</h3>
+            <p>125 playable missions across ages 5–12: counting, fractions, decimals, geometry, ratios &amp; equations.</p>
+            <button type="button" class="btn btn-primary btn-sm" id="btn-open-math">Open Math Lab</button>
+          </div>
+          <div class="lab-card" style="border-top-color:#A78BFA;">
+            <h3>⚛️ Physics Lab</h3>
+            <p>Interactive canvas sims: push &amp; pull carts, sink-or-float tanks, friction ramps, levers &amp; pulleys.</p>
+            <button type="button" class="btn btn-cyan btn-sm" id="btn-open-physics">Open Physics Lab</button>
+          </div>
+          <div class="lab-card" style="border-top-color:#FFE66D;">
+            <h3>⚡ Fact Arcade</h3>
+            <p>60-second arithmetic sprints with combo streaks, instant feedback, and personal bests.</p>
+            <button type="button" class="btn btn-cyan btn-sm" id="btn-open-arcade">Open Fact Arcade</button>
+          </div>
+          <div class="lab-card" style="border-top-color:#7C5CFF;">
+            <h3>🔭 Space Lab</h3>
+            <p>3D solar system, historic rocket liftoffs, Falcon 9 &amp; Starship catches, ISS orbit &amp; star lifecycles.</p>
+            <button type="button" class="btn btn-cyan btn-sm" id="btn-open-space">Open Space Lab</button>
+          </div>
+          <div class="lab-card" style="border-top-color:#4ECDC4;">
+            <h3>🗄️ Data Lab</h3>
+            <p>Beginner-to-Expert interactive coaching for PostgreSQL 18, SQL Server (T-SQL), SSIS &amp; Python ETL.</p>
+            <a class="btn btn-cyan btn-sm" href="data-lab/" id="btn-open-data-lab">Open Data Lab</a>
+          </div>
+        </div>
       </div>
 
       <div class="comic-panel">
@@ -174,7 +190,7 @@
         </div>
       </div>
       <div class="todays-path comic-panel" id="hub-todays-path"></div>
-      <h2 class="panel-title">Mission Map <span class="hub-track" id="hub-track-label"></span></h2>
+      <h2 class="panel-title"><span id="hub-subject-title">🔢 Math Lab</span> <span class="hub-track" id="hub-track-label"></span></h2>
       <div class="comic-panel review-panel hidden" id="review-due-panel"></div>
       <div class="unit-grid" id="unit-grid"></div>
     </section>
@@ -219,6 +235,10 @@
           <div class="speech-wrap"><div class="speech-bubble" id="progress-speech"></div></div>
         </div>
         <h2 class="panel-title">Adventure Log</h2>
+        <div class="progress-subject-tabs" id="progress-subject-tabs">
+          <button type="button" class="btn btn-sm" data-progress-subject="math">🔢 Math Lab</button>
+          <button type="button" class="btn btn-sm" data-progress-subject="physics">⚛️ Physics Lab</button>
+        </div>
         <p id="progress-profile-line" style="font-weight:700;margin-bottom:0.75rem;"></p>
         <div class="stat-row">
           <div class="stat-box"><div class="num" id="stat-stars">0</div><div class="label">Stars</div></div>

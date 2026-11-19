@@ -3,9 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#080d1a" />
+  <meta name="theme-color" content="#050811" />
   <title>Data Lab · Beginner to Expert PostgreSQL, SQL Server, SSIS &amp; Python — Einstein Math</title>
   <link rel="icon" href="../assets/icons/icon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/datalab.css" />
 </head>
 <body>
@@ -15,9 +18,12 @@
     <header class="hud-top">
       <div class="brand-left">
         <a class="em-back" href="../" title="Back to Einstein Math">← Einstein Math</a>
-        <div class="brand-title">
-          <h1>🗄️ Data Engineering Academy <span class="em-tag">Beginner → Expert</span></h1>
-          <p class="brand-sub">Complete interactive coaching for PostgreSQL, SQL Server (T-SQL), SSIS &amp; Python Data Engineering</p>
+        <div class="einstein-coach">
+          <img id="einstein-avatar" class="einstein-avatar" src="../assets/panels/explain.png" alt="Einstein Coach" />
+          <div class="brand-title">
+            <h1>Data Engineering Academy <span class="em-tag">Beginner → Expert</span></h1>
+            <p id="einstein-Tip" class="brand-sub">Interactive coaching for PostgreSQL 18, SQL Server (T-SQL), SSIS &amp; Python Data Engineering</p>
+          </div>
         </div>
       </div>
       <div class="hud-right">
@@ -30,13 +36,23 @@
       </div>
     </header>
 
-    <!-- Navigation Tabs -->
+    <!-- Segmented Pill Navigation Tabs -->
     <nav class="tab-bar" role="tablist">
-      <button type="button" id="tab-academy" class="tab-btn active" onclick="switchTab('academy')">1. Coaching Tracks (Beginner → Expert)</button>
-      <button type="button" id="tab-sql" class="tab-btn" onclick="switchTab('sql')">2. Live SQL Playground (Postgres ↔ T-SQL)</button>
-      <button type="button" id="tab-pipe" class="tab-btn" onclick="switchTab('pipe')">3. ETL Pipeline Studio (SSIS &amp; Python)</button>
-      <button type="button" id="tab-pg" class="tab-btn" onclick="switchTab('pg')">4. Postgres Internals (Partitions &amp; COPY)</button>
-      <button type="button" id="tab-recon" class="tab-btn" onclick="switchTab('recon')">5. Production Debugging Lab</button>
+      <button type="button" id="tab-academy" class="tab-btn active" onclick="switchTab('academy')">
+        <span class="tab-num">1</span><span>Coaching Tracks</span>
+      </button>
+      <button type="button" id="tab-sql" class="tab-btn" onclick="switchTab('sql')">
+        <span class="tab-num">2</span><span>Live Postgres 18 Lab</span>
+      </button>
+      <button type="button" id="tab-pipe" class="tab-btn" onclick="switchTab('pipe')">
+        <span class="tab-num">3</span><span>ETL Pipeline Studio</span>
+      </button>
+      <button type="button" id="tab-pg" class="tab-btn" onclick="switchTab('pg')">
+        <span class="tab-num">4</span><span>Partitions &amp; COPY</span>
+      </button>
+      <button type="button" id="tab-recon" class="tab-btn" onclick="switchTab('recon')">
+        <span class="tab-num">5</span><span>Debugging Lab</span>
+      </button>
     </nav>
 
     <!-- ============================================================
@@ -54,10 +70,10 @@
     </section>
 
     <!-- ============================================================
-         TAB 2: LIVE SQL PLAYGROUND (POSTGRES <-> T-SQL)
+         TAB 2: LIVE SQL PLAYGROUND (REAL POSTGRESQL 18 WASM)
     ============================================================ -->
     <section id="panel-sql" class="tab-panel hidden stack">
-      <div class="card row-between" style="padding:12px 16px;">
+      <div class="card row-between" style="padding:12px 18px;">
         <div class="row">
           <span id="pg-engine-badge" class="badge badge-warn">⏳ Click Tab 2 or "Try in Postgres" to boot PostgreSQL 18 (WASM)…</span>
           <span id="pg-exec-time" class="muted mono"></span>
@@ -67,19 +83,22 @@
         </div>
       </div>
 
-      <div class="grid-2" style="grid-template-columns: minmax(270px, 1fr) minmax(380px, 2fr);">
+      <div class="grid-2" style="grid-template-columns: minmax(275px, 1fr) minmax(400px, 2.1fr);">
         <div class="stack">
           <div class="card stack-sm">
             <div class="row-between">
               <h3>13 Real PostgreSQL Labs</h3>
-              <span class="muted">Beginner → Expert</span>
+              <span class="badge badge-pg">Beginner → Expert</span>
             </div>
             <p class="muted">Graded against real PostgreSQL 18 result sets &amp; <code class="mono">EXPLAIN</code> plans.</p>
-            <div id="sql-challenge-list" class="stack-sm" style="max-height:340px;overflow-y:auto;padding-right:4px;"></div>
+            <div id="sql-challenge-list" class="stack-sm" style="max-height:360px;overflow-y:auto;padding-right:4px;"></div>
           </div>
 
           <div class="card stack-sm">
-            <h3>Live PostgreSQL Schema</h3>
+            <div class="row-between">
+              <h3>Live PostgreSQL Schema</h3>
+              <span class="muted">Click to query</span>
+            </div>
             <div id="pg-schema-list" class="stack-sm text-xs">
               <div class="muted">Schema loads when PostgreSQL boots.</div>
             </div>
@@ -96,7 +115,16 @@
           </div>
           <p id="sql-chal-prompt" class="text-xs"></p>
 
-          <textarea id="sql-editor" class="sql-editor" spellcheck="false"></textarea>
+          <div class="code-window">
+            <div class="code-window-bar">
+              <div class="row">
+                <span class="window-dots"><span></span><span></span><span></span></span>
+                <span class="mono">query.sql · PostgreSQL 18 (WASM)</span>
+              </div>
+              <span class="mono">⌘/Ctrl + Enter</span>
+            </div>
+            <textarea id="sql-editor" class="sql-editor" style="border:none;border-radius:0;" spellcheck="false"></textarea>
+          </div>
 
           <div class="row-between">
             <div class="row">
@@ -105,7 +133,7 @@
               <button type="button" class="btn" onclick="showSQLHint()">💡 Hint</button>
               <button type="button" class="btn" onclick="fillSQLSolution()">✓ Solution</button>
             </div>
-            <span class="muted">Cmd/Ctrl+Enter to Run &amp; Grade</span>
+            <span class="muted">Transactions auto-rollback after grading</span>
           </div>
 
           <div id="sql-hint-box" class="subcard muted hidden"></div>
@@ -184,15 +212,26 @@
         </div>
 
         <div class="stack-sm">
-          <div class="muted" style="font-weight:600;">Execution Log</div>
-          <pre id="pipe-log" class="code-box">[READY] Select a pipeline and optional fault, then click Run Pipeline Simulation.</pre>
+          <div class="muted" style="font-weight:600;">Execution Console</div>
+          <div class="code-window">
+            <div class="code-window-bar">
+              <span class="window-dots"><span></span><span></span><span></span></span>
+              <span class="mono">etl-runner.log</span>
+            </div>
+            <pre id="pipe-log" class="code-box">[READY] Select a pipeline and optional fault, then click Run Pipeline Simulation.</pre>
+          </div>
         </div>
       </div>
 
       <div class="grid-2">
         <div class="card stack-sm">
           <h3>Defensive Python CSV Cleaner (<code class="mono">pandas</code>)</h3>
-          <pre class="code-box">import pandas as pd
+          <div class="code-window">
+            <div class="code-window-bar">
+              <span class="window-dots"><span></span><span></span><span></span></span>
+              <span class="mono">clean_vendor_csv.py</span>
+            </div>
+            <pre class="code-box" data-hl="py">import pandas as pd
 
 for enc in ("utf-8-sig", "cp1252", "latin1"):
     try:
@@ -205,10 +244,16 @@ df.columns = [c.strip().lower().replace(" ", "_") for c in df.columns]
 df["sku"] = df["sku"].str.strip().str.upper()
 df = df.drop_duplicates(subset=["sku"], keep="last")
 df.to_csv(staged_csv, index=False, encoding="utf-8")</pre>
+          </div>
         </div>
         <div class="card stack-sm">
           <h3>High-Throughput PostgreSQL Bulk Loader (<code class="mono">psycopg2 COPY</code>)</h3>
-          <pre class="code-box">import io
+          <div class="code-window">
+            <div class="code-window-bar">
+              <span class="window-dots"><span></span><span></span><span></span></span>
+              <span class="mono">pg_copy_stream.py</span>
+            </div>
+            <pre class="code-box" data-hl="py">import io
 
 buf = io.StringIO()
 df.to_csv(buf, index=False, header=False, sep="\t", na_rep="\\N")
@@ -220,6 +265,7 @@ with pg_conn.cursor() as cur:
         buf
     )
 pg_conn.commit()</pre>
+          </div>
         </div>
       </div>
     </section>
@@ -255,14 +301,20 @@ pg_conn.commit()</pre>
         <div id="pg-part-grid" class="partition-grid"></div>
 
         <div class="grid-3">
-          <div class="subcard"><div class="muted">Partitions Scanned</div><div id="pg-parts-scanned" class="mono tabular" style="font-size:15px;font-weight:700;">—</div></div>
-          <div class="subcard"><div class="muted">Est. Rows Touched</div><div id="pg-rows-scanned" class="mono tabular" style="font-size:15px;font-weight:700;">—</div></div>
-          <div class="subcard"><div class="muted">Est. Query Latency</div><div id="pg-latency" class="mono tabular" style="font-size:15px;font-weight:700;">—</div></div>
+          <div class="subcard"><div class="muted">Partitions Scanned</div><div id="pg-parts-scanned" class="mono tabular" style="font-size:16px;font-weight:700;">—</div></div>
+          <div class="subcard"><div class="muted">Est. Rows Touched</div><div id="pg-rows-scanned" class="mono tabular" style="font-size:16px;font-weight:700;">—</div></div>
+          <div class="subcard"><div class="muted">Est. Query Latency</div><div id="pg-latency" class="mono tabular" style="font-size:16px;font-weight:700;">—</div></div>
         </div>
 
         <div class="stack-sm">
           <div class="muted" style="font-weight:600;">Simulated PostgreSQL <code class="mono">EXPLAIN (ANALYZE, BUFFERS)</code></div>
-          <pre id="pg-explain" class="code-box"></pre>
+          <div class="code-window">
+            <div class="code-window-bar">
+              <span class="window-dots"><span></span><span></span><span></span></span>
+              <span class="mono">EXPLAIN (ANALYZE, BUFFERS)</span>
+            </div>
+            <pre id="pg-explain" class="code-box"></pre>
+          </div>
         </div>
       </div>
 
@@ -272,7 +324,7 @@ pg_conn.commit()</pre>
             <h3>Bulk-Load Throughput Optimizer (50M Rows: 14.0h → 2.5h)</h3>
             <p class="muted">Toggle PostgreSQL bulk-loading techniques to see how each optimization cuts historical load time.</p>
           </div>
-          <div id="backfill-total" class="subcard mono tabular" style="font-size:15px;font-weight:700;color:var(--warning);">14.0 hrs</div>
+          <div id="backfill-total" class="subcard mono tabular" style="font-size:16px;font-weight:700;color:var(--warning);">14.0 hrs</div>
         </div>
         <div class="grid-3 text-xs">
           <label class="subcard row" style="align-items:flex-start;cursor:pointer;">

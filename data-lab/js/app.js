@@ -1,4 +1,4 @@
-/* Data Engineering Academy — Beginner to Expert Interactive Controller (with Real PostgreSQL 18 WASM) */
+/* Data Engineering Academy — Beginner to Expert Interactive Controller (with Real PostgreSQL 18 WASM & High-Craft UI) */
 const STORAGE_KEY = 'einstein-data-academy-v2';
 
 const state = {
@@ -11,7 +11,15 @@ const state = {
   theme: 'dark'
 };
 
+const TRACK_COLORS = {
+  postgres: '#a78bfa',
+  sqlserver: '#38bdf8',
+  ssis: '#34d399',
+  python: '#fbbf24'
+};
+
 let pgBootPromise = null;
+let lastRenderedCode = '';
 
 function loadState() {
   try {
@@ -38,6 +46,45 @@ function toggleTheme() {
 
 function esc(str) {
   return String(str).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+function setEinsteinMood(mood, tipText) {
+  const img = document.getElementById('einstein-avatar');
+  const tip = document.getElementById('einstein-Tip');
+  if (img) {
+    const valid = ['explain', 'cheer', 'think', 'idle'].includes(mood) ? mood : 'explain';
+    img.src = `../assets/panels/${valid}.png`;
+    img.style.borderColor = valid === 'cheer' ? 'var(--success)' : (valid === 'think' ? 'var(--warning)' : 'var(--orange)');
+  }
+  if (tip && tipText) tip.textContent = tipText;
+}
+
+/* Lightweight zero-dependency SQL/Python syntax highlighter (safe HTML output) */
+function highlightCode(raw) {
+  const tokenRe = /(--[^\n]*|#[^\n]*)|('(?:''|[^'])*'|"(?:\\"|[^"])*")|\b(SELECT|FROM|WHERE|JOIN|LEFT|INNER|RIGHT|ON|GROUP|BY|ORDER|HAVING|LIMIT|TOP|WITH|RECURSIVE|UNION|ALL|AS|INSERT|INTO|VALUES|UPDATE|SET|DELETE|MERGE|USING|WHEN|MATCHED|THEN|NOT|CONFLICT|DO|EXCLUDED|RETURNING|CREATE|OR|ALTER|TABLE|INDEX|NONCLUSTERED|CLUSTERED|COLUMNSTORE|PROCEDURE|PARTITION|RANGE|FOR|TO|PRIMARY|KEY|UNIQUE|CHECK|DEFAULT|GENERATED|ALWAYS|IDENTITY|EXPLAIN|ANALYZE|BUFFERS|COSTS|OFF|BEGIN|TRAN|COMMIT|ROLLBACK|AND|OR|IN|EXISTS|CASE|END|OVER|DESC|ASC|NULL|TRUE|FALSE|import|from|def|for|in|try|except|continue|break|return|if|raise)\b|\b(COUNT|SUM|MAX|MIN|AVG|ABS|COALESCE|ISNULL|ROW_NUMBER|NOW|GETDATE|SYSDATETIME|SYSUTCDATETIME|CURRENT_DATE|CURRENT_TIMESTAMP|DATEADD|EXTRACT|LOWER|UPPER|CAST|CONVERT|FORMAT|INTERVAL|TIMESTAMPTZ|NUMERIC|INT|BIGINT|TEXT|DATE|BOOLEAN|VARCHAR|DATETIME2)\b|\b(\d+(?:\.\d+)?)\b/gi;
+  let out = '';
+  let last = 0;
+  let m;
+  while ((m = tokenRe.exec(raw)) !== null) {
+    out += esc(raw.slice(last, m.index));
+    if (m[1]) out += `<span class="tok-cmt">${esc(m[1])}</span>`;
+    else if (m[2]) out += `<span class="tok-str">${esc(m[2])}</span>`;
+    else if (m[3]) out += `<span class="tok-kw">${esc(m[3])}</span>`;
+    else if (m[4]) out += `<span class="tok-fn">${esc(m[4])}</span>`;
+    else if (m[5]) out += `<span class="tok-num">${esc(m[5])}</span>`;
+    last = tokenRe.lastIndex;
+  }
+  out += esc(raw.slice(last));
+  return out;
+}
+
+function copyActiveLessonCode(btn) {
+  if (!navigator.clipboard) return;
+  navigator.clipboard.writeText(lastRenderedCode).then(() => {
+    const old = btn.textContent;
+    btn.textContent = '✓ Copied';
+    setTimeout(() => { btn.textContent = old; }, 1200);
+  });
 }
 
 function renderPgResultHtml(res) {
@@ -102,6 +149,7 @@ async function ensurePgBoot() {
       const ver = await PgLab.init(mod.PGlite);
       badge.className = 'badge badge-ok';
       badge.textContent = `✓ ${ver} Live (In-Browser WASM)`;
+      setEinsteinMood('explain', `${ver} booted in your browser! Run any query or tackle the 13 progressive labs.`);
       await renderPgSchema();
       return ver;
     } catch (err) {
@@ -156,12 +204,13 @@ function renderTrackCards() {
   container.innerHTML = DataLabCurriculum.TRACKS.map(t => {
     const done = t.modules.filter(m => state.lessonsMastered[m.id]).length;
     const active = t.id === state.activeTrack;
-    return `<button type="button" onclick="selectTrack('${t.id}')" class="choice-btn ${active ? 'active' : ''}" style="padding:14px;">
-      <div class="row-between" style="margin-bottom:6px;">
-        <span style="font-size:15px;font-weight:700;">${t.icon} ${esc(t.name)}</span>
-        <span class="badge ${done === t.modules.length ? 'badge-ok' : t.badge}">${done}/${t.modules.length}</span>
+    const color = TRACK_COLORS[t.id] || 'var(--primary)';
+    return `<button type="button" onclick="selectTrack('${t.id}')" class="track-card ${active ? 'active' : ''}" style="--track-color:${color};">
+      <div class="row-between" style="margin-bottom:7px;">
+        <span style="font-size:15.5px;font-weight:700;">${t.icon} ${esc(t.name)}</span>
+        <span class="badge ${done === t.modules.length ? 'badge-ok' : t.badge}">${done}/${t.modules.length} Mastered</span>
       </div>
-      <div class="muted" style="line-height:1.4;">${esc(t.tagline)}</div>
+      <div class="muted" style="line-height:1.45;">${esc(t.tagline)}</div>
     </button>`;
   }).join('');
 }
@@ -194,17 +243,18 @@ async function tryLessonInPostgres(modId) {
 function renderModuleView() {
   const track = DataLabCurriculum.TRACKS.find(t => t.id === state.activeTrack) || DataLabCurriculum.TRACKS[0];
   const mod = track.modules[state.activeModuleIdx] || track.modules[0];
+  lastRenderedCode = mod.code;
 
   const stepper = document.getElementById('level-stepper');
   stepper.innerHTML = track.modules.map((m, idx) => {
     const done = !!state.lessonsMastered[m.id];
     const active = idx === state.activeModuleIdx;
-    return `<button type="button" onclick="selectModule(${idx})" class="choice-btn ${active ? 'active' : ''}" style="padding:10px 12px;">
+    return `<button type="button" onclick="selectModule(${idx})" class="level-pill-card ${active ? 'active' : ''}">
       <div class="row-between">
-        <span class="text-xs" style="font-weight:700;color:${active ? 'var(--primary)' : 'var(--text)'};">${esc(m.level)}</span>
-        <span class="badge ${done ? 'badge-ok' : ''}">${done ? '✓' : (idx + 1)}</span>
+        <span class="text-xs" style="font-weight:700;color:${active ? 'var(--primary)' : 'var(--text)'};">LVL ${idx + 1} · ${esc(m.level)}</span>
+        <span class="badge ${done ? 'badge-ok' : ''}">${done ? '✓ Done' : `Step ${idx + 1}`}</span>
       </div>
-      <div class="muted" style="margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(m.title)}</div>
+      <div class="muted" style="margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(m.title)}</div>
     </button>`;
   }).join('');
 
@@ -220,24 +270,30 @@ function renderModuleView() {
           <span class="badge ${done ? 'badge-ok' : 'badge-warn'}">${done ? '✓ Mastered' : 'In Progress'}</span>
         </div>
         <h2>${esc(mod.title)}</h2>
-        <p class="text-xs" style="line-height:1.65;">${esc(mod.concept)}</p>
+        <p class="text-xs" style="line-height:1.68;">${esc(mod.concept)}</p>
         <div class="subcard">
-          <div class="text-xs" style="font-weight:700;color:var(--primary);margin-bottom:3px;">🧠 Mental Model</div>
+          <div class="text-xs" style="font-weight:700;color:var(--primary);margin-bottom:4px;">🧠 Mental Model</div>
           <div class="muted" style="color:var(--text);">${esc(mod.mentalModel)}</div>
         </div>
         <div class="subcard" style="border-color:rgba(251,191,36,0.45);">
-          <div class="text-xs" style="font-weight:700;color:var(--warning);margin-bottom:3px;">⚠️ Common Production Pitfall</div>
+          <div class="text-xs" style="font-weight:700;color:var(--warning);margin-bottom:4px;">⚠️ Common Production Pitfall</div>
           <div class="muted">${esc(mod.pitfall)}</div>
         </div>
       </div>
 
       <div class="stack">
-        <div class="stack-sm">
-          <div class="row-between">
-            <div class="muted" style="font-weight:600;">${esc(mod.codeLabel)}</div>
-            ${tryIt ? `<button type="button" class="btn btn-primary" onclick="tryLessonInPostgres('${mod.id}')">▶ ${esc(tryIt.label)}</button>` : ''}
+        <div class="code-window">
+          <div class="code-window-bar">
+            <div class="row">
+              <span class="window-dots"><span></span><span></span><span></span></span>
+              <span class="mono">${esc(mod.codeLabel)}</span>
+            </div>
+            <div class="row">
+              <button type="button" class="btn" style="padding:3px 9px;font-size:11px;" onclick="copyActiveLessonCode(this)">📋 Copy</button>
+              ${tryIt ? `<button type="button" class="btn btn-primary" style="padding:3px 10px;font-size:11px;" onclick="tryLessonInPostgres('${mod.id}')">▶ ${esc(tryIt.label)}</button>` : ''}
+            </div>
           </div>
-          <pre class="code-box">${esc(mod.code)}</pre>
+          <pre class="code-box">${highlightCode(mod.code)}</pre>
         </div>
 
         <div class="subcard stack-sm">
@@ -245,7 +301,7 @@ function renderModuleView() {
           <div class="stack-sm">
             ${mod.check.opts.map((o, oi) => `<button type="button" onclick="answerLessonCheck('${mod.id}', ${oi})" id="lc-${mod.id}-${oi}" class="choice-btn">${esc(o)}</button>`).join('')}
           </div>
-          <div id="lc-fb-${mod.id}" class="card text-xs hidden" style="padding:9px 11px;"></div>
+          <div id="lc-fb-${mod.id}" class="card text-xs hidden" style="padding:10px 12px;"></div>
           ${nextExists ? `<div class="row" style="justify-content:flex-end;margin-top:4px;"><button type="button" class="btn btn-primary" onclick="selectModule(${state.activeModuleIdx + 1})">Next Level (${esc(track.modules[state.activeModuleIdx + 1].level)}) →</button></div>` : ''}
         </div>
       </div>
@@ -274,8 +330,11 @@ function answerLessonCheck(modId, optIdx) {
 
   if (ok) {
     state.lessonsMastered[modId] = true;
+    setEinsteinMood('cheer', `Eureka! You mastered ${track.name} (${mod.level}): ${mod.title}.`);
     saveState();
     renderTrackCards();
+  } else {
+    setEinsteinMood('think', `Hmm — review the mental model and pitfall box for ${mod.title}, then try again!`);
   }
 }
 
@@ -330,6 +389,7 @@ async function runUserSQL() {
   fb.classList.remove('hidden');
   if (res.ok) {
     state.sqlSolved[c.id] = true;
+    setEinsteinMood('cheer', `Brilliant SQL! Lab #${state.activeChallenge + 1} (${c.title}) passed against real PostgreSQL 18 in ${ms} ms.`);
     saveState();
     renderChallengeList();
     fb.className = 'subcard text-xs';
@@ -337,6 +397,7 @@ async function runUserSQL() {
     fb.style.color = 'var(--success)';
     fb.textContent = res.message;
   } else {
+    setEinsteinMood('think', res.message);
     fb.className = 'subcard text-xs';
     fb.style.borderColor = res.error ? 'var(--error)' : 'var(--warning)';
     fb.style.color = res.error ? 'var(--error)' : 'var(--warning)';
@@ -449,6 +510,7 @@ function runPipelineSim() {
     if (step >= nodes.length) {
       clearInterval(pipeTimer);
       logEl.textContent += `[DONE] Pipeline completed cleanly! Target SLA met.\n`;
+      setEinsteinMood('cheer', 'Pipeline completed with 100% parity! All 5 ETL stages passed.');
       return;
     }
     const n = nodes[step];
@@ -465,6 +527,7 @@ function runPipelineSim() {
       el.classList.remove('running');
       if (failAt && !fixEnabled) {
         el.classList.add('fail');
+        setEinsteinMood('think', 'Pipeline halted on injected fault! Check the console log and toggle "Apply Production Fix".');
         if (fault === 'encoding') {
           stat.textContent = 'CRASH: UnicodeDecodeError';
           stat.style.color = 'var(--error)';
@@ -599,7 +662,7 @@ function renderRecon() {
         <h3>${esc(bug.title)}</h3>
         <span id="recon-b-${idx}" class="badge ${done ? 'badge-ok' : 'badge-warn'}">${done ? '✓ Resolved' : 'Open'}</span>
       </div>
-      <pre class="code-box" style="padding:9px 11px;">${esc(bug.evidence)}</pre>
+      <pre class="code-box" style="padding:9px 11px;">${highlightCode(bug.evidence)}</pre>
       <div class="grid-3">
         ${bug.options.map((o, oi) => `<button type="button" onclick="checkRecon(${idx}, ${oi})" class="choice-btn">${esc(o.text)}</button>`).join('')}
       </div>
@@ -621,7 +684,10 @@ function checkRecon(bi, oi) {
     const b = document.getElementById('recon-b-' + bi);
     b.textContent = '✓ Resolved';
     b.className = 'badge badge-ok';
+    setEinsteinMood('cheer', `Incident #${bi + 1} resolved! ${opt.msg}`);
     saveState();
+  } else {
+    setEinsteinMood('think', opt.msg);
   }
 }
 
@@ -651,6 +717,11 @@ document.addEventListener('DOMContentLoaded', () => {
   updateBackfill();
   renderRecon();
   updateXP();
+
+  // Syntax-highlight static code blocks
+  document.querySelectorAll('pre[data-hl]').forEach(el => {
+    el.innerHTML = highlightCode(el.textContent);
+  });
 
   document.getElementById('sql-editor').addEventListener('keydown', (e) => {
     if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {

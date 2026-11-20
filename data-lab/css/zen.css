@@ -1,0 +1,498 @@
+/* The River of Data — Zen Sketchbook & Taoist Focus UI (Einstein Math Data Lab)
+ * Principle: Ma (generous negative space), one calm truth at a time, warm sketchbook paper (#F4EEDF),
+ * sepia ink (#3A3631 / #6B4F3A), selective saffron (#E8892F), slate river blue (#4A6B82), sage (#6B8E63).
+ */
+:root {
+  --paper: #F4EEDF;
+  --surface: #FFFDF7;
+  --surface-soft: #EFE7D4;
+  --ink: #3A3631;
+  --sepia: #6B4F3A;
+  --muted: #786D5F;
+  --border: rgba(107, 79, 58, 0.22);
+  --border-strong: rgba(58, 54, 49, 0.45);
+  --saffron: #E8892F;
+  --saffron-soft: rgba(232, 137, 47, 0.14);
+  --river: #4A6B82;
+  --river-soft: rgba(74, 107, 130, 0.14);
+  --sage: #5E7D54;
+  --sage-soft: rgba(94, 125, 84, 0.14);
+  --warn: #C25E3E;
+  --code-bg: #231F2B;
+  --code-fg: #F7F1E5;
+  --radius: 16px;
+  --radius-sm: 10px;
+  --shadow: 0 12px 34px -14px rgba(58, 54, 49, 0.18);
+  --font-serif: Georgia, "Iowan Old Style", "Palatino Linotype", serif;
+  --font: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+html.dark {
+  --paper: #16131E;
+  --surface: #1F1B2B;
+  --surface-soft: #2A2438;
+  --ink: #EFE7D8;
+  --sepia: #CBB89D;
+  --muted: #A19589;
+  --border: rgba(239, 231, 216, 0.14);
+  --border-strong: rgba(239, 231, 216, 0.30);
+  --saffron: #F09843;
+  --saffron-soft: rgba(240, 152, 67, 0.16);
+  --river: #8DA3B8;
+  --river-soft: rgba(141, 163, 184, 0.16);
+  --sage: #89AD7D;
+  --sage-soft: rgba(137, 173, 125, 0.16);
+  --warn: #E87D64;
+  --code-bg: #110E18;
+  --code-fg: #F7F1E5;
+  --shadow: 0 18px 42px -14px rgba(0, 0, 0, 0.55);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body { margin: 0; padding: 0; min-height: 100%; }
+
+body {
+  background:
+    radial-gradient(ellipse 85% 40% at 50% 0%, rgba(141, 163, 184, 0.14), transparent 62%),
+    var(--paper);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: 15px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+.zen-shell {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 20px 18px 64px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* —— Minimal Serene Header —— */
+.zen-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.zen-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.back-link {
+  text-decoration: none;
+  color: var(--sepia);
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  transition: all 0.18s ease;
+}
+.back-link:hover { border-color: var(--saffron); color: var(--ink); }
+
+.brand-wordmark {
+  display: flex;
+  flex-direction: column;
+}
+.brand-wordmark h1 {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+.brand-wordmark span {
+  font-size: 11.5px;
+  color: var(--muted);
+}
+
+.zen-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+button {
+  font-family: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  border-radius: 999px;
+  transition: all 0.18s ease;
+}
+
+.pill-btn {
+  padding: 6px 13px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--ink);
+  font-weight: 500;
+}
+.pill-btn:hover { border-color: var(--sepia); background: var(--surface-soft); }
+
+.btn-saffron {
+  padding: 10px 22px;
+  border: 1px solid var(--saffron);
+  background: var(--saffron);
+  color: #fff;
+  font-weight: 600;
+  box-shadow: 0 6px 18px -6px rgba(232, 137, 47, 0.55);
+}
+.btn-saffron:hover { filter: brightness(1.06); transform: translateY(-1px); }
+
+.btn-quiet {
+  padding: 9px 18px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--ink);
+  font-weight: 600;
+}
+.btn-quiet:hover { border-color: var(--sepia); background: var(--surface-soft); }
+
+/* —— Living River World Panorama —— */
+.river-card {
+  position: relative;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+#zen-river-canvas {
+  display: block;
+  width: 100%;
+  height: 155px;
+}
+.river-caption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 9px 16px;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* —— Single-Focus Chapter Stage (Ma / Negative Space) —— */
+.focus-stage {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px 30px;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  animation: breathIn 0.35s ease;
+}
+
+@keyframes breathIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+
+.chapter-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.chapter-eyebrow {
+  font-size: 11.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--saffron);
+  font-weight: 700;
+}
+
+.chapter-title {
+  margin: 2px 0 0;
+  font-family: var(--font-serif);
+  font-size: 1.75rem;
+  font-weight: 500;
+  color: var(--ink);
+  line-height: 1.2;
+}
+
+.chapter-sub {
+  margin: 4px 0 0;
+  font-size: 13.5px;
+  color: var(--muted);
+}
+
+/* 4-Beat Stepper Dots */
+.beat-dots {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.beat-dot {
+  padding: 5px 12px;
+  font-size: 11.5px;
+  font-weight: 600;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+}
+.beat-dot.active {
+  background: var(--saffron-soft);
+  border-color: var(--saffron);
+  color: var(--saffron);
+}
+.beat-dot.done {
+  background: var(--sage-soft);
+  border-color: var(--sage);
+  color: var(--sage);
+}
+
+/* Beat 1: Motion Koan Canvas + Synced Captions */
+.koan-stage-wrap {
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: var(--paper);
+}
+#koan-stage-canvas {
+  display: block;
+  width: 100%;
+  height: 230px;
+}
+.koan-subtitle-bar {
+  padding: 14px 18px;
+  background: var(--surface-soft);
+  border-top: 1px solid var(--border);
+  font-family: var(--font-serif);
+  font-size: 1.05rem;
+  font-style: italic;
+  color: var(--ink);
+  text-align: center;
+  min-height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.progress-hairline {
+  height: 3px;
+  background: var(--border);
+  width: 100%;
+}
+.progress-hairline-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--saffron);
+  transition: width 0.12s linear;
+}
+
+/* Beat 2: Touch & Feel Sandbox */
+.touch-box {
+  background: var(--surface-soft);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.touch-toggle-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+}
+.touch-choice {
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  color: var(--ink);
+  text-align: left;
+  font-weight: 600;
+}
+.touch-choice.selected {
+  border-color: var(--saffron);
+  background: var(--saffron-soft);
+}
+.touch-readout {
+  padding: 14px 16px;
+  border-radius: 10px;
+  background: var(--surface);
+  border-left: 3px solid var(--river);
+  font-family: var(--mono);
+  font-size: 12.5px;
+}
+
+/* Beat 3: Speak the Spell (Real Postgres 18 / Python) */
+.sql-box {
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--border-strong);
+  background: var(--code-bg);
+}
+.sql-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: #c2b9cf;
+}
+textarea.zen-sql {
+  width: 100%;
+  min-height: 150px;
+  padding: 14px 16px;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--code-fg);
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 1.65;
+  resize: vertical;
+}
+pre.zen-code {
+  margin: 0;
+  padding: 14px 16px;
+  background: var(--code-bg);
+  color: var(--code-fg);
+  font-family: var(--mono);
+  font-size: 12.5px;
+  line-height: 1.6;
+  overflow-x: auto;
+  border-radius: 10px;
+}
+
+/* Beat 4: Rest & Koan */
+.koan-card {
+  text-align: center;
+  padding: 28px 22px;
+  border-radius: 14px;
+  background: radial-gradient(circle at 50% 0%, var(--saffron-soft), transparent 70%), var(--surface-soft);
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+.koan-quote {
+  font-family: var(--font-serif);
+  font-size: 1.5rem;
+  font-style: italic;
+  color: var(--ink);
+  max-width: 28em;
+  line-height: 1.45;
+  margin: 0;
+}
+
+/* Tables & Feedback */
+.table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); }
+table.zen-table { width: 100%; border-collapse: collapse; font-size: 12.5px; font-family: var(--mono); }
+table.zen-table th { text-align: left; padding: 8px 11px; background: var(--surface-soft); color: var(--sepia); border-bottom: 1px solid var(--border); font-family: var(--font); font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; }
+table.zen-table td { padding: 7px 11px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+table.zen-table tr:last-child td { border-bottom: none; }
+
+.zen-feedback {
+  padding: 11px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  border: 1px solid var(--border);
+  background: var(--surface-soft);
+}
+.zen-feedback.ok { border-color: var(--sage); background: var(--sage-soft); color: var(--sage); font-weight: 600; }
+.zen-feedback.warn { border-color: var(--warn); color: var(--warn); }
+
+/* Partition Grid in Ch VI */
+.part-mini-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(46px, 1fr));
+  gap: 4px;
+}
+.part-mini {
+  padding: 4px 2px;
+  border-radius: 5px;
+  text-align: center;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  background: var(--surface);
+}
+.part-mini.open { background: var(--saffron); color: #fff; border-color: var(--saffron); font-weight: 700; }
+.part-mini.scan { background: rgba(194, 94, 62, 0.22); border-color: var(--warn); color: var(--ink); }
+
+/* Quiet Drawers / Modals (World Map, Field Journal, Full SQL Studio) */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: rgba(22, 19, 30, 0.55);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+}
+.modal-sheet {
+  width: min(860px, 100%);
+  max-height: 86vh;
+  overflow-y: auto;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  padding: 24px;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.chapter-list-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 13px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--surface-soft);
+  color: var(--ink);
+  text-align: left;
+}
+.chapter-list-item:hover:not(:disabled) { border-color: var(--saffron); }
+.chapter-list-item.mist { opacity: 0.48; border-style: dashed; }
+.chapter-list-item.current { border-color: var(--saffron); background: var(--saffron-soft); }
+
+.row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.row-between { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.stack-sm { display: flex; flex-direction: column; gap: 8px; }
+.hidden { display: none !important; }
+.mono { font-family: var(--mono); }
+.muted { color: var(--muted); font-size: 12.5px; }
+
+@media (max-width: 640px) {
+  .focus-stage { padding: 20px 16px; }
+  .chapter-title { font-size: 1.4rem; }
+  #koan-stage-canvas { height: 190px; }
+}

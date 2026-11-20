@@ -3,446 +3,98 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#FFF8E7" />
-  <title>Data Lab · Beginner to Expert PostgreSQL, SQL Server, SSIS &amp; Python — Einstein Math</title>
+  <meta name="theme-color" content="#F4EEDF" />
+  <title>The River of Data · Zen Data Lab — Einstein Math</title>
   <link rel="icon" href="../assets/icons/icon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Bangers&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/datalab.css" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/zen.css" />
 </head>
 <body>
-  <div class="wrap">
+  <div class="zen-shell">
 
-    <!-- Top HUD -->
-    <header class="hud-top">
-      <div class="brand-left">
-        <a class="em-back" href="../#data" title="Back to Einstein Math Data Lab">← Einstein Math</a>
-        <div class="einstein-coach">
-          <img id="einstein-avatar" class="einstein-avatar" src="../assets/panels/explain.png" alt="Einstein Coach" />
-          <div class="brand-title">
-            <h1>Data Engineering Academy <span class="em-tag">Beginner → Expert</span></h1>
-            <p id="einstein-Tip" class="coach-bubble">Interactive coaching for PostgreSQL 18, SQL Server (T-SQL), SSIS &amp; Python Data Engineering</p>
-          </div>
+    <!-- Minimal Serene Header -->
+    <header class="zen-header">
+      <div class="zen-brand">
+        <a class="back-link" href="../#data" title="Return to Einstein Math Data Lab">← Einstein Math</a>
+        <div class="brand-wordmark">
+          <h1>The River of Data</h1>
+          <span>Zen Data Lab · PostgreSQL 18 · T-SQL · SSIS · Python</span>
         </div>
       </div>
-      <div class="hud-right">
-        <div class="xp-pill" title="Saved locally in your browser">
-          <div class="xp-bar-wrap"><div id="xp-bar" class="xp-bar-fill"></div></div>
-          <span id="xp-text" class="mono tabular" style="font-weight:700;">0/33 Mastered (0%)</span>
-        </div>
-        <button type="button" class="btn" id="theme-btn" onclick="toggleTheme()">🌙 Cozy Dark</button>
-        <button type="button" class="btn" onclick="resetProgress()" title="Clear saved progress">↺ Reset</button>
-      </div>
+      <nav class="zen-actions" aria-label="Data Lab tools">
+        <button type="button" id="btn-map" class="pill-btn">🗺️ Map</button>
+        <button type="button" id="btn-journal" class="pill-btn">📖 Journal (0/7)</button>
+        <button type="button" id="btn-studio" class="pill-btn">🐘 SQL Studio</button>
+        <button type="button" id="btn-sound" class="pill-btn" title="Toggle Orion voice &amp; Zen chimes">🔊 Voice On</button>
+        <button type="button" id="btn-theme" class="pill-btn" title="Switch Warm Paper / Cozy Night">🌙 Night</button>
+      </nav>
     </header>
 
-    <!-- Segmented Pill Navigation Tabs -->
-    <nav class="tab-bar" role="tablist">
-      <button type="button" id="tab-factory" class="tab-btn active" onclick="switchTab('factory')">
-        <span class="tab-num">1</span><span>🏭 Data Factory &amp; Skill Tree</span>
-      </button>
-      <button type="button" id="tab-sql" class="tab-btn" onclick="switchTab('sql')">
-        <span class="tab-num">2</span><span>🐘 Live Postgres 18 Lab</span>
-      </button>
-      <button type="button" id="tab-academy" class="tab-btn" onclick="switchTab('academy')">
-        <span class="tab-num">3</span><span>📚 4-Tech Curriculum</span>
-      </button>
-      <button type="button" id="tab-pg" class="tab-btn" onclick="switchTab('pg')">
-        <span class="tab-num">4</span><span>⚡ Partitions &amp; COPY</span>
-      </button>
-      <button type="button" id="tab-recon" class="tab-btn" onclick="switchTab('recon')">
-        <span class="tab-num">5</span><span>🛠️ Debugging &amp; Pipeline</span>
-      </button>
-    </nav>
-
-    <!-- ============================================================
-         TAB 1: EINSTEIN'S DATA FACTORY & UNLOCKABLE SKILL TREE
-    ============================================================ -->
-    <section id="panel-factory" class="tab-panel stack">
-      <!-- Live Animated Pipeline Canvas + Telemetry HUD -->
-      <div class="card stack">
-        <div class="row-between">
-          <div>
-            <h2>🏭 Einstein&rsquo;s Live Data Factory <span id="factory-rank-badge" class="badge badge-py">Rank 1 · Apprentice Scribbler</span></h2>
-            <p class="muted">Every concept you master physically upgrades your pipeline—unlocking quarantine shields, an 85× COPY firehose, 12× partition pruning &amp; 100% parity.</p>
-          </div>
-          <div class="row">
-            <label class="row text-xs" style="cursor:pointer;" title="Unlock every milestone immediately for free exploration">
-              <input type="checkbox" id="toggle-sandbox" onchange="toggleSandboxMode()" />
-              <strong>Sandbox (Unlock All)</strong>
-            </label>
-          </div>
-        </div>
-
-        <div class="factory-canvas-wrap">
-          <canvas id="factory-canvas"></canvas>
-        </div>
-
-        <div class="row-between">
-          <div class="packet-legend">
-            <span><i class="legend-dot" style="background:#4ECDC4;"></i>Valid Row</span>
-            <span><i class="legend-dot" style="background:#FB923C;"></i>Dirty / Latin-1 Row</span>
-            <span><i class="legend-dot" style="background:#A78BFA;"></i>Unknown SKU</span>
-            <span><i class="legend-dot" style="background:#34D399;"></i>Rescued (-1 Key)</span>
-          </div>
-          <div class="row">
-            <button type="button" class="btn" onclick="triggerFactoryFault('encoding')">⚡ Inject Latin-1 Dirty Batch</button>
-            <button type="button" class="btn" onclick="triggerFactoryFault('orphan')">⚡ Inject Unknown SKU Spike</button>
-          </div>
-        </div>
-
-        <!-- Live Factory Telemetry Gains -->
-        <div class="telemetry-grid">
-          <div class="telemetry-card">
-            <div class="muted">Pipeline Throughput</div>
-            <div id="tel-throughput" class="telemetry-val tabular">950 rows/s</div>
-            <div id="tel-throughput-sub" class="telemetry-gain">Baseline (Row-by-Row)</div>
-          </div>
-          <div class="telemetry-card">
-            <div class="muted">50M-Row Backfill ETA</div>
-            <div id="tel-backfill" class="telemetry-val tabular">14.0 hrs</div>
-            <div id="tel-backfill-sub" class="telemetry-gain">Target: ≤ 2.5 hrs</div>
-          </div>
-          <div class="telemetry-card">
-            <div class="muted">90-Day Query Latency</div>
-            <div id="tel-latency" class="telemetry-val tabular">21.4 s</div>
-            <div id="tel-latency-sub" class="telemetry-gain">Target: &lt; 3.0 s</div>
-          </div>
-          <div class="telemetry-card">
-            <div class="muted">Financial Data Parity</div>
-            <div id="tel-parity" class="telemetry-val tabular">74.2%</div>
-            <div id="tel-parity-sub" class="telemetry-gain">Target: 99.98%+</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Progressive Unlockable Skill Tree + Active Milestone Workbench -->
-      <div class="grid-2" style="grid-template-columns: minmax(340px, 1.35fr) minmax(320px, 1fr);">
-        <div class="card stack">
-          <div class="row-between">
-            <div>
-              <h3>🌳 Pipeline Skill Tree (Complete a Concept → Unlock the Next)</h3>
-              <p class="muted">Click any unlocked milestone to inspect its concept, code, and graded assessment.</p>
-            </div>
-            <span id="tree-progress-badge" class="badge badge-ok">0 / 8 Unlocked</span>
-          </div>
-          <div id="skill-tree-host" class="skill-tree"></div>
-        </div>
-
-        <div id="milestone-drawer" class="card stack"></div>
+    <!-- Living River World Panorama (permanently heals as you master chapters) -->
+    <section class="river-card" aria-label="Living River of Data">
+      <canvas id="zen-river-canvas"></canvas>
+      <div class="river-caption">
+        <span id="river-status">A quiet mountain stream awaits. Master each chapter to heal the river.</span>
+        <span id="river-right" class="mono">Postgres 18 Labs: 0/13</span>
       </div>
     </section>
 
-    <!-- ============================================================
-         TAB 3: BEGINNER -> EXPERT COACHING TRACKS
-    ============================================================ -->
-    <section id="panel-academy" class="tab-panel hidden stack">
-      <!-- 4 Technology Track Cards -->
-      <div id="track-selector" class="grid-4"></div>
-
-      <!-- 4-Level Progression Stepper (Beginner -> Intermediate -> Advanced -> Expert) -->
-      <div id="level-stepper" class="grid-4"></div>
-
-      <!-- Active Lesson Coaching View -->
-      <div id="lesson-viewer" class="card"></div>
-    </section>
-
-    <!-- ============================================================
-         TAB 2: LIVE SQL PLAYGROUND (REAL POSTGRESQL 18 WASM)
-    ============================================================ -->
-    <section id="panel-sql" class="tab-panel hidden stack">
-      <div class="card row-between" style="padding:12px 18px;">
-        <div class="row">
-          <span id="pg-engine-badge" class="badge badge-warn">⏳ Click Tab 2 or "Try in Postgres" to boot PostgreSQL 18 (WASM)…</span>
-          <span id="pg-exec-time" class="muted mono"></span>
-        </div>
-        <div class="row">
-          <button type="button" class="btn" onclick="resetPgDb()" title="Reset all tables to initial seed">↺ Reset Seed DB</button>
-        </div>
-      </div>
-
-      <div class="grid-2" style="grid-template-columns: minmax(275px, 1fr) minmax(400px, 2.1fr);">
-        <div class="stack">
-          <div class="card stack-sm">
-            <div class="row-between">
-              <h3>13 Real PostgreSQL Labs</h3>
-              <span class="badge badge-pg">Beginner → Expert</span>
-            </div>
-            <p class="muted">Graded against real PostgreSQL 18 result sets &amp; <code class="mono">EXPLAIN</code> plans.</p>
-            <div id="sql-challenge-list" class="stack-sm" style="max-height:360px;overflow-y:auto;padding-right:4px;"></div>
-          </div>
-
-          <div class="card stack-sm">
-            <div class="row-between">
-              <h3>Live PostgreSQL Schema</h3>
-              <span class="muted">Click to query</span>
-            </div>
-            <div id="pg-schema-list" class="stack-sm text-xs">
-              <div class="muted">Schema loads when PostgreSQL boots.</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="card stack">
-          <div class="row-between">
-            <div>
-              <div id="sql-chal-meta" class="muted" style="font-weight:600;"></div>
-              <h2 id="sql-chal-title">Challenge</h2>
-            </div>
-            <span id="sql-chal-badge" class="badge badge-pg">PostgreSQL 18</span>
-          </div>
-          <p id="sql-chal-prompt" class="text-xs"></p>
-
-          <div class="code-window">
-            <div class="code-window-bar">
-              <div class="row">
-                <span class="window-dots"><span></span><span></span><span></span></span>
-                <span class="mono">query.sql · PostgreSQL 18 (WASM)</span>
-              </div>
-              <span class="mono">⌘/Ctrl + Enter</span>
-            </div>
-            <textarea id="sql-editor" class="sql-editor" style="border:none;border-radius:0;" spellcheck="false"></textarea>
-          </div>
-
-          <div class="row-between">
-            <div class="row">
-              <button type="button" class="btn btn-primary" id="btn-run-sql" onclick="runUserSQL()">▶ Run &amp; Grade</button>
-              <button type="button" class="btn" onclick="runScratchSQL()">⚡ Run Only (Scratchpad)</button>
-              <button type="button" class="btn" onclick="showSQLHint()">💡 Hint</button>
-              <button type="button" class="btn" onclick="fillSQLSolution()">✓ Solution</button>
-            </div>
-            <span class="muted">Transactions auto-rollback after grading</span>
-          </div>
-
-          <div id="sql-hint-box" class="subcard muted hidden"></div>
-          <div id="sql-feedback" class="hidden"></div>
-          <div id="sql-plan-box" class="hidden stack-sm">
-            <div class="muted" style="font-weight:600;">Real PostgreSQL EXPLAIN Plan</div>
-            <pre id="sql-plan-pre" class="code-box"></pre>
-          </div>
-          <div id="sql-output"></div>
-        </div>
-      </div>
-
-      <!-- T-SQL <-> PostgreSQL Dialect Reference -->
-      <div class="card stack-sm">
-        <h3>SQL Server (T-SQL) ↔ PostgreSQL (PL/pgSQL) Dialect Reference</h3>
-        <p class="muted">Master the 10 key syntax and behavior differences when working across both engines.</p>
-        <div class="table-wrap">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Concept</th>
-                <th>SQL Server (T-SQL)</th>
-                <th>PostgreSQL (PL/pgSQL)</th>
-                <th>Key Gotcha</th>
-              </tr>
-            </thead>
-            <tbody id="dialect-table-body"></tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <!-- ============================================================
-         TAB 3: ANIMATED SSIS & PYTHON ETL PIPELINE STUDIO
-    ============================================================ -->
-    <section id="panel-pipe" class="tab-panel hidden stack">
-      <div class="card stack">
-        <div class="row-between">
-          <div>
-            <h2>Animated SSIS &amp; Python ETL Pipeline Studio</h2>
-            <p class="muted">Simulate real production faults (encoding errors, join fan-outs, slow inserts) and observe how engineering safeguards recover cleanly.</p>
-          </div>
-          <button type="button" class="btn btn-primary" onclick="runPipelineSim()">▶ Run Pipeline Simulation</button>
-        </div>
-
-        <div class="grid-3">
-          <div class="subcard stack-sm">
-            <label class="muted" for="pipe-project">Select Architecture</label>
-            <select id="pipe-project" class="btn" style="width:100%;">
-              <option value="retail">SQL Server Stack: SSIS + Python → SQL Server</option>
-              <option value="mfg">PostgreSQL Stack: Python COPY → PostgreSQL</option>
-            </select>
-          </div>
-          <div class="subcard stack-sm">
-            <label class="muted" for="pipe-fault">Inject Real-World Fault</label>
-            <select id="pipe-fault" class="btn" style="width:100%;">
-              <option value="none">None (Healthy Batch Run)</option>
-              <option value="encoding">Fault: Latin-1 Encoding Crash (UnicodeDecodeError)</option>
-              <option value="dupsku">Fault: Duplicate Dimension Key Join Fan-Out</option>
-              <option value="slowinsert">Fault: Row-by-Row INSERT Throughput Bottleneck</option>
-            </select>
-          </div>
-          <div class="subcard row" style="align-items:center;">
-            <label class="row" style="cursor:pointer;">
-              <input type="checkbox" id="pipe-fix" />
-              <div>
-                <div class="text-xs" style="font-weight:700;">Apply Production Fix</div>
-                <div class="muted">Encoding fallback / dedupe / COPY</div>
-              </div>
-            </label>
-          </div>
-        </div>
-
-        <div id="pipe-track" class="pipeline-track">
-          <div class="subcard muted" style="grid-column:1/-1;">Click <strong>▶ Run Pipeline Simulation</strong> above to animate rows flowing through all 5 stages.</div>
-        </div>
-
-        <div class="stack-sm">
-          <div class="muted" style="font-weight:600;">Execution Console</div>
-          <div class="code-window">
-            <div class="code-window-bar">
-              <span class="window-dots"><span></span><span></span><span></span></span>
-              <span class="mono">etl-runner.log</span>
-            </div>
-            <pre id="pipe-log" class="code-box">[READY] Select a pipeline and optional fault, then click Run Pipeline Simulation.</pre>
-          </div>
-        </div>
-      </div>
-
-      <div class="grid-2">
-        <div class="card stack-sm">
-          <h3>Defensive Python CSV Cleaner (<code class="mono">pandas</code>)</h3>
-          <div class="code-window">
-            <div class="code-window-bar">
-              <span class="window-dots"><span></span><span></span><span></span></span>
-              <span class="mono">clean_vendor_csv.py</span>
-            </div>
-            <pre class="code-box" data-hl="py">import pandas as pd
-
-for enc in ("utf-8-sig", "cp1252", "latin1"):
-    try:
-        df = pd.read_csv(path, encoding=enc, dtype={"sku": str})
-        break
-    except UnicodeDecodeError:
-        continue
-
-df.columns = [c.strip().lower().replace(" ", "_") for c in df.columns]
-df["sku"] = df["sku"].str.strip().str.upper()
-df = df.drop_duplicates(subset=["sku"], keep="last")
-df.to_csv(staged_csv, index=False, encoding="utf-8")</pre>
-          </div>
-        </div>
-        <div class="card stack-sm">
-          <h3>High-Throughput PostgreSQL Bulk Loader (<code class="mono">psycopg2 COPY</code>)</h3>
-          <div class="code-window">
-            <div class="code-window-bar">
-              <span class="window-dots"><span></span><span></span><span></span></span>
-              <span class="mono">pg_copy_stream.py</span>
-            </div>
-            <pre class="code-box" data-hl="py">import io
-
-buf = io.StringIO()
-df.to_csv(buf, index=False, header=False, sep="\t", na_rep="\\N")
-buf.seek(0)  # Required! Rewind buffer before streaming
-
-with pg_conn.cursor() as cur:
-    cur.copy_expert(
-        "COPY stg.shop_floor_events FROM STDIN WITH (FORMAT text, NULL '\\N')",
-        buf
-    )
-pg_conn.commit()</pre>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ============================================================
-         TAB 4: POSTGRESQL INTERNALS (PARTITIONING, EXPLAIN & COPY)
-    ============================================================ -->
-    <section id="panel-pg" class="tab-panel hidden stack">
-      <div class="card stack">
-        <div class="row-between">
-          <div>
-            <h2>PostgreSQL Partition Pruning &amp; <code class="mono">EXPLAIN ANALYZE</code> Visualizer</h2>
-            <p class="muted">Explore how monthly range partitioning and B-Tree indexing accelerate queries on a 42M-row (6-year) event table.</p>
-          </div>
-          <div class="row">
-            <label class="row text-xs" style="cursor:pointer;">
-              <input type="checkbox" id="pg-part" checked onchange="updatePGExplorer()" />
-              <span>Monthly Partitioning</span>
-            </label>
-            <label class="row text-xs" style="cursor:pointer;">
-              <input type="checkbox" id="pg-idx" checked onchange="updatePGExplorer()" />
-              <span>B-Tree Index</span>
-            </label>
-            <select id="pg-range" onchange="updatePGExplorer()" class="btn">
-              <option value="1">Query: Last 30 Days (1 mo)</option>
-              <option value="3" selected>Query: Last 90 Days (3 mos)</option>
-              <option value="12">Query: Last 1 Year (12 mos)</option>
-              <option value="72">Query: Full 6 Years (72 mos)</option>
-            </select>
-          </div>
-        </div>
-
-        <div id="pg-part-grid" class="partition-grid"></div>
-
-        <div class="grid-3">
-          <div class="subcard"><div class="muted">Partitions Scanned</div><div id="pg-parts-scanned" class="mono tabular" style="font-size:16px;font-weight:700;">—</div></div>
-          <div class="subcard"><div class="muted">Est. Rows Touched</div><div id="pg-rows-scanned" class="mono tabular" style="font-size:16px;font-weight:700;">—</div></div>
-          <div class="subcard"><div class="muted">Est. Query Latency</div><div id="pg-latency" class="mono tabular" style="font-size:16px;font-weight:700;">—</div></div>
-        </div>
-
-        <div class="stack-sm">
-          <div class="muted" style="font-weight:600;">Simulated PostgreSQL <code class="mono">EXPLAIN (ANALYZE, BUFFERS)</code></div>
-          <div class="code-window">
-            <div class="code-window-bar">
-              <span class="window-dots"><span></span><span></span><span></span></span>
-              <span class="mono">EXPLAIN (ANALYZE, BUFFERS)</span>
-            </div>
-            <pre id="pg-explain" class="code-box"></pre>
-          </div>
-        </div>
-      </div>
-
-      <div class="card stack">
-        <div class="row-between">
-          <div>
-            <h3>Bulk-Load Throughput Optimizer (50M Rows: 14.0h → 2.5h)</h3>
-            <p class="muted">Toggle PostgreSQL bulk-loading techniques to see how each optimization cuts historical load time.</p>
-          </div>
-          <div id="backfill-total" class="subcard mono tabular" style="font-size:16px;font-weight:700;color:var(--warning);">14.0 hrs</div>
-        </div>
-        <div class="grid-3 text-xs">
-          <label class="subcard row" style="align-items:flex-start;cursor:pointer;">
-            <input type="checkbox" id="opt-copy" onchange="updateBackfill()" />
-            <div><strong>PostgreSQL COPY Stream</strong><div class="muted">Replaces row-by-row INSERTs (-7.5 hrs)</div></div>
-          </label>
-          <label class="subcard row" style="align-items:flex-start;cursor:pointer;">
-            <input type="checkbox" id="opt-index" onchange="updateBackfill()" />
-            <div><strong>Drop &amp; Rebuild Indexes</strong><div class="muted">Load raw tables first, index once (-2.5 hrs)</div></div>
-          </label>
-          <label class="subcard row" style="align-items:flex-start;cursor:pointer;">
-            <input type="checkbox" id="opt-chunk" onchange="updateBackfill()" />
-            <div><strong>Parallel 4-Worker Chunking</strong><div class="muted">Stream 4 year-chunks concurrently (-1.5 hrs)</div></div>
-          </label>
-        </div>
-      </div>
-    </section>
-
-    <!-- ============================================================
-         TAB 5: PRODUCTION DEBUGGING LAB
-    ============================================================ -->
-    <section id="panel-recon" class="tab-panel hidden stack">
-      <div class="card stack">
-        <div class="row-between">
-          <div>
-            <h2>Production Data Debugging Lab</h2>
-            <p class="muted">Diagnose and fix 4 real-world SQL Server, PostgreSQL, and ETL data quality incidents.</p>
-          </div>
-          <span id="recon-status" class="badge badge-warn">4 Open Production Incidents</span>
-        </div>
-        <div id="recon-cases" class="stack"></div>
-      </div>
-    </section>
+    <!-- Single-Focus Chapter Stage (One Beat at a Time) -->
+    <main id="focus-stage" class="focus-stage" aria-live="polite">
+      <p class="muted">Opening the sketchbook…</p>
+    </main>
 
   </div>
 
-  <script src="js/curriculum.js"></script>
-  <script src="js/sql-engine.js"></script>
+  <!-- Quiet Modal 1: World Map -->
+  <div id="modal-map" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="modal-map-title">
+    <div class="modal-sheet">
+      <div class="row-between">
+        <div>
+          <div class="chapter-eyebrow">World Map</div>
+          <h2 id="modal-map-title" class="chapter-title" style="font-size:1.35rem;">Seven Chapters Along the River</h2>
+        </div>
+        <button type="button" class="pill-btn" data-close-modal aria-label="Close World Map">✕ Close</button>
+      </div>
+      <div id="modal-map-body" class="stack-sm" style="gap:12px;"></div>
+    </div>
+  </div>
+
+  <!-- Quiet Modal 2: Field Journal (Collected Koans & Spaced Recall) -->
+  <div id="modal-journal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="modal-journal-title">
+    <div class="modal-sheet">
+      <div class="row-between">
+        <div>
+          <div class="chapter-eyebrow">Field Journal</div>
+          <h2 id="modal-journal-title" class="chapter-title" style="font-size:1.35rem;">Collected Koans &amp; Recall</h2>
+        </div>
+        <button type="button" class="pill-btn" data-close-modal aria-label="Close Field Journal">✕ Close</button>
+      </div>
+      <div id="modal-journal-body" class="stack-sm" style="gap:12px;"></div>
+    </div>
+  </div>
+
+  <!-- Quiet Modal 3: Full PostgreSQL 18 SQL Studio (All 13 Labs, Schema, Scratchpad & T-SQL Map) -->
+  <div id="modal-studio" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="modal-studio-title">
+    <div class="modal-sheet" style="width:min(920px, 100%);">
+      <div class="row-between">
+        <div>
+          <div class="chapter-eyebrow">Full SQL Studio</div>
+          <h2 id="modal-studio-title" class="chapter-title" style="font-size:1.35rem;">Real PostgreSQL 18 (WASM) · 13 Labs &amp; Dialect Map</h2>
+        </div>
+        <button type="button" class="pill-btn" data-close-modal aria-label="Close SQL Studio">✕ Close</button>
+      </div>
+      <div id="modal-studio-body" class="stack-sm" style="gap:12px;"></div>
+    </div>
+  </div>
+
   <script src="js/pg-lab.js"></script>
-  <script src="js/factory.js"></script>
-  <script src="js/app.js"></script>
+  <script src="js/sql-engine.js"></script>
+  <script src="js/zen-chapters.js"></script>
+  <script src="js/zen-audio.js"></script>
+  <script src="js/zen-world.js"></script>
+  <script src="js/zen-app.js"></script>
 </body>
 </html>

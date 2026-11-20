@@ -1,41 +1,41 @@
 /* Data Lab Catalog — mirrors js/space.js so clicking "🗄️ Data Lab" opens seamlessly
  * inside Einstein Math (#screen-data, keeping header, Einstein coach & halftone paper)
- * and each section card deep-links into data-lab/?tab=… */
+ * and each section card deep-links into The River of Data (data-lab/). */
 const DataLabCatalog = {
   BASE: 'data-lab/',
 
   SECTIONS: [
     {
-      id: 'factory', icon: '🏭', title: "Einstein's Data Factory & Skill Tree", tab: 'factory', color: '#FF6B35',
-      blurb: 'Live animated data-pipeline sandbox! Master each concept to physically upgrade stations—unlocking quarantine shields, an 85× COPY firehose, 12× partition pruning & 100% parity.',
-      topics: ['live canvas', '8-node skill tree', 'fault stress-tests', 'massive gains']
+      id: 'river', icon: '🌊', title: 'The River of Data (7-Chapter Zen Journey)', query: '', color: '#E8892F',
+      blurb: 'Learn PostgreSQL 18, SQL Server (T-SQL), SSIS & Python effortlessly—one calm breath at a time. Voice-narrated visual koans, tactile sandboxes, and real Postgres grading that heal a living river.',
+      topics: ['Orion voice & canvas', '7 timeless chapters', '4-beat focus flow', 'living river']
     },
     {
-      id: 'sql', icon: '🐘', title: 'Live PostgreSQL 18 Playground', tab: 'sql', color: '#A78BFA',
-      blurb: 'Run real SQL directly in your browser on PostgreSQL 18 (WASM). Solve 13 Beginner→Expert labs graded on real result sets & EXPLAIN plans.',
-      topics: ['real Postgres 18', '13 graded labs', 'T-SQL ↔ PG cheat sheet']
+      id: 'studio', icon: '🐘', title: 'Full PostgreSQL 18 SQL Studio', query: '?view=studio', color: '#4A6B82',
+      blurb: 'Jump straight into real PostgreSQL 18 running locally in your browser (WASM): 13 Beginner→Expert graded labs, live schema explorer, freeform scratchpad & 10-row T-SQL ↔ PG dialect map.',
+      topics: ['real Postgres 18', '13 graded labs', 'T-SQL ↔ PG map', 'live schema']
     },
     {
-      id: 'academy', icon: '🎓', title: '4-Tech Curriculum (Beginner → Expert)', tab: 'academy', color: '#4ECDC4',
-      blurb: '16 structured lessons across PostgreSQL, SQL Server (T-SQL), SSIS & Python — with mental models, real code, pitfalls & mastery checks.',
-      topics: ['PostgreSQL', 'T-SQL', 'SSIS', 'Python ETL']
+      id: 'partitions', icon: '🗂️', title: 'Chapter VI: Effortless Speed (Partitions)', query: '?ch=6', color: '#5E7D54',
+      blurb: 'Feel how 72 monthly range partitions and sargable date bounds drop queries from 21.4s to 1.4s, then prove it on a real PostgreSQL 18 EXPLAIN plan.',
+      topics: ['72-month pruning', 'sargable ranges', 'real EXPLAIN plan']
     },
     {
-      id: 'pg', icon: '⚡', title: 'Postgres Partitioning & COPY Lab', tab: 'pg', color: '#FFE66D',
-      blurb: 'Interactive 72-month range partition pruning visualizer, simulated EXPLAIN (ANALYZE, BUFFERS), and a 14h → 2.5h bulk-load optimizer.',
-      topics: ['range partitions', 'B-Tree indexes', 'EXPLAIN', 'bulk COPY']
+      id: 'mirror', icon: '⚖️', title: 'Chapter VII: The Mirror (Reconciliation)', query: '?ch=7', color: '#9B7EDE',
+      blurb: 'Master fan-out-safe CTE reconciliation, local timezone boundaries, and recursive Bill-of-Materials queries to light the harbour watchtower lantern.',
+      topics: ['CTE reconciliation', 'zero fan-out', 'timezones', 'WITH RECURSIVE']
     },
     {
-      id: 'recon', icon: '🛠️', title: 'Production Debugging Lab', tab: 'recon', color: '#FF6B9D',
-      blurb: 'Diagnose and fix 4 real-world SQL & ETL incidents: duplicate-SKU fan-outs, split work-order grain inflation, UTC timezone shifts & empty files.',
-      topics: ['reconciliation', 'grain bugs', 'timezones', 'row-count gates']
+      id: 'journal', icon: '📖', title: 'Field Journal & Spaced Recall', query: '?view=journal', color: '#C25E3E',
+      blurb: 'Review your collected one-sentence Data Koans and clear the moss with gentle spaced-recall practice on real PostgreSQL 18.',
+      topics: ['7 Data Koans', 'spaced recall', 'World Map']
     }
   ],
 
   url(section) {
     const s = typeof section === 'string' ? this.SECTIONS.find(x => x.id === section) : section;
     if (!s) return this.BASE;
-    return this.BASE + '?tab=' + encodeURIComponent(s.tab);
+    return this.BASE + (s.query || '');
   },
 
   _esc(v) {
@@ -49,7 +49,7 @@ const DataLabCatalog = {
       <h3>${e(s.title)}</h3>
       <p>${e(s.blurb)}</p>
       <p class="unit-mastery-line">${(s.topics || []).map(e).join(' · ')}</p>
-      <span class="btn btn-cyan btn-sm">Launch ▶</span>
+      <span class="btn btn-cyan btn-sm">Enter ▶</span>
     </a>`).join('');
   }
 };

@@ -20,21 +20,38 @@ const ZenWorld = {
   _koanProgress: 0,
   _koanScene: 'table',
 
-  STAGES: [
-    { id: 'l1-filter',     label: 'Filter' },
-    { id: 'l2-groupby',    label: 'Group' },
-    { id: 'l3-dupes',      label: 'Quality' },
-    { id: 'l4-python',     label: 'Python' },
-    { id: 'l5-leftjoin',   label: 'Joins' },
-    { id: 'l6-bulkload',   label: 'Bulk Load' },
-    { id: 'l7-dialects',   label: 'Dialects' },
-    { id: 'l8-partitions', label: 'Partitions' },
-    { id: 'l9-reconcile',  label: 'Audit' }
-  ],
+  TRACK_STAGES: {
+    1: [
+      { id: 'l1-filter',     num: 1, label: 'Filter' },
+      { id: 'l2-groupby',    num: 2, label: 'Group' },
+      { id: 'l3-dupes',      num: 3, label: 'Quality' },
+      { id: 'l4-python',     num: 4, label: 'Python' },
+      { id: 'l5-leftjoin',   num: 5, label: 'Joins' },
+      { id: 'l6-bulkload',   num: 6, label: 'Bulk Load' },
+      { id: 'l7-dialects',   num: 7, label: 'Dialects' },
+      { id: 'l8-partitions', num: 8, label: 'Partitions' },
+      { id: 'l9-reconcile',  num: 9, label: 'Audit' }
+    ],
+    2: [
+      { id: 'l10-windows',   num: 10, label: 'Windows' },
+      { id: 'l11-dedup',     num: 11, label: 'Dedup' },
+      { id: 'l12-scd2',      num: 12, label: 'SCD-2' },
+      { id: 'l13-timezone',  num: 13, label: 'Timezones' },
+      { id: 'l14-recursive', num: 14, label: 'Recursive' },
+      { id: 'l15-jsonb',     num: 15, label: 'JSONB' }
+    ]
+  },
 
-  setMastered(map, activeNum = 1) {
+  _activeTrack: 1,
+
+  activeStages() {
+    return this.TRACK_STAGES[this._activeTrack] || this.TRACK_STAGES[1];
+  },
+
+  setMastered(map, activeNum = 1, activeTrack = 1) {
     this._mastered = { ...(map || {}) };
     this._activeChapter = activeNum || 1;
+    this._activeTrack = activeTrack || (activeNum >= 10 ? 2 : 1);
   },
 
   setKoanState(chNum, progress, scene) {
@@ -99,10 +116,11 @@ const ZenWorld = {
     };
   },
 
-  _nodeX(idx, w) {
-    const pad = Math.max(38, w * 0.065);
+  _nodeX(idx, w, count) {
+    const n = count || this.activeStages().length;
+    const pad = Math.max(40, w * (n <= 6 ? 0.10 : 0.065));
     const span = w - pad * 2;
-    return pad + (idx / (this.STAGES.length - 1)) * span;
+    return pad + (idx / Math.max(1, n - 1)) * span;
   },
 
   /* ============================================================
@@ -171,9 +189,10 @@ const ZenWorld = {
     }
     g.globalAlpha = 1;
 
-    const x0 = this._nodeX(0, w);
-    const xEnd = this._nodeX(this.STAGES.length - 1, w);
-    const hasBulk = !!this._mastered['l6-bulkload'];
+    const stages = this.activeStages();
+    const x0 = this._nodeX(0, w, stages.length);
+    const xEnd = this._nodeX(stages.length - 1, w, stages.length);
+    const hasBulk = !!this._mastered['l6-bulkload'] || this._activeTrack === 2;
 
     // Soft pipeline conduit background rail
     g.strokeStyle = P.waterSoft;
@@ -212,13 +231,13 @@ const ZenWorld = {
       g.globalAlpha = 1;
     }
 
-    // Draw the 9 Pipeline Stage Nodes
+    // Draw the active Track's Pipeline Stage Nodes
     const compact = w < 640;
     const r = compact ? 12 : 15;
-    this.STAGES.forEach((st, idx) => {
-      const nx = this._nodeX(idx, w);
+    stages.forEach((st, idx) => {
+      const nx = this._nodeX(idx, w, stages.length);
       const done = !!this._mastered[st.id];
-      const active = (idx + 1) === this._activeChapter;
+      const active = st.num === this._activeChapter;
 
       // Active lesson subtle breathing halo
       if (active) {
@@ -238,24 +257,24 @@ const ZenWorld = {
       g.fill();
       g.stroke();
 
-      // Number or checkmark inside circle
+      // Lesson number or checkmark inside circle
       g.fillStyle = (done || active) ? '#FFFFFF' : P.sepia;
-      g.font = `700 ${compact ? 10 : 11.5}px "DM Sans", sans-serif`;
+      g.font = `700 ${compact ? 9.5 : 11}px "DM Sans", sans-serif`;
       g.textAlign = 'center';
       g.textBaseline = 'middle';
-      g.fillText(done ? '✓' : String(idx + 1), nx, cy + 0.5);
+      g.fillText(done ? '✓' : String(st.num), nx, cy + 0.5);
 
-      // Stage label below node: on mobile show ONLY the active stage label (prevents collisions!)
+      // Stage label below node: on mobile show ONLY the active stage label
       if (!compact || active) {
-        const labelX = compact ? Math.max(38, Math.min(w - 38, nx)) : nx;
+        const labelX = compact ? Math.max(44, Math.min(w - 44, nx)) : nx;
         g.fillStyle = active ? P.ink : (done ? P.sage : P.muted);
-        g.font = `${active ? 700 : 600} ${compact ? 11 : 11}px "DM Sans", sans-serif`;
+        g.font = `${active ? 700 : 600} 11px "DM Sans", sans-serif`;
         g.textBaseline = 'alphabetic';
-        g.fillText(compact ? `${idx + 1}. ${st.label}` : st.label, labelX, cy + r + 17);
+        g.fillText(compact ? `${st.num}. ${st.label}` : st.label, labelX, cy + r + 17);
       }
 
-      // Small Quarantine note under Stage 4 on desktop when Python cleaner is active
-      if (idx === 3 && this._mastered['l4-python'] && !compact) {
+      // Small Quarantine note under Stage 4 (Track 1) when Python cleaner is active
+      if (st.id === 'l4-python' && this._mastered['l4-python'] && !compact) {
         g.fillStyle = P.warn;
         g.font = '600 9px "DM Sans", sans-serif';
         g.fillText('↳ Quarantine', nx, cy + r + 29);
@@ -490,7 +509,7 @@ const ZenWorld = {
       }
       g.globalAlpha = 1;
       this._label(g, cx, cy + 54, p > 0.42 ? 'Sargable Range (>= & <): 11 of 12 Partitions Skipped → 1.4s' : 'Wrapped Column EXTRACT(): Scans All 12 Partitions → 21.4s', P);
-    } else {
+    } else if (ch === 9) {
       // Lesson 9: Aggregate-First CTE Reconciliation
       this._sketchBox(g, cx - 205, cy - 28, 138, 56, 'CTE 1: Legacy EOD\nSUM per Store', P.water, P);
       this._sketchBox(g, cx + 67, cy - 28, 138, 56, 'CTE 2: Warehouse\nSUM per Store', P.sage, P);
@@ -503,6 +522,125 @@ const ZenWorld = {
         g.font = '700 12px "DM Sans", sans-serif';
         g.fillText('✓', cx, cy + 4);
         this._label(g, cx, cy + 54, '1 Row per Store on Both Sides → Zero Fan-Out · Exact Variance Caught', P);
+      }
+    } else if (ch === 10) {
+      // Lesson 10: Window Functions — Running Total beside every row
+      const narrow = w < 460;
+      const items = [
+        { id: 'T-1001', amt: 49.98, run: 49.98 },
+        { id: 'T-1002', amt: 120.00, run: 169.98 },
+        { id: 'T-1003', amt: 45.00, run: 214.98 },
+        { id: 'T-1004', amt: 36.75, run: 251.73 }
+      ];
+      this._label(g, cx, 26, 'Store 12 · SUM(net_amount) OVER (PARTITION BY store_id ORDER BY txn_ts)', P);
+      const bx = cx - Math.min(220, w * 0.44);
+      const bw = Math.min(440, w - 40);
+      items.forEach((it, i) => {
+        const y = 38 + i * 34;
+        const showBar = p > 0.25 + i * 0.14;
+        g.fillStyle = P.card; g.strokeStyle = P.sepia; g.lineWidth = 1.3;
+        g.beginPath(); g.roundRect(bx, y, bw, 27, 6); g.fill(); g.stroke();
+        if (showBar) {
+          const frac = it.run / 260;
+          g.fillStyle = P.sageSoft;
+          g.beginPath(); g.roundRect(bx + bw * 0.45, y + 3, bw * 0.52 * frac, 21, 4); g.fill();
+        }
+        g.fillStyle = P.ink; g.font = `600 ${narrow ? 9.5 : 11}px "JetBrains Mono", monospace`;
+        g.textAlign = 'left';
+        g.fillText(`${it.id}  $${it.amt.toFixed(2).padStart(6)}`, bx + 10, y + 17);
+        g.fillStyle = showBar ? P.sage : P.muted;
+        g.textAlign = 'right';
+        g.fillText(showBar ? `running: $${it.run.toFixed(2)}` : '...', bx + bw - 10, y + 17);
+      });
+      g.textAlign = 'center';
+    } else if (ch === 11) {
+      // Lesson 11: ROW_NUMBER() Dedup — newest row per SKU kept (rn=1)
+      const narrow = w < 460;
+      const rows = [
+        { sku: 'A-9042', price: '$24.99', dt: 'Nov 10', rn: 1 },
+        { sku: 'A-9042', price: '$23.99', dt: 'Oct 01', rn: 2 },
+        { sku: 'B-2210', price: '$120.00', dt: 'Nov 01', rn: 1 },
+        { sku: 'B-2210', price: '$118.00', dt: 'Oct 01', rn: 2 }
+      ];
+      this._label(g, cx, 26, p > 0.55 ? 'WHERE rn = 1 → Latest Version per SKU Kept' : 'ROW_NUMBER() OVER (PARTITION BY sku ORDER BY updated_at DESC)', P);
+      const bx = cx - Math.min(220, w * 0.44);
+      const bw = Math.min(440, w - 40);
+      rows.forEach((r, i) => {
+        const y = 38 + i * 34;
+        const faded = p > 0.55 && r.rn > 1;
+        g.globalAlpha = faded ? 0.30 : 1;
+        g.fillStyle = r.rn === 1 && p > 0.25 ? P.sageSoft : P.card;
+        g.strokeStyle = r.rn === 1 && p > 0.25 ? P.sage : P.sepia;
+        g.lineWidth = 1.4;
+        g.beginPath(); g.roundRect(bx, y, bw, 27, 6); g.fill(); g.stroke();
+        g.fillStyle = P.ink; g.font = `600 ${narrow ? 9.5 : 11}px "JetBrains Mono", monospace`;
+        g.textAlign = 'left';
+        g.fillText(`${r.sku}   ${r.price.padStart(7)}   ${r.dt}`, bx + 12, y + 17);
+        g.fillStyle = r.rn === 1 ? P.sage : P.warn;
+        g.textAlign = 'right';
+        g.fillText(p > 0.22 ? `rn = ${r.rn}${r.rn === 1 ? ' ✓' : ''}` : 'raw', bx + bw - 12, y + 17);
+        g.globalAlpha = 1;
+      });
+      g.textAlign = 'center';
+    } else if (ch === 12) {
+      // Lesson 12: SCD Type 2 Price History Timeline
+      const narrow = w < 460;
+      const bw = Math.min(460, w - 44);
+      const lx = cx - bw / 2;
+      this._label(g, cx, 28, 'dim_product_scd2 · SKU A-9042 Price Timeline', P);
+      // Historical window bar (Jan 1 -> Nov 14)
+      this._sketchBox(g, lx, 54, bw * 0.52, 46, 'v1: $22.99\nJan 01 – Nov 14', P.sage, P, narrow ? 9.5 : 11);
+      // Current window bar (Nov 15 -> 9999)
+      this._sketchBox(g, lx + bw * 0.54, 54, bw * 0.46, 46, 'v2: $24.99 (current)\nNov 15 – 9999-12-31', P.water, P, narrow ? 9.5 : 11);
+      // Sale pointer arrow on Nov 14
+      const saleX = lx + bw * 0.36;
+      const bad = p > 0.28 && p <= 0.62;
+      const targetX = bad ? (lx + bw * 0.76) : saleX;
+      g.strokeStyle = bad ? P.warn : P.saffron; g.lineWidth = 2.2;
+      g.beginPath(); g.moveTo(saleX, 134); g.lineTo(targetX, 104); g.stroke();
+      this._sketchBox(g, saleX - 74, 136, 148, 36, bad ? 'is_current → $24.99 ✗' : 'Sale Nov 14 → $22.99 ✓', bad ? P.warn : P.saffron, P, 10.5);
+    } else if (ch === 13) {
+      // Lesson 13: UTC vs America/Chicago Timezone Shift
+      this._label(g, cx, 28, 'Store 12 Evening Sale (T-1003 · $45.00)', P);
+      this._sketchBox(g, cx - 205, 52, 165, 58, 'Stored in UTC\n2021-11-15 03:30+00\n→ Wrong Day (Nov 15)', P.warn, P, 10);
+      g.strokeStyle = P.saffron; g.lineWidth = 2.2;
+      g.beginPath(); g.moveTo(cx - 34, 81); g.lineTo(cx + 34, 81); g.stroke();
+      this._label(g, cx, 72, '-6 hrs CST', P);
+      this._sketchBox(g, cx + 40, 52, 165, 58, "AT TIME ZONE 'Chicago'\n2021-11-14 21:30 CST\n→ True Biz Day (Nov 14)", p > 0.45 ? P.sage : P.water, P, 10);
+      this._label(g, cx, 146, p > 0.45 ? 'Nov 14 Store 12 Total = $214.98 (Matches POS EOD Register ✓)' : 'Casting raw UTC shifts late evening sales into tomorrow', P);
+    } else if (ch === 14) {
+      // Lesson 14: Recursive BOM Explosion Tree for PUMP-100
+      this._label(g, cx, 24, 'WITH RECURSIVE · PUMP-100 Leaf Bolt Count', P);
+      this._sketchBox(g, cx - 58, 32, 116, 28, 'PUMP-100 (×1)', P.saffron, P, 10.5);
+      // Level 1 branches
+      g.strokeStyle = P.sepia; g.lineWidth = 1.5;
+      g.beginPath();
+      g.moveTo(cx, 60); g.lineTo(cx - 140, 82);
+      g.moveTo(cx, 60); g.lineTo(cx, 82);
+      g.moveTo(cx, 60); g.lineTo(cx + 140, 82);
+      g.stroke();
+      this._sketchBox(g, cx - 195, 82, 110, 28, 'BOLT-M8 (×8)', P.sage, P, 10);
+      this._sketchBox(g, cx - 55, 82, 110, 28, 'MOTOR-20 (×1)', P.water, P, 10);
+      this._sketchBox(g, cx + 85, 82, 110, 28, 'HOUSING-5 (×1)', P.water, P, 10);
+      if (p > 0.42) {
+        g.beginPath();
+        g.moveTo(cx, 110); g.lineTo(cx, 130);
+        g.moveTo(cx + 140, 110); g.lineTo(cx + 140, 130);
+        g.stroke();
+        this._sketchBox(g, cx - 55, 130, 110, 28, '+4 BOLT-M8', P.sage, P, 10);
+        this._sketchBox(g, cx + 65, 130, 150, 28, '+6 + (2×2) = +10 BOLT', P.sage, P, 10);
+      }
+      if (p > 0.72) this._label(g, cx, 180, 'Total Leaf BOLT-M8 = 8 + 4 + 6 + 4 = 22 ✓', P);
+    } else {
+      // Lesson 15: JSONB Webhook Payload -> LATERAL Unnest into Flat Rows
+      this._label(g, cx, 26, 'raw_webhook_orders (JSONB) → Flat Order Line Table', P);
+      this._sketchBox(g, cx - 210, 44, 175, 106, '{"order_id":"ORD-501",\n "customer":{"tier":"gold"},\n "items":[\n  {"sku":"A-9042","qty":2},\n  {"sku":"C-5501","qty":1}\n ]}', P.water, P, 9.5);
+      g.strokeStyle = P.saffron; g.lineWidth = 2;
+      g.beginPath(); g.moveTo(cx - 30, 96); g.lineTo(cx + 28, 96); g.stroke();
+      this._label(g, cx - 1, 86, 'LATERAL', P);
+      if (p > 0.35) {
+        this._sketchBox(g, cx + 34, 52, 178, 38, 'ORD-501 | gold | A-9042 | $49.98', P.sage, P, 9.5);
+        this._sketchBox(g, cx + 34, 102, 178, 38, 'ORD-501 | gold | C-5501 | $45.00', P.sage, P, 9.5);
       }
     }
     g.restore();

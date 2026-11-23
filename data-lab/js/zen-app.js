@@ -78,6 +78,52 @@
         [14750, 2, 11, '2022-03-31 23:40:00+00', 515],
         ['…', '…', '…', '60,000 rows across 12 monthly partitions (2022_01 .. 2022_12)', '…']
       ]
+    },
+    stg_vendor_products: {
+      cols: ['sku', 'category', 'unit_price', 'updated_at'],
+      rows: [
+        ['A-9042', 'Apparel',     '23.99',  '2021-10-01 09:00+00'],
+        ['A-9042', 'Apparel',     '24.99',  '2021-11-10 09:00+00'],
+        ['B-2210', 'Footwear',    '115.00', '2021-09-15 09:00+00'],
+        ['B-2210', 'Footwear',    '120.00', '2021-11-01 09:00+00'],
+        ['B-2210', 'Footwear',    '118.00', '2021-10-01 09:00+00'],
+        ['C-5501', 'Accessories', '45.00',  '2021-10-15 09:00+00'],
+        ['D-7310', 'Home',        '12.25',  '2021-11-05 09:00+00'],
+        ['D-7310', 'Home',        '11.50',  '2021-08-20 09:00+00']
+      ]
+    },
+    dim_product_scd2: {
+      cols: ['version_id', 'sku_code', 'unit_price', 'valid_from', 'valid_to', 'is_current'],
+      rows: [
+        [1, 'A-9042', '22.99',  '2021-01-01', '2021-11-14', 'FALSE'],
+        [2, 'A-9042', '24.99',  '2021-11-15', '9999-12-31', 'TRUE'],
+        [3, 'B-2210', '115.00', '2021-01-01', '2021-11-14', 'FALSE'],
+        [4, 'B-2210', '120.00', '2021-11-15', '9999-12-31', 'TRUE'],
+        [5, 'C-5501', '45.00',  '2021-01-01', '9999-12-31', 'TRUE']
+      ]
+    },
+    bom: {
+      cols: ['parent_part', 'child_part', 'qty_per'],
+      rows: [
+        ['PUMP-100',  'HOUSING-5', '1.00'],
+        ['PUMP-100',  'MOTOR-20',  '1.00'],
+        ['PUMP-100',  'BOLT-M8',   '8.00'],
+        ['MOTOR-20',  'ROTOR-3',   '1.00'],
+        ['MOTOR-20',  'BOLT-M8',   '4.00'],
+        ['MOTOR-20',  'WIRE-1M',   '2.00'],
+        ['HOUSING-5', 'GASKET-2',  '2.00'],
+        ['HOUSING-5', 'BOLT-M8',   '6.00'],
+        ['HOUSING-5', 'BRACKET-9', '2.00'],
+        ['BRACKET-9', 'BOLT-M8',   '2.00']
+      ]
+    },
+    raw_webhook_orders: {
+      cols: ['event_id', 'payload (JSONB)'],
+      rows: [
+        ['WH-01', '{"order_id":"ORD-501","customer":{"tier":"gold"},"items":[{"sku":"A-9042","qty":2,"price":24.99},{"sku":"C-5501","qty":1,"price":45.00}]}'],
+        ['WH-02', '{"order_id":"ORD-502","customer":{"tier":"silver"},"items":[{"sku":"B-2210","qty":1,"price":120.00}]}'],
+        ['WH-03', '{"order_id":"ORD-503","customer":{"tier":"gold"},"items":[{"sku":"A-9042","qty":1,"price":24.99},{"sku":"G-4400","qty":2,"price":89.50}]}']
+      ]
     }
   };
 
@@ -153,7 +199,7 @@
   }
 
   function isChapterUnlocked(idx) {
-    if (idx <= 0) return true;
+    if (idx <= 0 || idx === 9) return true; // Lesson 1 (Track 1) and Lesson 10 (Track 2) always open
     if (state.unlockAll) return true;
     if (idx === state.currentChapterIdx) return true;
     const ch = ZenChapters[idx];
@@ -174,7 +220,9 @@
     }
     saveState();
     syncHeaderAndPipeline();
-    const xFrac = (ch.num - 1) / Math.max(1, ZenChapters.length - 1);
+    const stages = ZenWorld.activeStages();
+    const localIdx = Math.max(0, stages.findIndex(s => s.id === ch.id));
+    const xFrac = localIdx / Math.max(1, stages.length - 1);
     ZenWorld.ripple(xFrac);
     if (!wasMastered) {
       setTimeout(() => ZenWorld.ripple(xFrac), 300);
@@ -241,23 +289,32 @@
 
   function syncHeaderAndPipeline() {
     const ch = getChapter();
-    ZenWorld.setMastered(state.mastered, ch.num);
+    const track = ch.track || (ch.num >= 10 ? 2 : 1);
+    ZenWorld.setMastered(state.mastered, ch.num, track);
     const done = masteredCount();
     const total = ZenChapters.length;
 
     const journalBtn = $('#btn-journal');
     if (journalBtn) journalBtn.textContent = `📝 Takeaways (${done}/${total})`;
 
+    // Sync track switcher pills
+    $$('[data-track-switch]').forEach(btn => {
+      btn.classList.toggle('active', Number(btn.dataset.trackSwitch) === track);
+    });
+
+    const trackChapters = ZenChapters.filter(c => (c.track || 1) === track);
+    const trackDone = trackChapters.filter(c => state.mastered[c.id]).length;
+
     const statusEl = $('#river-status');
     const rightEl = $('#river-right');
     if (statusEl) {
-      if (done === 0) {
-        statusEl.textContent = `Pipeline progress: 0/${total} stages · Start with Lesson 1 to light up Stage 1.`;
-      } else if (done === total) {
-        statusEl.textContent = `All ${total}/${total} pipeline stages complete · End-to-end data pipeline verified!`;
+      if (trackDone === 0) {
+        statusEl.textContent = `Track ${track}: 0/${trackChapters.length} stages · Start with Lesson ${trackChapters[0].num}.`;
+      } else if (trackDone === trackChapters.length) {
+        statusEl.textContent = `Track ${track} complete (${trackDone}/${trackChapters.length})!`;
       } else {
-        const names = ZenChapters.filter(c => state.mastered[c.id]).map(c => c.stageLabel);
-        statusEl.textContent = `Pipeline progress: ${done}/${total} stages active · ${names.join(' → ')}`;
+        const names = trackChapters.filter(c => state.mastered[c.id]).map(c => c.stageLabel);
+        statusEl.textContent = `Track ${track}: ${trackDone}/${trackChapters.length} active · ${names.join(' → ')}`;
       }
     }
     if (rightEl) {
@@ -453,6 +510,18 @@
         _touchState[ch.id] = { side: 'both' };
       } else if (ch.touch.type === 'partitions') {
         _touchState[ch.id] = { sargable: false, month: 39 };
+      } else if (ch.touch.type === 'window-slide') {
+        _touchState[ch.id] = { mode: 'window' }; // 'group' | 'window'
+      } else if (ch.touch.type === 'dedup-rank') {
+        _touchState[ch.id] = { ranked: true, onlyLatest: false };
+      } else if (ch.touch.type === 'scd2-timeline') {
+        _touchState[ch.id] = { pointInTime: false };
+      } else if (ch.touch.type === 'tz-shift') {
+        _touchState[ch.id] = { local: false };
+      } else if (ch.touch.type === 'bom-tree') {
+        _touchState[ch.id] = { depth: 1 }; // 1 | 2 | 3
+      } else if (ch.touch.type === 'jsonb-unnest') {
+        _touchState[ch.id] = { flattened: false };
       }
     }
     return _touchState[ch.id];
@@ -715,6 +784,167 @@
             : `⚠ Full Table Scan: Wrapping event_ts in EXTRACT() blocks pruning → all 72 partitions scanned · ~21.4s`}
         </div>
       `;
+    } else if (ch.touch.type === 'window-slide') {
+      const isWin = ts.mode === 'window';
+      const s12 = [
+        { id: 'T-1001', ts: 'Nov 14 15:05', amt: 49.98, run: 49.98 },
+        { id: 'T-1002', ts: 'Nov 14 18:40', amt: 120.00, run: 169.98 },
+        { id: 'T-1003', ts: 'Nov 15 03:30', amt: 45.00, run: 214.98 },
+        { id: 'T-1004', ts: 'Nov 15 16:10', amt: 36.75, run: 251.73 }
+      ];
+      const liveSql = isWin
+        ? `SELECT txn_id, store_id, net_amount,\n       SUM(net_amount) OVER (\n         PARTITION BY store_id\n         ORDER BY txn_ts\n       ) AS running_total\nFROM stg_pos_sales\nORDER BY store_id, txn_ts;`
+        : `SELECT store_id, SUM(net_amount) AS total\nFROM stg_pos_sales\nGROUP BY store_id;\n-- Collapses 4 transactions into 1 row!`;
+      inner = `
+        <div class="row">
+          <button type="button" class="pill-btn ${!isWin ? 'btn-saffron' : ''}" data-win="group">GROUP BY (Collapses Rows)</button>
+          <button type="button" class="pill-btn ${isWin ? 'btn-saffron' : ''}" data-win="window"><span class="chip-mark">${isWin ? '✓' : '+'}</span> SUM() OVER (Keeps All Rows)</button>
+        </div>
+        <div class="explore-split">
+          <div class="table-wrap">
+            <table class="zen-table">
+              <thead><tr>${isWin ? '<th>txn_id</th><th>net_amount</th><th>running_total</th>' : '<th>store_id</th><th>total</th>'}</tr></thead>
+              <tbody>
+                ${isWin
+                  ? s12.map(r => `<tr class="row-kept"><td>${r.id}</td><td>${r.amt.toFixed(2)}</td><td style="font-weight:700;">${r.run.toFixed(2)}</td></tr>`).join('')
+                  : `<tr><td>Store 12</td><td style="font-weight:700;">251.73 (4 rows merged)</td></tr>`}
+              </tbody>
+            </table>
+          </div>
+          <div class="stack-sm" style="gap:6px;">
+            <span class="muted"><strong>Matching SQL</strong></span>
+            <pre class="zen-code">${esc(liveSql)}</pre>
+          </div>
+        </div>
+      `;
+    } else if (ch.touch.type === 'dedup-rank') {
+      const rankedRows = [
+        { sku: 'A-9042', price: '24.99',  dt: '2021-11-10', rn: 1 },
+        { sku: 'A-9042', price: '23.99',  dt: '2021-10-01', rn: 2 },
+        { sku: 'B-2210', price: '120.00', dt: '2021-11-01', rn: 1 },
+        { sku: 'B-2210', price: '118.00', dt: '2021-10-01', rn: 2 },
+        { sku: 'B-2210', price: '115.00', dt: '2021-09-15', rn: 3 },
+        { sku: 'C-5501', price: '45.00',  dt: '2021-10-15', rn: 1 },
+        { sku: 'D-7310', price: '12.25',  dt: '2021-11-05', rn: 1 },
+        { sku: 'D-7310', price: '11.50',  dt: '2021-08-20', rn: 2 }
+      ];
+      const liveSql = `WITH ranked AS (\n  SELECT sku, category, unit_price,\n         ROW_NUMBER() OVER (\n           PARTITION BY sku\n           ORDER BY updated_at DESC\n         ) AS rn\n  FROM stg_vendor_products\n)\nSELECT sku, category, unit_price\nFROM ranked${ts.onlyLatest ? '\nWHERE rn = 1' : ''};`;
+      inner = `
+        <div class="row">
+          <button type="button" class="pill-btn ${ts.ranked ? 'btn-saffron' : ''}" data-dedup="rank"><span class="chip-mark">${ts.ranked ? '✓' : '+'}</span> Add ROW_NUMBER() Rank</button>
+          <button type="button" class="pill-btn ${ts.onlyLatest ? 'btn-saffron' : ''}" data-dedup="filter"><span class="chip-mark">${ts.onlyLatest ? '✓' : '+'}</span> Filter WHERE rn = 1</button>
+        </div>
+        <div class="explore-split">
+          <div class="table-wrap" style="max-height:235px;overflow-y:auto;">
+            <table class="zen-table">
+              <thead><tr><th>sku</th><th>unit_price</th><th>updated_at</th>${ts.ranked ? '<th>rn</th>' : ''}</tr></thead>
+              <tbody>
+                ${rankedRows.map(r => {
+                  const cls = ts.onlyLatest ? (r.rn === 1 ? 'row-kept' : 'row-excluded') : (ts.ranked && r.rn === 1 ? 'row-kept' : '');
+                  return `<tr class="${cls}"><td>${r.sku}</td><td>${r.price}</td><td>${r.dt}</td>${ts.ranked ? `<td style="font-weight:700;">${r.rn}</td>` : ''}</tr>`;
+                }).join('')}
+              </tbody>
+            </table>
+          </div>
+          <div class="stack-sm" style="gap:6px;">
+            <span class="muted"><strong>Matching SQL</strong> (${ts.onlyLatest ? '4 unique SKUs kept' : '8 raw rows'})</span>
+            <pre class="zen-code">${esc(liveSql)}</pre>
+          </div>
+        </div>
+      `;
+    } else if (ch.touch.type === 'scd2-timeline') {
+      const pit = !!ts.pointInTime;
+      const sample = [
+        { txn: 'T-1001', sku: 'A-9042', date: '2021-11-14', cur: '24.99 (wrong!)', hist: '22.99 ✓' },
+        { txn: 'T-1002', sku: 'B-2210', date: '2021-11-14', cur: '120.00 (wrong!)', hist: '115.00 ✓' },
+        { txn: 'T-1009', sku: 'B-2210', date: '2021-11-15', cur: '120.00', hist: '120.00 ✓' }
+      ];
+      inner = `
+        <div class="touch-toggle-row">
+          <button type="button" class="touch-choice ${!pit ? 'selected' : ''}" data-scd="off">
+            <div style="font-size:11px;color:var(--warn);text-transform:uppercase;">Rewrites History</div>
+            <div class="mono" style="font-size:12px;">ON d.sku_code = s.sku AND d.is_current</div>
+          </button>
+          <button type="button" class="touch-choice ${pit ? 'selected' : ''}" data-scd="on">
+            <div style="font-size:11px;color:var(--sage);text-transform:uppercase;">Point-in-Time SCD-2</div>
+            <div class="mono" style="font-size:12px;">AND s.txn_ts::date BETWEEN d.valid_from AND d.valid_to</div>
+          </button>
+        </div>
+        <div class="table-wrap">
+          <table class="zen-table">
+            <thead><tr><th>txn_id</th><th>sku</th><th>sale_date</th><th>matched unit_price</th></tr></thead>
+            <tbody>
+              ${sample.map(r => `<tr class="${pit ? 'row-kept' : ''}"><td>${r.txn}</td><td>${r.sku}</td><td>${r.date}</td><td style="color:${pit ? 'var(--sage)' : (r.cur.includes('wrong') ? 'var(--warn)' : 'inherit')};font-weight:700;">${pit ? r.hist : r.cur}</td></tr>`).join('')}
+            </tbody>
+          </table>
+        </div>
+      `;
+    } else if (ch.touch.type === 'tz-shift') {
+      const local = !!ts.local;
+      const sales = [
+        { txn: 'T-1001', utc: '2021-11-14 15:05+00', utcDate: '2021-11-14', cstDate: '2021-11-14 (09:05 CST)', amt: '49.98', shifted: false },
+        { txn: 'T-1002', utc: '2021-11-14 18:40+00', utcDate: '2021-11-14', cstDate: '2021-11-14 (12:40 CST)', amt: '120.00', shifted: false },
+        { txn: 'T-1003', utc: '2021-11-15 03:30+00', utcDate: '2021-11-15 ⚠', cstDate: '2021-11-14 (21:30 CST) ✓', amt: '45.00', shifted: true },
+        { txn: 'T-1004', utc: '2021-11-15 16:10+00', utcDate: '2021-11-15', cstDate: '2021-11-15 (10:10 CST)', amt: '36.75', shifted: false }
+      ];
+      inner = `
+        <div class="row">
+          <button type="button" class="pill-btn ${!local ? 'btn-saffron' : ''}" data-tz="utc">Raw UTC Date (txn_ts::date)</button>
+          <button type="button" class="pill-btn ${local ? 'btn-saffron' : ''}" data-tz="local"><span class="chip-mark">${local ? '✓' : '+'}</span> America/Chicago Local Date</button>
+        </div>
+        <div class="table-wrap">
+          <table class="zen-table">
+            <thead><tr><th>txn_id</th><th>stored UTC</th><th>assigned biz_date</th><th>net_amount</th></tr></thead>
+            <tbody>
+              ${sales.map(r => `<tr class="${r.shifted ? (local ? 'row-kept' : '') : ''}"><td>${r.txn}</td><td>${r.utc}</td><td style="font-weight:${r.shifted ? 700 : 400};color:${r.shifted ? (local ? 'var(--sage)' : 'var(--warn)') : 'inherit'};">${local ? r.cstDate : r.utcDate}</td><td>${r.amt}</td></tr>`).join('')}
+            </tbody>
+          </table>
+        </div>
+        <div class="touch-readout" style="border-left-color:${local ? 'var(--sage)' : 'var(--warn)'};">
+          ${local
+            ? '✓ Nov 14 Total = $214.98 | Nov 15 Total = $36.75 — Matches Dallas Store 12 EOD Register to the penny!'
+            : '⚠ Nov 14 Total = $169.98 | Nov 15 Total = $81.75 — $45.00 evening sale T-1003 drifted into tomorrow!'}
+        </div>
+      `;
+    } else if (ch.touch.type === 'bom-tree') {
+      const d = ts.depth || 1;
+      const levels = [
+        { n: 1, label: 'Level 1 (Direct)', bolts: 8,  desc: 'PUMP-100 → 8 BOLT-M8 (misses sub-assemblies MOTOR-20 & HOUSING-5!)' },
+        { n: 2, label: 'Level 2 (+ Sub-Assemblies)', bolts: 18, desc: '+4 bolts inside MOTOR-20, +6 bolts inside HOUSING-5 (still misses BRACKET-9!)' },
+        { n: 3, label: 'Level 3 (Full Recursive Leaves)', bolts: 22, desc: '+2 BRACKET-9 × 2 bolts = +4 more → 22 BOLT-M8, 2 GASKET-2, 1 ROTOR-3, 2 WIRE-1M ✓' }
+      ];
+      const cur = levels[d - 1];
+      inner = `
+        <div class="row">
+          ${levels.map(lv => `<button type="button" class="pill-btn ${d === lv.n ? 'btn-saffron' : ''}" data-bom="${lv.n}">${lv.label}</button>`).join('')}
+        </div>
+        <div class="touch-readout" style="border-left-color:${d === 3 ? 'var(--sage)' : 'var(--saffron)'};">
+          <div class="row-between">
+            <span><strong>Depth Explored:</strong> Level ${d} of 3</span>
+            <span><strong>BOLT-M8 Counted:</strong> ${cur.bolts} of 22</span>
+          </div>
+          <div style="margin-top:6px;">${esc(cur.desc)}</div>
+        </div>
+      `;
+    } else if (ch.touch.type === 'jsonb-unnest') {
+      const flat = !!ts.flattened;
+      const flatRows = [
+        ['ORD-501', 'gold',   'A-9042', 2, '49.98'],
+        ['ORD-501', 'gold',   'C-5501', 1, '45.00'],
+        ['ORD-502', 'silver', 'B-2210', 1, '120.00'],
+        ['ORD-503', 'gold',   'A-9042', 1, '24.99'],
+        ['ORD-503', 'gold',   'G-4400', 2, '179.00']
+      ];
+      inner = `
+        <div class="row">
+          <button type="button" class="pill-btn ${!flat ? 'btn-saffron' : ''}" data-jb="raw">3 Nested JSONB Webhooks</button>
+          <button type="button" class="pill-btn ${flat ? 'btn-saffron' : ''}" data-jb="flat"><span class="chip-mark">${flat ? '✓' : '+'}</span> Unnest via jsonb_array_elements (5 Rows)</button>
+        </div>
+        ${flat
+          ? `<div class="table-wrap"><table class="zen-table"><thead><tr><th>order_id</th><th>tier</th><th>sku</th><th>qty</th><th>line_total</th></tr></thead><tbody>${flatRows.map(r => `<tr class="row-kept"><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td></tr>`).join('')}</tbody></table></div>`
+          : `<pre class="zen-code">WH-01: {"order_id":"ORD-501","customer":{"tier":"gold"},"items":[{"sku":"A-9042","qty":2,"price":24.99},{"sku":"C-5501","qty":1,"price":45.00}]}\nWH-02: {"order_id":"ORD-502","customer":{"tier":"silver"},"items":[{"sku":"B-2210","qty":1,"price":120.00}]}\nWH-03: {"order_id":"ORD-503","customer":{"tier":"gold"},"items":[{"sku":"A-9042","qty":1,"price":24.99},{"sku":"G-4400","qty":2,"price":89.50}]}</pre>`
+        }
+      `;
     }
 
     return `
@@ -822,6 +1052,55 @@
           });
         });
       }
+    } else if (ch.touch.type === 'window-slide') {
+      $$('[data-win]', body).forEach(btn => {
+        btn.addEventListener('click', () => {
+          ts.mode = btn.dataset.win;
+          ts.mode === 'window' ? ZenAudio.chime(false) : ZenAudio.tap();
+          renderStage(false);
+        });
+      });
+    } else if (ch.touch.type === 'dedup-rank') {
+      $$('[data-dedup]', body).forEach(btn => {
+        btn.addEventListener('click', () => {
+          if (btn.dataset.dedup === 'rank') ts.ranked = !ts.ranked;
+          if (btn.dataset.dedup === 'filter') { ts.onlyLatest = !ts.onlyLatest; if (ts.onlyLatest) ts.ranked = true; }
+          ts.onlyLatest ? ZenAudio.chime(false) : ZenAudio.tap();
+          renderStage(false);
+        });
+      });
+    } else if (ch.touch.type === 'scd2-timeline') {
+      $$('[data-scd]', body).forEach(btn => {
+        btn.addEventListener('click', () => {
+          ts.pointInTime = btn.dataset.scd === 'on';
+          ts.pointInTime ? ZenAudio.chime(false) : ZenAudio.tap();
+          renderStage(false);
+        });
+      });
+    } else if (ch.touch.type === 'tz-shift') {
+      $$('[data-tz]', body).forEach(btn => {
+        btn.addEventListener('click', () => {
+          ts.local = btn.dataset.tz === 'local';
+          ts.local ? ZenAudio.chime(false) : ZenAudio.tap();
+          renderStage(false);
+        });
+      });
+    } else if (ch.touch.type === 'bom-tree') {
+      $$('[data-bom]', body).forEach(btn => {
+        btn.addEventListener('click', () => {
+          ts.depth = Number(btn.dataset.bom);
+          ts.depth === 3 ? ZenAudio.chime(false) : ZenAudio.tap();
+          renderStage(false);
+        });
+      });
+    } else if (ch.touch.type === 'jsonb-unnest') {
+      $$('[data-jb]', body).forEach(btn => {
+        btn.addEventListener('click', () => {
+          ts.flattened = btn.dataset.jb === 'flat';
+          ts.flattened ? ZenAudio.chime(false) : ZenAudio.tap();
+          renderStage(false);
+        });
+      });
     }
 
     const back = $('#btn-back-beat1', body);
@@ -920,7 +1199,46 @@
       <div id="spell-results" class="hidden"></div>
       <div class="row-between" style="padding-top:4px;">
         <button type="button" id="btn-back-beat2" class="btn-quiet">← Back to Explore</button>
-        <button type="button" id="btn-open-studio-inline" class="pill-btn">🐘 Open Full SQL Playground (All 13 Labs &amp; Schema)</button>
+        <button type="button" id="btn-open-studio-inline" class="pill-btn">🐘 Open Full SQL Playground (All ${PgLab.CHALLENGES.length} Labs &amp; Schema)</button>
+      </div>
+    `;
+  }
+
+  /* Visual EXPLAIN Plan Tree Viewer — turns raw PostgreSQL EXPLAIN lines into scannable color-coded nodes */
+  function renderExplainTreeHtml(planText) {
+    if (!planText) return '';
+    const lines = String(planText).split('\n').filter(l => l.trim());
+    const parts = new Set(String(planText).match(/fact_shop_floor_events_\d{4}_\d{2}/g) || []);
+    const partBanner = parts.size
+      ? `<div class="muted" style="font-weight:600;color:${parts.size <= 1 ? 'var(--sage)' : 'var(--warn)'};margin-bottom:4px;">
+          ${parts.size <= 1 ? `✓ Partition Pruning Active: only ${parts.size} partition scanned (11 pruned)` : `⚠ Scanning ${parts.size} of 12 partitions (make predicate sargable to prune)`}
+         </div>`
+      : '';
+    const nodesHtml = lines.map(line => {
+      const leadSpaces = (line.match(/^(\s*)/) || ['', ''])[1].length;
+      const depth = Math.min(6, Math.floor(leadSpaces / 4));
+      const clean = line.trim().replace(/^->\s*/, '');
+      let badge = 'OP', cls = 'op';
+      if (/Seq Scan/i.test(clean)) { badge = 'SEQ SCAN'; cls = 'seq'; }
+      else if (/Index Only Scan/i.test(clean)) { badge = 'INDEX ONLY'; cls = 'idx'; }
+      else if (/Bitmap|Index Scan/i.test(clean)) { badge = 'INDEX SCAN'; cls = 'idx'; }
+      else if (/Hash|Merge|Nested Loop/i.test(clean)) { badge = 'JOIN'; cls = 'op'; }
+      else if (/Aggregate|Group|Sort/i.test(clean)) { badge = 'AGG/SORT'; cls = 'op'; }
+      else if (/Append/i.test(clean)) { badge = 'PARTITIONS'; cls = 'op'; }
+      else if (/Filter:|Index Cond:|Planning Time:|Execution Time:/i.test(clean)) { badge = 'DETAIL'; cls = 'op'; }
+      return `<div class="plan-node" style="margin-left:${depth * 16}px;">
+        <span class="plan-badge ${cls}">${badge}</span>
+        <span style="overflow-wrap:anywhere;">${esc(clean)}</span>
+      </div>`;
+    }).join('');
+    return `
+      <div class="stack-sm" style="gap:6px;">
+        <div class="muted" style="font-weight:600;">Visual PostgreSQL 18 EXPLAIN Plan Tree:</div>
+        <div class="plan-tree">${partBanner}${nodesHtml}</div>
+        <details class="peek-details" style="padding:7px 12px;">
+          <summary style="font-size:12px;">Raw EXPLAIN text</summary>
+          <pre class="zen-code" style="margin-top:6px;">${esc(planText)}</pre>
+        </details>
       </div>
     `;
   }
@@ -1084,7 +1402,7 @@
 
         if (res.plan) {
           planBox.classList.remove('hidden');
-          planBox.innerHTML = `<div class="muted" style="margin-bottom:4px;">Real PostgreSQL 18 EXPLAIN Plan:</div><pre class="zen-code">${esc(res.plan)}</pre>`;
+          planBox.innerHTML = renderExplainTreeHtml(res.plan);
         }
         if (res.user && res.user.fields && res.user.fields.length) {
           resBox.classList.remove('hidden');
@@ -1154,8 +1472,8 @@
         <div class="row" style="margin-top:8px;">
           ${nextCh
             ? `<button type="button" id="btn-next-chapter" class="btn-saffron">Next: Lesson ${nextCh.num} — ${esc(nextCh.title)} →</button>`
-            : `<button type="button" id="btn-finish-journal" class="btn-saffron">📝 Review All 9 Key Takeaways</button>
-               <button type="button" id="btn-finish-studio" class="btn-quiet">🐘 Explore All 13 Postgres Labs</button>`
+            : `<button type="button" id="btn-finish-journal" class="btn-saffron">📝 Review All ${ZenChapters.length} Key Takeaways</button>
+               <button type="button" id="btn-finish-studio" class="btn-quiet">🐘 Explore All ${PgLab.CHALLENGES.length} Postgres Labs</button>`
           }
           <button type="button" id="btn-replay-chapter" class="btn-quiet">↺ Replay Lesson</button>
         </div>
@@ -1207,31 +1525,41 @@
     const body = $('#modal-map-body');
     if (!body) return;
     const done = masteredCount();
+    const tracks = window.ZenTracks || [
+      { id: 1, name: 'Track 1 · Core SQL & Pipelines' },
+      { id: 2, name: 'Track 2 · Analytical SQL & Modeling' }
+    ];
     body.innerHTML = `
       <div class="row-between">
-        <span class="muted">${done} of ${ZenChapters.length} lessons completed.</span>
+        <span class="muted">${done} of ${ZenChapters.length} lessons completed across ${tracks.length} tracks.</span>
         <label class="row" style="font-size:13px;cursor:pointer;">
           <input type="checkbox" id="chk-unlock-all" ${state.unlockAll ? 'checked' : ''} style="accent-color:var(--saffron);" />
           <span>Unlock all lessons (jump freely)</span>
         </label>
       </div>
-      <div class="stack-sm">
-        ${ZenChapters.map((ch, idx) => {
-          const unlocked = isChapterUnlocked(idx);
-          const isDone = !!state.mastered[ch.id];
-          const isCurr = idx === state.currentChapterIdx;
-          const badge = isDone ? '✓ Done' : (isCurr ? '● Active' : (unlocked ? '○ Ready' : '🔒 Locked'));
-          return `
-            <button type="button" class="chapter-list-item ${!unlocked ? 'mist' : ''} ${isCurr ? 'current' : ''}" data-jump-ch="${idx}" ${!unlocked ? 'disabled' : ''}>
-              <div>
-                <div style="font-weight:700;">Lesson ${ch.num} · ${esc(ch.title)} <span class="muted" style="font-weight:400;">— ${esc(ch.subtitle)}</span></div>
-                <div class="muted" style="font-size:11.5px;">${esc(ch.level)} · ${esc(ch.tech)}</div>
-              </div>
-              <span class="mono" style="font-size:12px;color:${isDone ? 'var(--sage)' : (isCurr ? 'var(--saffron)' : 'var(--muted)')};">${badge}</span>
-            </button>
-          `;
-        }).join('')}
-      </div>
+      ${tracks.map(tr => {
+        const list = ZenChapters.map((ch, idx) => ({ ch, idx })).filter(x => (x.ch.track || 1) === tr.id);
+        return `
+          <div class="stack-sm" style="gap:6px;">
+            <div class="chapter-eyebrow" style="margin-top:4px;">${esc(tr.name)}</div>
+            ${list.map(({ ch, idx }) => {
+              const unlocked = isChapterUnlocked(idx);
+              const isDone = !!state.mastered[ch.id];
+              const isCurr = idx === state.currentChapterIdx;
+              const badge = isDone ? '✓ Done' : (isCurr ? '● Active' : (unlocked ? '○ Ready' : '🔒 Locked'));
+              return `
+                <button type="button" class="chapter-list-item ${!unlocked ? 'mist' : ''} ${isCurr ? 'current' : ''}" data-jump-ch="${idx}" ${!unlocked ? 'disabled' : ''}>
+                  <div>
+                    <div style="font-weight:700;">Lesson ${ch.num} · ${esc(ch.title)} <span class="muted" style="font-weight:400;">— ${esc(ch.subtitle)}</span></div>
+                    <div class="muted" style="font-size:11.5px;">${esc(ch.level)} · ${esc(ch.tech)}</div>
+                  </div>
+                  <span class="mono" style="font-size:12px;color:${isDone ? 'var(--sage)' : (isCurr ? 'var(--saffron)' : 'var(--muted)')};">${badge}</span>
+                </button>
+              `;
+            }).join('')}
+          </div>
+        `;
+      }).join('')}
       <div class="row-between" style="padding-top:8px;border-top:1px solid var(--border);">
         <span class="muted">Saved locally on this device — works offline.</span>
         <button type="button" id="btn-reset-journey" class="pill-btn" style="color:var(--warn);">↺ Reset Progress</button>
@@ -1329,7 +1657,7 @@
     body.innerHTML = `
       <div class="row-between">
         <div class="row">
-          <button type="button" class="pill-btn ${_studioSubTab === 'labs' ? 'btn-saffron' : ''}" data-studio-tab="labs">13 Graded Labs (${solvedCount}/13)</button>
+          <button type="button" class="pill-btn ${_studioSubTab === 'labs' ? 'btn-saffron' : ''}" data-studio-tab="labs">${PgLab.CHALLENGES.length} Graded Labs (${solvedCount}/${PgLab.CHALLENGES.length})</button>
           <button type="button" class="pill-btn ${_studioSubTab === 'scratch' ? 'btn-saffron' : ''}" data-studio-tab="scratch">Scratchpad &amp; Schema</button>
           <button type="button" class="pill-btn ${_studioSubTab === 'dialect' ? 'btn-saffron' : ''}" data-studio-tab="dialect">T-SQL ↔ PostgreSQL Guide</button>
         </div>
@@ -1428,7 +1756,7 @@
         fb.textContent = res.message;
         if (res.plan) {
           planEl.classList.remove('hidden');
-          planEl.innerHTML = `<pre class="zen-code">${esc(res.plan)}</pre>`;
+          planEl.innerHTML = renderExplainTreeHtml(res.plan);
         }
         if (res.user && res.user.fields && res.user.fields.length) {
           resEl.classList.remove('hidden');
@@ -1479,7 +1807,9 @@
       { label: 'Store Revenue', sql: `SELECT s.store_id, st.store_name, COUNT(*) AS txns, SUM(s.net_amount) AS revenue\nFROM stg_pos_sales s\nJOIN dim_store st ON st.store_id = s.store_id\nGROUP BY s.store_id, st.store_name\nORDER BY revenue DESC;` },
       { label: 'Partition EXPLAIN', sql: PgLab.TRY_IT['pg-exp'].sql },
       { label: 'ROW_NUMBER Dedup', sql: PgLab.TRY_IT['pg-int'].sql },
-      { label: 'Recursive BOM', sql: PgLab.CHALLENGES.find(c => c.id === 'pg13-bom').solution }
+      { label: 'SCD-2 Point-in-Time', sql: PgLab.CHALLENGES.find(c => c.id === 'pg14-scd2').solution },
+      { label: 'Recursive BOM', sql: PgLab.CHALLENGES.find(c => c.id === 'pg13-bom').solution },
+      { label: 'JSONB Unnest', sql: PgLab.CHALLENGES.find(c => c.id === 'pg15-jsonb').solution }
     ];
 
     pane.innerHTML = `
@@ -1538,6 +1868,10 @@
         const { results, ms } = await PgLab.run(sql);
         msEl.textContent = `${ms.toFixed(1)} ms`;
         const blocks = results.map(r => {
+          if (r.fields && r.fields.length === 1 && /QUERY PLAN/i.test(r.fields[0].name)) {
+            const planText = (r.rows || []).map(row => row[0]).join('\n');
+            return renderExplainTreeHtml(planText);
+          }
           if (r.fields && r.fields.length) return renderResultTableHtml(r);
           return `<div class="zen-feedback ok">✓ Statement executed (${r.affectedRows || 0} rows affected)</div>`;
         }).join('');
@@ -1627,24 +1961,26 @@
   function wirePipelineCanvasClicks(canvas) {
     if (!canvas) return;
     canvas.style.cursor = 'pointer';
-    canvas.title = 'Click any unlocked pipeline stage to jump to that lesson';
+    canvas.title = 'Click any unlocked stage to jump to that lesson';
     canvas.addEventListener('click', e => {
+      const stages = ZenWorld.activeStages();
       const rect = canvas.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const w = rect.width || 760;
-      const pad = Math.max(38, w * 0.065);
+      const pad = Math.max(40, w * (stages.length <= 6 ? 0.10 : 0.065));
       const span = w - pad * 2;
-      let nearest = -1;
-      let bestDist = 28;
-      for (let i = 0; i < ZenChapters.length; i++) {
-        const nx = pad + (i / (ZenChapters.length - 1)) * span;
+      let hitStage = null;
+      let bestDist = 30;
+      for (let i = 0; i < stages.length; i++) {
+        const nx = pad + (i / Math.max(1, stages.length - 1)) * span;
         const d = Math.abs(x - nx);
-        if (d < bestDist) { bestDist = d; nearest = i; }
+        if (d < bestDist) { bestDist = d; hitStage = stages[i]; }
       }
-      if (nearest >= 0) {
-        if (isChapterUnlocked(nearest)) {
+      if (hitStage) {
+        const globalIdx = ZenChapters.findIndex(c => c.id === hitStage.id);
+        if (globalIdx >= 0 && isChapterUnlocked(globalIdx)) {
           ZenAudio.tap();
-          openChapter(nearest, 1, false);
+          openChapter(globalIdx, 1, false);
         } else {
           ZenAudio.woodblock();
           openModal('map');
@@ -1656,6 +1992,7 @@
   function applyUrlParams() {
     const params = new URLSearchParams(window.location.search);
     const lessonParam = params.get('lesson') || params.get('ch');
+    const trackParam = params.get('track');
     const viewParam = params.get('view');
     const legacyTab = params.get('tab');
 
@@ -1665,6 +2002,9 @@
         state.currentChapterIdx = n - 1;
         state.currentBeat = 1;
       }
+    } else if (trackParam === '2') {
+      state.currentChapterIdx = 9; // Lesson 10: Track 2 entry
+      state.currentBeat = 1;
     } else if (legacyTab === 'pg') {
       state.currentChapterIdx = 7; // Lesson 8: Making Large Tables Fast (Partitions)
       state.currentBeat = 1;
@@ -1695,6 +2035,19 @@
     syncHeaderAndPipeline();
     renderStage(false);
 
+    // Track switcher pills in pipeline bar
+    $$('[data-track-switch]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const targetTrack = Number(btn.dataset.trackSwitch);
+        const curTrack = getChapter().track || 1;
+        if (targetTrack === curTrack) return;
+        ZenAudio.tap();
+        const firstIdx = ZenChapters.findIndex(c => (c.track || 1) === targetTrack);
+        if (firstIdx >= 0) openChapter(firstIdx, 1, false);
+      });
+    });
+
+    // Header actions
     const mapBtn = $('#btn-map');
     const journalBtn = $('#btn-journal');
     const studioBtn = $('#btn-studio');

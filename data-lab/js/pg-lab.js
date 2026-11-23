@@ -141,6 +141,31 @@ INSERT INTO bom VALUES
   ('HOUSING-5', 'BRACKET-9', 2),
   ('BRACKET-9', 'BOLT-M8',   2);
 
+CREATE TABLE dim_product_scd2 (
+  version_id INT PRIMARY KEY,
+  sku_code   TEXT NOT NULL,
+  unit_price NUMERIC(10,2) NOT NULL,
+  valid_from DATE NOT NULL,
+  valid_to   DATE NOT NULL,
+  is_current BOOLEAN NOT NULL
+);
+INSERT INTO dim_product_scd2 VALUES
+  (1, 'A-9042',  22.99, '2021-01-01', '2021-11-14', FALSE),
+  (2, 'A-9042',  24.99, '2021-11-15', '9999-12-31', TRUE),
+  (3, 'B-2210', 115.00, '2021-01-01', '2021-11-14', FALSE),
+  (4, 'B-2210', 120.00, '2021-11-15', '9999-12-31', TRUE),
+  (5, 'C-5501',  45.00, '2021-01-01', '9999-12-31', TRUE);
+
+CREATE TABLE raw_webhook_orders (
+  event_id    TEXT PRIMARY KEY,
+  received_at TIMESTAMPTZ NOT NULL,
+  payload     JSONB NOT NULL
+);
+INSERT INTO raw_webhook_orders VALUES
+  ('WH-01', '2022-03-10 14:00+00', '{"order_id":"ORD-501","customer":{"tier":"gold"},"items":[{"sku":"A-9042","qty":2,"price":24.99},{"sku":"C-5501","qty":1,"price":45.00}]}'::jsonb),
+  ('WH-02', '2022-03-10 14:15+00', '{"order_id":"ORD-502","customer":{"tier":"silver"},"items":[{"sku":"B-2210","qty":1,"price":120.00}]}'::jsonb),
+  ('WH-03', '2022-03-10 14:30+00', '{"order_id":"ORD-503","customer":{"tier":"gold"},"items":[{"sku":"A-9042","qty":1,"price":24.99},{"sku":"G-4400","qty":2,"price":89.50}]}'::jsonb);
+
 CREATE TABLE fact_shop_floor_events (
   event_id     BIGINT NOT NULL,
   plant_id     INT NOT NULL,
@@ -329,6 +354,22 @@ RESET enable_seqscan;` }
       hint: 'WITH RECURSIVE: anchor = children of PUMP-100 (cast qty_per::numeric — PostgreSQL requires both terms of a recursive CTE to have the SAME type, and numeric(10,2) × numeric(10,2) widens to plain numeric); recursive step joins bom on parent_part = child_part and multiplies qty. Keep parts that never appear as a parent_part and SUM per part.',
       starter: `-- Direct children only — misses nested sub-assemblies!\nSELECT child_part, qty_per AS total_qty\nFROM bom\nWHERE parent_part = 'PUMP-100';`,
       solution: `WITH RECURSIVE explode AS (\n  SELECT child_part, qty_per::numeric AS total_qty\n  FROM bom WHERE parent_part = 'PUMP-100'\n  UNION ALL\n  SELECT b.child_part, e.total_qty * b.qty_per\n  FROM explode e JOIN bom b ON b.parent_part = e.child_part\n)\nSELECT child_part, SUM(total_qty) AS total_qty\nFROM explode e\nWHERE NOT EXISTS (SELECT 1 FROM bom b WHERE b.parent_part = e.child_part)\nGROUP BY child_part;`
+    },
+    {
+      id: 'pg14-scd2', level: 'Advanced', title: 'Point-in-Time Join on SCD Type 2 History',
+      prompt: 'Prices changed on 2021-11-15 in dim_product_scd2. The starter joins on is_current, applying TODAY\'s price to past sales! Fix the join so each sale matches the price active on its UTC date (s.txn_ts::date). Return txn_id, sku, sale_date, historical_price ordered by txn_id.',
+      hint: 'Replace d.is_current with s.txn_ts::date BETWEEN d.valid_from AND d.valid_to inside the JOIN ON clause.',
+      starter: `SELECT s.txn_id, s.sku, s.txn_ts::date AS sale_date,\n       d.unit_price AS historical_price\nFROM stg_pos_sales s\nJOIN dim_product_scd2 d\n  ON d.sku_code = s.sku AND d.is_current\nORDER BY s.txn_id;`,
+      solution: `SELECT s.txn_id, s.sku, s.txn_ts::date AS sale_date,\n       d.unit_price AS historical_price\nFROM stg_pos_sales s\nJOIN dim_product_scd2 d\n  ON d.sku_code = s.sku\n AND s.txn_ts::date BETWEEN d.valid_from AND d.valid_to\nORDER BY s.txn_id;`,
+      orderMatters: true
+    },
+    {
+      id: 'pg15-jsonb', level: 'Expert', title: 'Unnest Nested JSONB Webhook Orders',
+      prompt: 'raw_webhook_orders stores API payloads with a nested items array. Extract order_id, tier (customer.tier), sku, qty (INT), and line_total (qty * price as NUMERIC) for every line item, ordered by order_id, sku.',
+      hint: 'Use CROSS JOIN LATERAL jsonb_array_elements(w.payload->\'items\') AS item, then read item->>\'sku\', (item->>\'qty\')::int, and (item->>\'price\')::numeric.',
+      starter: `SELECT w.payload->>'order_id' AS order_id,\n       w.payload->'customer'->>'tier' AS tier\nFROM raw_webhook_orders w\n-- CROSS JOIN LATERAL jsonb_array_elements(w.payload->'items') AS item\nORDER BY order_id;`,
+      solution: `SELECT w.payload->>'order_id' AS order_id,\n       w.payload->'customer'->>'tier' AS tier,\n       item->>'sku' AS sku,\n       (item->>'qty')::int AS qty,\n       (item->>'qty')::int * (item->>'price')::numeric AS line_total\nFROM raw_webhook_orders w\nCROSS JOIN LATERAL jsonb_array_elements(w.payload->'items') AS item\nORDER BY order_id, sku;`,
+      orderMatters: true
     }
   ],
 

@@ -1,10 +1,16 @@
-/* Data Lab — 9 First-Principles Lessons (Day-1 Beginner → Production Data Engineering)
- * Calm, single-focus flow: Watch -> Explore Visually -> Practice (Real Postgres 18 / Python) -> Takeaway.
- * Plain, concrete engineering language throughout; PostgreSQL, SQL Server, SSIS & Python learned in natural progression.
+/* Data Lab — 15 First-Principles Lessons across 2 Tracks (Day-1 Beginner → Senior Analytical SQL Engineer)
+ * Track 1 (L1–L9): Core SQL & Data Pipelines
+ * Track 2 (L10–L15): Analytical SQL & Dimensional Modeling (Windows, Dedup, SCD-2, Timezones, Recursive BOM, JSONB)
  */
+const ZenTracks = [
+  { id: 1, name: 'Track 1 · Core SQL & Pipelines', short: 'Track 1 (L1–9)', range: [1, 9] },
+  { id: 2, name: 'Track 2 · Analytical SQL & Modeling', short: 'Track 2 (L10–15)', range: [10, 15] }
+];
+
 const ZenChapters = [
   {
     id: 'l1-filter',
+    track: 1,
     num: 1,
     roman: '1',
     stageLabel: 'Filter',
@@ -351,9 +357,233 @@ const ZenChapters = [
       ]
     },
     koan: 'Aggregate each table to the same grain in its own CTE before joining—otherwise 1-to-many joins multiply your sums.',
-    worldUpgrade: 'Stage 9 active: End-to-end automated reconciliation verifies 100% parity across your entire data pipeline!'
+    worldUpgrade: 'Track 1 complete! End-to-end automated reconciliation verifies 100% parity across your core pipeline.'
+  },
+  /* ==================== TRACK 2: ANALYTICAL SQL & MODELING (L10–L15) ==================== */
+  {
+    id: 'l10-windows',
+    track: 2,
+    num: 10,
+    roman: '10',
+    stageLabel: 'Windows',
+    title: 'Window Functions & Running Totals',
+    subtitle: 'Compute cumulative metrics with OVER() without collapsing rows',
+    level: 'Intermediate',
+    tech: 'PostgreSQL · Window Functions',
+    audio: 'audio/ch10.mp3',
+    durationSec: 19,
+    narration: 'GROUP BY collapses rows down to one line per store. Sometimes you want to keep every individual transaction visible while still showing the cumulative running total beside it. Window functions use OVER with PARTITION BY and ORDER BY to calculate across neighboring rows without losing a single detail row.',
+    cues: [
+      { at: 0.0, scene: 'groupby-collapse', caption: 'GROUP BY collapses detail rows into one summary line per store.' },
+      { at: 5.5, scene: 'window-keep', caption: 'Window functions keep every transaction row while calculating a cumulative total beside it.' },
+      { at: 11.5, scene: 'running-sum', caption: 'Use SUM(net_amount) OVER (PARTITION BY store_id ORDER BY txn_ts) to reset totals per store.' }
+    ],
+    touch: {
+      prompt: 'Compare GROUP BY against SUM() OVER (PARTITION BY store_id ORDER BY txn_ts) on Store 12 transactions:',
+      type: 'window-slide'
+    },
+    spell: {
+      mode: 'pg',
+      pgChallengeId: 'pg9-running',
+      peekTable: 'stg_pos_sales',
+      autoPeek: false,
+      intro: 'Add a running_total column per store in transaction-time order using a window function in real PostgreSQL 18.',
+      helpers: [
+        { label: 'SUM(net_amount) OVER (...)', insert: ',\n       SUM(net_amount) OVER (PARTITION BY store_id ORDER BY txn_ts) AS running_total', target: 'select' }
+      ]
+    },
+    koan: 'GROUP BY collapses rows; window functions with OVER() compute totals across rows while preserving every detail row.',
+    worldUpgrade: 'Track 2 Stage 1 active: Analytical window frames now compute running totals and trends without losing row grain.'
+  },
+  {
+    id: 'l11-dedup',
+    track: 2,
+    num: 11,
+    roman: '11',
+    stageLabel: 'Dedup',
+    title: 'Deduplicating Versions with ROW_NUMBER()',
+    subtitle: 'Keep only the latest snapshot per business key cleanly',
+    level: 'Intermediate',
+    tech: 'PostgreSQL · CTEs & Ranking Windows',
+    audio: 'audio/ch11.mp3',
+    durationSec: 19,
+    narration: 'Staging tables often receive multiple updates for the same product over weeks or months. To keep only the newest record per SKU, assign a sequential rank with ROW_NUMBER partitioned by SKU and ordered by updated_at descending. Then wrap it in a CTE and filter where row number equals one.',
+    cues: [
+      { at: 0.0, scene: 'multi-ver', caption: 'Vendor feeds often stack multiple historical updates for the same SKU in staging.' },
+      { at: 5.8, scene: 'rank-rows', caption: 'ROW_NUMBER() OVER (PARTITION BY sku ORDER BY updated_at DESC) numbers newest rows as 1.' },
+      { at: 11.8, scene: 'keep-rn1', caption: 'Filter WHERE rn = 1 in a CTE to emit one clean, latest row per SKU.' }
+    ],
+    touch: {
+      prompt: 'Rank the 8 versioned rows in stg_vendor_products with ROW_NUMBER() and filter to rn = 1 to see how deduplication works:',
+      type: 'dedup-rank'
+    },
+    spell: {
+      mode: 'pg',
+      pgChallengeId: 'pg5-rownumber',
+      peekTable: 'stg_vendor_products',
+      autoPeek: true,
+      intro: 'Deduplicate stg_vendor_products in PostgreSQL 18 so only the latest version (newest updated_at) of each SKU is returned.',
+      helpers: [
+        { label: 'Scaffold ranked CTE', replaceAll: `WITH ranked AS (\n  SELECT sku, category, unit_price,\n         ROW_NUMBER() OVER (PARTITION BY sku ORDER BY updated_at DESC) AS rn\n  FROM stg_vendor_products\n)\nSELECT sku, category, unit_price\nFROM ranked\n-- filter to latest version\n;` },
+        { label: 'WHERE rn = 1', insert: 'WHERE rn = 1' }
+      ]
+    },
+    koan: 'Deduplicate staged feeds deterministically with ROW_NUMBER() OVER (PARTITION BY key ORDER BY updated_at DESC) and WHERE rn = 1.',
+    worldUpgrade: 'Track 2 Stage 2 active: Multi-version vendor feeds now collapse deterministically to the single latest state.'
+  },
+  {
+    id: 'l12-scd2',
+    track: 2,
+    num: 12,
+    roman: '12',
+    stageLabel: 'SCD-2',
+    title: 'Slowly Changing Dimensions (SCD Type 2)',
+    subtitle: 'Join historical facts to the exact version active on that date',
+    level: 'Advanced',
+    tech: 'Dimensional Modeling · Temporal Joins',
+    audio: 'audio/ch12.mp3',
+    durationSec: 20,
+    narration: 'Product prices and customer tiers change over time. If you only join sales to the current dimension row, last month\'s reports quietly rewrite history with today\'s price. Slowly Changing Dimension Type 2 stores valid-from and valid-to dates so every past transaction joins to the exact version active on that day.',
+    cues: [
+      { at: 0.0, scene: 'price-change', caption: 'Prices changed on Nov 15: A-9042 rose from $22.99 to $24.99, B-2210 from $115 to $120.' },
+      { at: 6.0, scene: 'naive-current', caption: 'Joining on is_current = TRUE rewrites Nov 14 history using Nov 15 prices.' },
+      { at: 12.0, scene: 'between-dates', caption: 'Join with s.txn_ts::date BETWEEN d.valid_from AND d.valid_to to preserve exact history.' }
+    ],
+    touch: {
+      prompt: 'Compare joining on is_current against a point-in-time BETWEEN valid_from AND valid_to join as dates cross the Nov 15 price change:',
+      type: 'scd2-timeline'
+    },
+    spell: {
+      mode: 'pg',
+      pgChallengeId: 'pg14-scd2',
+      peekTable: 'dim_product_scd2',
+      autoPeek: true,
+      intro: 'Fix the join against dim_product_scd2 in PostgreSQL 18 so every sale matches the unit_price active on its UTC sale date.',
+      helpers: [
+        { label: 'Replace is_current with BETWEEN', find: 'AND d.is_current', replace: '\n AND s.txn_ts::date BETWEEN d.valid_from AND d.valid_to' }
+      ]
+    },
+    koan: 'Never join historical facts on is_current = TRUE; use point-in-time range joins (event_date BETWEEN valid_from AND valid_to).',
+    worldUpgrade: 'Track 2 Stage 3 active: Historical analytics preserve point-in-time truth across price and attribute changes.'
+  },
+  {
+    id: 'l13-timezone',
+    track: 2,
+    num: 13,
+    roman: '13',
+    stageLabel: 'Timezones',
+    title: 'Timezones & Business-Day Cutoffs',
+    subtitle: 'Store in UTC, report in local store time with AT TIME ZONE',
+    level: 'Advanced',
+    tech: 'PostgreSQL · TIMESTAMPTZ & DST',
+    audio: 'audio/ch13.mp3',
+    durationSec: 19,
+    narration: 'Always store timestamps in UTC so servers never argue over clocks. But when Finance asks for Tuesday\'s store revenue, a nine-thirty PM sale in Dallas is already three-thirty AM Wednesday in UTC. Convert with AT TIME ZONE before casting to a date so evening sales land on the right business day.',
+    cues: [
+      { at: 0.0, scene: 'utc-store', caption: 'Store timestamps in UTC—but remember local evening sales cross UTC midnight early.' },
+      { at: 5.8, scene: 'utc-drift', caption: '9:30 PM CST on Nov 14 is stored as 03:30 UTC on Nov 15—casting raw UTC shifts the day!' },
+      { at: 11.8, scene: 'local-cast', caption: "Convert with (txn_ts AT TIME ZONE 'America/Chicago')::date before grouping daily sales." }
+    ],
+    touch: {
+      prompt: 'Switch Store 12 between raw UTC dates and US Central (America/Chicago) local dates. Watch evening sale T-1003 ($45.00):',
+      type: 'tz-shift'
+    },
+    spell: {
+      mode: 'pg',
+      pgChallengeId: 'pg11-timezone',
+      peekTable: 'pos_eod_summary',
+      autoPeek: false,
+      intro: 'Fix Store 12\'s daily totals in PostgreSQL 18 by converting txn_ts from UTC to America/Chicago before casting to DATE.',
+      helpers: [
+        { label: "AT TIME ZONE 'America/Chicago'", find: 'txn_ts::date', replace: "(txn_ts AT TIME ZONE 'America/Chicago')::date" }
+      ]
+    },
+    koan: 'Store raw events in TIMESTAMPTZ (UTC), and always apply AT TIME ZONE before truncating or casting to a local business date.',
+    worldUpgrade: 'Track 2 Stage 4 active: Local business-day rollups now align cleanly with store registers across timezones.'
+  },
+  {
+    id: 'l14-recursive',
+    track: 2,
+    num: 14,
+    roman: '14',
+    stageLabel: 'Recursive',
+    title: 'Recursive Hierarchies (WITH RECURSIVE)',
+    subtitle: 'Explode nested assemblies, org charts & trees in pure SQL',
+    level: 'Expert',
+    tech: 'PostgreSQL · Recursive CTEs',
+    audio: 'audio/ch14.mp3',
+    durationSec: 18,
+    narration: 'Some data forms trees of arbitrary depth—like a pump made of housings, brackets, and bolts, or managers reporting to directors. A regular join only steps one level deep. WITH RECURSIVE combines a starting anchor query with a recursive step that walks every branch down to the final leaf parts.',
+    cues: [
+      { at: 0.0, scene: 'bom-root', caption: 'PUMP-100 contains direct parts AND nested sub-assemblies like HOUSING-5 and MOTOR-20.' },
+      { at: 6.2, scene: 'bom-expand', caption: 'Each recursive step multiplies quantities down the tree (2 brackets × 2 bolts = 4 bolts).' },
+      { at: 12.4, scene: 'bom-leaves', caption: 'Keep only leaf parts (no children) and SUM totals: 1 pump needs 22 BOLT-M8 total!' }
+    ],
+    touch: {
+      prompt: 'Expand the PUMP-100 Bill of Materials one level at a time to see why a single query misses 14 nested bolts:',
+      type: 'bom-tree'
+    },
+    spell: {
+      mode: 'pg',
+      pgChallengeId: 'pg13-bom',
+      peekTable: 'bom',
+      autoPeek: true,
+      intro: 'Write a WITH RECURSIVE CTE in PostgreSQL 18 to compute the total quantity of every leaf component needed to build one PUMP-100.',
+      helpers: [
+        { label: 'Scaffold WITH RECURSIVE explode', replaceAll: `WITH RECURSIVE explode AS (\n  SELECT child_part, qty_per::numeric AS total_qty\n  FROM bom\n  WHERE parent_part = 'PUMP-100'\n  UNION ALL\n  SELECT b.child_part, e.total_qty * b.qty_per\n  FROM explode e\n  JOIN bom b ON b.parent_part = e.child_part\n)\nSELECT child_part, SUM(total_qty) AS total_qty\nFROM explode e\n-- keep leaf parts only + GROUP BY\n;` },
+        { label: 'WHERE NOT EXISTS (leaves) + GROUP BY', insert: 'WHERE NOT EXISTS (SELECT 1 FROM bom b WHERE b.parent_part = e.child_part)\nGROUP BY child_part' }
+      ]
+    },
+    koan: 'A recursive CTE needs an anchor term, UNION ALL with a self-join step, and matching column types across both branches.',
+    worldUpgrade: 'Track 2 Stage 5 active: Multi-level manufacturing BOMs and graph hierarchies resolve in a single SQL query.'
+  },
+  {
+    id: 'l15-jsonb',
+    track: 2,
+    num: 15,
+    roman: '15',
+    stageLabel: 'JSONB',
+    title: 'Semi-Structured JSONB Pipelines',
+    subtitle: 'Flatten nested API & webhook arrays into clean relational tables',
+    level: 'Expert',
+    tech: 'PostgreSQL · JSONB & LATERAL Unnest',
+    audio: 'audio/ch15.mp3',
+    durationSec: 23,
+    narration: 'Modern APIs and webhooks rarely arrive as flat tables—they send nested JSON objects with arrays of line items inside. PostgreSQL stores these cleanly as binary JSONB. Use the arrow operators to pull out fields and CROSS JOIN LATERAL with jsonb_array_elements to turn nested arrays into crisp, queryable rows.',
+    cues: [
+      { at: 0.0, scene: 'raw-json', caption: 'Webhooks arrive as nested JSONB payloads containing customer objects and items arrays.' },
+      { at: 6.0, scene: 'lateral-unnest', caption: "Use -> and ->> to extract fields, and CROSS JOIN LATERAL jsonb_array_elements() to unnest arrays." },
+      { at: 12.2, scene: 'flat-rows', caption: 'Cast extracted text to INT/NUMERIC so downstream aggregations run at full native speed.' }
+    ],
+    touch: {
+      prompt: 'Step through flattening raw_webhook_orders from raw JSONB documents into queryable order line items:',
+      type: 'jsonb-unnest'
+    },
+    spell: {
+      mode: 'pg',
+      pgChallengeId: 'pg15-jsonb',
+      peekTable: 'raw_webhook_orders',
+      autoPeek: true,
+      intro: 'Unnest the items array from raw_webhook_orders in PostgreSQL 18 and calculate line_total = qty * price for each order item.',
+      helpers: [
+        { label: 'Extract sku, qty, line_total', insert: ",\n       item->>'sku' AS sku,\n       (item->>'qty')::int AS qty,\n       (item->>'qty')::int * (item->>'price')::numeric AS line_total", target: 'select' },
+        { label: 'CROSS JOIN LATERAL jsonb_array_elements', find: "-- CROSS JOIN LATERAL jsonb_array_elements(w.payload->'items') AS item", replace: "CROSS JOIN LATERAL jsonb_array_elements(w.payload->'items') AS item" },
+        { label: 'ORDER BY order_id, sku', find: 'ORDER BY order_id;', replace: 'ORDER BY order_id, sku;' }
+      ]
+    },
+    koan: 'Use -> for nested JSON objects, ->> for text values, and CROSS JOIN LATERAL jsonb_array_elements() to unnest arrays safely.',
+    worldUpgrade: 'Track 2 Complete! You now command analytical SQL, SCD-2 history, timezones, recursive hierarchies, and JSONB pipelines.'
   }
 ];
 
-if (typeof module !== 'undefined' && module.exports) module.exports = ZenChapters;
-if (typeof window !== 'undefined') window.ZenChapters = ZenChapters;
+// Assign track: 1 to Lessons 2..9 automatically if omitted
+ZenChapters.forEach(c => { if (!c.track) c.track = c.num <= 9 ? 1 : 2; });
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = ZenChapters;
+  module.exports.ZenTracks = ZenTracks;
+}
+if (typeof window !== 'undefined') {
+  window.ZenChapters = ZenChapters;
+  window.ZenTracks = ZenTracks;
+}

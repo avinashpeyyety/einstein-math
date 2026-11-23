@@ -6,29 +6,29 @@ const DataLabCatalog = {
 
   SECTIONS: [
     {
-      id: 'path', icon: '📊', title: 'Interactive Data Pipeline Path (9 Lessons)', query: '', color: '#E8892F',
-      blurb: 'Start from Day-1 SQL basics (SELECT, WHERE, GROUP BY) and build all the way to Python ETL, Star Schemas, bulk COPY, partitioning & pipeline auditing — one calm, visual step at a time.',
-      topics: ['Beginner friendly', 'Voice + diagrams', 'Live table previews', 'Real Postgres 18']
+      id: 'track1', icon: '📊', title: 'Track 1: Core SQL & Data Pipelines (L1–9)', query: '', color: '#E8892F',
+      blurb: 'Start from Day-1 SQL basics (SELECT, WHERE, GROUP BY) and build through Python CSV cleaning, Star Schemas, bulk COPY, T-SQL dialects, partitioning & pipeline auditing.',
+      topics: ['Beginner friendly', 'Voice + diagrams', 'Table previews', 'Real Postgres 18']
+    },
+    {
+      id: 'track2', icon: '🔬', title: 'Track 2: Analytical SQL & Modeling (L10–15)', query: '?track=2', color: '#8B74C9',
+      blurb: 'Level up to senior analytics engineering: Window functions, ROW_NUMBER() dedup, SCD Type 2 point-in-time joins, UTC/local timezones, WITH RECURSIVE BOMs & JSONB unnesting.',
+      topics: ['Windows & dedup', 'SCD Type 2', 'Timezones', 'Recursive + JSONB']
     },
     {
       id: 'playground', icon: '🐘', title: 'Full PostgreSQL 18 SQL Playground', query: '?view=playground', color: '#4A6B82',
-      blurb: 'Run real SQL locally in your browser on PostgreSQL 18 (WASM): 13 Beginner→Expert graded labs, freeform Scratchpad, live schema inspector & 10-row T-SQL ↔ PostgreSQL guide.',
-      topics: ['Real Postgres 18', '13 graded labs', 'T-SQL ↔ PG guide', 'Live schema']
+      blurb: 'Run real SQL locally in your browser on PostgreSQL 18 (WASM): 15 Beginner→Expert graded labs, Visual EXPLAIN Tree, freeform Scratchpad, live schema & T-SQL ↔ PG guide.',
+      topics: ['Real Postgres 18', '15 graded labs', 'Visual EXPLAIN tree', 'T-SQL ↔ PG guide']
     },
     {
       id: 'partitions', icon: '⚡', title: 'Lesson 8: Making Large Tables Fast', query: '?lesson=8', color: '#5E7D54',
-      blurb: 'Interactive 72-month range partitioning explorer: see how sargable date bounds drop queries from 21.4s to 1.4s, then verify it on a real PostgreSQL 18 EXPLAIN plan.',
-      topics: ['72-month pruning', 'Sargable ranges', 'Real EXPLAIN plan']
-    },
-    {
-      id: 'audit', icon: '⚖️', title: 'Lesson 9: Verifying Pipeline Accuracy', query: '?lesson=9', color: '#8B74C9',
-      blurb: 'Learn why raw table joins multiply totals and how aggregate-first CTE reconciliation catches real discrepancies with 100% precision.',
-      topics: ['CTE reconciliation', 'Zero fan-out', 'Data auditing']
+      blurb: 'Interactive 72-month range partitioning explorer: see how sargable date bounds drop queries from 21.4s to 1.4s, then inspect the Visual EXPLAIN plan on real PostgreSQL 18.',
+      topics: ['72-month pruning', 'Sargable ranges', 'Visual EXPLAIN plan']
     },
     {
       id: 'takeaways', icon: '📝', title: 'Key Takeaways & Quick Review', query: '?view=takeaways', color: '#C25E3E',
-      blurb: 'Review your saved one-sentence engineering rules from completed lessons and run quick PostgreSQL 18 refreshers anytime.',
-      topics: ['9 core rules', 'Quick review', 'Curriculum overview']
+      blurb: 'Review your saved one-sentence engineering rules across all 15 lessons and run quick PostgreSQL 18 refreshers anytime.',
+      topics: ['15 core rules', 'Quick review', '2-track roadmap']
     }
   ],
 

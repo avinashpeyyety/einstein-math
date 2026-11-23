@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/zen.css?v=2.6.28" />
+  <link rel="stylesheet" href="css/zen.css?v=2.6.29" />
 </head>
 <body>
   <div class="zen-shell">
@@ -25,7 +25,7 @@
       </div>
       <nav class="zen-actions" aria-label="Data Lab tools">
         <button type="button" id="btn-map" class="pill-btn">🗺️ Lessons</button>
-        <button type="button" id="btn-journal" class="pill-btn">📝 Takeaways (0/9)</button>
+        <button type="button" id="btn-journal" class="pill-btn">📝 Takeaways (0/15)</button>
         <button type="button" id="btn-studio" class="pill-btn">🐘 SQL Playground</button>
         <button type="button" id="btn-sound" class="pill-btn" title="Toggle voice explanations &amp; sound" aria-label="Toggle voice">🔊 Voice</button>
         <button type="button" id="btn-theme" class="pill-btn" title="Switch Warm Paper / Night theme" aria-label="Switch theme">🌙</button>
@@ -36,8 +36,14 @@
     <section class="river-card" aria-label="Interactive Data Pipeline Progress">
       <canvas id="zen-river-canvas"></canvas>
       <div class="river-caption">
-        <span id="river-status">Pipeline progress: 0/9 stages · Start with Lesson 1 to light up Stage 1.</span>
-        <span id="river-right" class="mono">Postgres 18 Labs: 0/13</span>
+        <div class="row" style="gap:8px;">
+          <div class="track-pills" role="tablist" aria-label="Curriculum tracks">
+            <button type="button" class="track-pill active" data-track-switch="1">Track 1 (L1–9)</button>
+            <button type="button" class="track-pill" data-track-switch="2">Track 2 (L10–15)</button>
+          </div>
+          <span id="river-status">Track 1: 0/9 stages · Start with Lesson 1.</span>
+        </div>
+        <span id="river-right" class="mono">Postgres 18 Labs: 0/15</span>
       </div>
     </section>
 
@@ -54,7 +60,7 @@
       <div class="row-between">
         <div>
           <div class="chapter-eyebrow">Curriculum</div>
-          <h2 id="modal-map-title" class="chapter-title" style="font-size:1.35rem;">9-Lesson Data Pipeline Path</h2>
+          <h2 id="modal-map-title" class="chapter-title" style="font-size:1.35rem;">15-Lesson Data Engineering Path (2 Tracks)</h2>
         </div>
         <button type="button" class="pill-btn" data-close-modal aria-label="Close Lessons">✕ Close</button>
       </div>
@@ -82,7 +88,7 @@
       <div class="row-between">
         <div>
           <div class="chapter-eyebrow">SQL Playground</div>
-          <h2 id="modal-studio-title" class="chapter-title" style="font-size:1.35rem;">Real PostgreSQL 18 (WASM) · 13 Labs &amp; Dialect Guide</h2>
+          <h2 id="modal-studio-title" class="chapter-title" style="font-size:1.35rem;">Real PostgreSQL 18 (WASM) · 15 Labs &amp; Dialect Guide</h2>
         </div>
         <button type="button" class="pill-btn" data-close-modal aria-label="Close SQL Playground">✕ Close</button>
       </div>
@@ -90,11 +96,11 @@
     </div>
   </div>
 
-  <script src="js/pg-lab.js?v=2.6.28"></script>
-  <script src="js/sql-engine.js?v=2.6.28"></script>
-  <script src="js/zen-chapters.js?v=2.6.28"></script>
-  <script src="js/zen-audio.js?v=2.6.28"></script>
-  <script src="js/zen-world.js?v=2.6.28"></script>
-  <script src="js/zen-app.js?v=2.6.28"></script>
+  <script src="js/pg-lab.js?v=2.6.29"></script>
+  <script src="js/sql-engine.js?v=2.6.29"></script>
+  <script src="js/zen-chapters.js?v=2.6.29"></script>
+  <script src="js/zen-audio.js?v=2.6.29"></script>
+  <script src="js/zen-world.js?v=2.6.29"></script>
+  <script src="js/zen-app.js?v=2.6.29"></script>
 </body>
 </html>

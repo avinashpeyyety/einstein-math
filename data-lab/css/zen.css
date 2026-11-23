@@ -600,6 +600,7 @@ tr.row-kept td {
   .chapter-title { font-size: 1.32rem; }
   #zen-river-canvas { height: 84px; }
   #koan-stage-canvas { height: 184px; }
+  .koan-play-overlay { display: none; }
   .pill-btn, .back-link { padding: 5px 9px; font-size: 11.5px; }
   .beat-dot { padding: 4px 8px; font-size: 10.5px; }
 }

@@ -25,7 +25,7 @@ const ZenWorld = {
     { id: 'l2-groupby',    label: 'Group' },
     { id: 'l3-dupes',      label: 'Quality' },
     { id: 'l4-python',     label: 'Python' },
-    { id: 'l5-leftjoin',   label: 'Join -1' },
+    { id: 'l5-leftjoin',   label: 'Joins' },
     { id: 'l6-bulkload',   label: 'Bulk Load' },
     { id: 'l7-dialects',   label: 'Dialects' },
     { id: 'l8-partitions', label: 'Partitions' },
@@ -155,7 +155,7 @@ const ZenWorld = {
     const g = this._riverCtx;
     const { w, h } = this._setupHiDPI(this._riverCanvas, g);
     const P = this._palette();
-    const cy = h * 0.50;
+    const cy = h * 0.42;
 
     // Warm sketchbook backdrop
     g.fillStyle = P.paper;
@@ -163,9 +163,9 @@ const ZenWorld = {
 
     // Subtle drafting dot grid (very faint architectural paper feel)
     g.fillStyle = P.sepia;
-    g.globalAlpha = P.dark ? 0.10 : 0.12;
+    g.globalAlpha = P.dark ? 0.08 : 0.10;
     for (let x = 18; x < w; x += 26) {
-      for (let y = 18; y < h; y += 26) {
+      for (let y = 16; y < h; y += 26) {
         g.fillRect(x, y, 1.2, 1.2);
       }
     }
@@ -177,7 +177,7 @@ const ZenWorld = {
 
     // Soft pipeline conduit background rail
     g.strokeStyle = P.waterSoft;
-    g.lineWidth = hasBulk ? 16 : 10;
+    g.lineWidth = hasBulk ? 14 : 9;
     g.lineCap = 'round';
     g.beginPath();
     g.moveTo(x0, cy);
@@ -186,7 +186,7 @@ const ZenWorld = {
 
     // Animated dashed flow line inside the conduit
     g.strokeStyle = P.water;
-    g.lineWidth = 1.6;
+    g.lineWidth = 1.5;
     g.setLineDash([8, 12]);
     g.lineDashOffset = -(now * (hasBulk ? 0.065 : 0.028));
     g.beginPath();
@@ -206,15 +206,15 @@ const ZenWorld = {
       g.strokeStyle = P.ink;
       g.lineWidth = 1.2;
       g.beginPath();
-      g.roundRect(px - 4.5, py - 4.5, 9, 9, 2.5);
+      g.roundRect(px - 4, py - 4, 8, 8, 2);
       g.fill();
       g.stroke();
       g.globalAlpha = 1;
     }
 
     // Draw the 9 Pipeline Stage Nodes
-    const compact = w < 620;
-    const r = compact ? 13 : 16;
+    const compact = w < 640;
+    const r = compact ? 12 : 15;
     this.STAGES.forEach((st, idx) => {
       const nx = this._nodeX(idx, w);
       const done = !!this._mastered[st.id];
@@ -222,7 +222,7 @@ const ZenWorld = {
 
       // Active lesson subtle breathing halo
       if (active) {
-        const pulse = 5 + Math.sin(now * 0.004) * 2.5;
+        const pulse = 4 + Math.sin(now * 0.004) * 2;
         g.fillStyle = P.saffronSoft;
         g.beginPath();
         g.arc(nx, cy, r + pulse, 0, Math.PI * 2);
@@ -232,7 +232,7 @@ const ZenWorld = {
       // Node circle
       g.fillStyle = done ? P.sage : (active ? P.saffron : P.card);
       g.strokeStyle = done ? P.sage : (active ? P.saffron : P.sepia);
-      g.lineWidth = active ? 2.4 : 1.6;
+      g.lineWidth = active ? 2.2 : 1.5;
       g.beginPath();
       g.arc(nx, cy, r, 0, Math.PI * 2);
       g.fill();
@@ -245,13 +245,16 @@ const ZenWorld = {
       g.textBaseline = 'middle';
       g.fillText(done ? '✓' : String(idx + 1), nx, cy + 0.5);
 
-      // Stage label below node
-      g.fillStyle = active ? P.ink : (done ? P.sage : P.muted);
-      g.font = `${active ? 700 : 600} ${compact ? 9.5 : 11}px "DM Sans", sans-serif`;
-      g.textBaseline = 'alphabetic';
-      g.fillText(st.label, nx, cy + r + 16);
+      // Stage label below node: on mobile show ONLY the active stage label (prevents collisions!)
+      if (!compact || active) {
+        const labelX = compact ? Math.max(38, Math.min(w - 38, nx)) : nx;
+        g.fillStyle = active ? P.ink : (done ? P.sage : P.muted);
+        g.font = `${active ? 700 : 600} ${compact ? 11 : 11}px "DM Sans", sans-serif`;
+        g.textBaseline = 'alphabetic';
+        g.fillText(compact ? `${idx + 1}. ${st.label}` : st.label, labelX, cy + r + 17);
+      }
 
-      // Small Quarantine note under Stage 4 when Python cleaner is active
+      // Small Quarantine note under Stage 4 on desktop when Python cleaner is active
       if (idx === 3 && this._mastered['l4-python'] && !compact) {
         g.fillStyle = P.warn;
         g.font = '600 9px "DM Sans", sans-serif';
@@ -312,39 +315,85 @@ const ZenWorld = {
     g.textAlign = 'center';
 
     if (ch === 1) {
-      // Lesson 1: Table rows -> WHERE filter -> ORDER BY DESC
+      // Lesson 1: Structured 4-column table with header -> WHERE filter -> ORDER BY DESC
+      const narrow = w < 460;
       const rows = p > 0.68
         ? [
-            { sku: 'B-2210', cat: 'Footwear', price: '$120.00', active: true, keep: true },
-            { sku: 'G-4400', cat: 'Footwear', price: '$89.50',  active: true, keep: true },
-            { sku: 'C-5501', cat: 'Access.',  price: '$45.00',  active: true, keep: true },
-            { sku: 'H-3030', cat: 'Access.',  price: '$64.00',  active: false, keep: false }
+            { sku: 'B-2210', cat: 'Footwear',    price: '$120.00', active: 'TRUE',  keep: true },
+            { sku: 'G-4400', cat: 'Footwear',    price: '$89.50',  active: 'TRUE',  keep: true },
+            { sku: 'C-5501', cat: 'Accessories', price: '$45.00',  active: 'TRUE',  keep: true },
+            { sku: 'H-3030', cat: 'Accessories', price: '$64.00',  active: 'FALSE', keep: false }
           ]
         : [
-            { sku: 'A-9042', cat: 'Apparel',  price: '$24.99',  active: true,  keep: false },
-            { sku: 'B-2210', cat: 'Footwear', price: '$120.00', active: true,  keep: true },
-            { sku: 'C-5501', cat: 'Access.',  price: '$45.00',  active: true,  keep: true },
-            { sku: 'H-3030', cat: 'Access.',  price: '$64.00',  active: false, keep: false }
+            { sku: 'A-9042', cat: 'Apparel',     price: '$24.99',  active: 'TRUE',  keep: false },
+            { sku: 'B-2210', cat: 'Footwear',    price: '$120.00', active: 'TRUE',  keep: true },
+            { sku: 'C-5501', cat: 'Accessories', price: '$45.00',  active: 'TRUE',  keep: true },
+            { sku: 'H-3030', cat: 'Accessories', price: '$64.00',  active: 'FALSE', keep: false }
           ];
-      const tw = Math.min(430, w - 56);
+      const tw = Math.min(520, w - 36);
       const tx = cx - tw / 2;
-      const startY = 38;
-      this._label(g, cx, 28, p > 0.68 ? 'ORDER BY unit_price DESC (Highest First)' : (p > 0.30 ? 'WHERE is_active AND unit_price > 30' : 'Table: dim_product (Rows & Columns)'), P);
+      const rowH = narrow ? 25 : 27;
+      const hdrH = narrow ? 22 : 24;
+      const totalH = hdrH + rows.length * rowH;
+      const titleY = Math.max(24, (h - totalH) / 2 - 4);
+      const tableY = titleY + 10;
+
+      const colX = [tx + 12, tx + tw * 0.24, tx + tw * 0.58, tx + tw * 0.80];
+      const fSize = narrow ? 10 : 11.5;
+
+      this._label(
+        g, cx, titleY,
+        p > 0.68 ? 'ORDER BY unit_price DESC (Highest First)'
+          : (p > 0.30 ? 'WHERE is_active AND unit_price > 30' : 'Table: dim_product (Rows & Columns)'),
+        P
+      );
+
+      // Outer rounded table card
+      g.fillStyle = P.card;
+      g.strokeStyle = P.sepia;
+      g.lineWidth = 1.4;
+      g.beginPath();
+      g.roundRect(tx, tableY, tw, totalH, 8);
+      g.fill();
+      g.stroke();
+
+      // Column header strip
+      g.fillStyle = P.waterSoft;
+      g.beginPath();
+      g.roundRect(tx, tableY, tw, hdrH, [8, 8, 0, 0]);
+      g.fill();
+      g.fillStyle = P.sepia;
+      g.font = `700 ${narrow ? 9.5 : 10.5}px "DM Sans", sans-serif`;
+      g.textAlign = 'left';
+      const headers = ['sku_code', 'category', 'unit_price', 'is_active'];
+      headers.forEach((hdr, i) => g.fillText(hdr, colX[i], tableY + hdrH - 7));
+
+      // Data rows with crisp column alignment
       rows.forEach((r, idx) => {
-        const y = startY + idx * 38;
+        const ry = tableY + hdrH + idx * rowH;
         const faded = p > 0.30 && !r.keep;
-        g.globalAlpha = faded ? 0.25 : 1;
-        g.fillStyle = (p > 0.30 && r.keep) ? P.sageSoft : P.card;
-        g.strokeStyle = (p > 0.30 && r.keep) ? P.sage : P.sepia;
-        g.lineWidth = 1.5;
-        g.beginPath();
-        g.roundRect(tx, y, tw, 30, 6);
-        g.fill();
-        g.stroke();
+        const kept = p > 0.30 && r.keep;
+
+        // Horizontal divider
+        g.strokeStyle = P.sepia;
+        g.globalAlpha = 0.18;
+        g.beginPath(); g.moveTo(tx, ry); g.lineTo(tx + tw, ry); g.stroke();
+        g.globalAlpha = 1;
+
+        if (kept) {
+          g.fillStyle = P.sageSoft;
+          g.fillRect(tx + 1, ry + 1, tw - 2, rowH - 2);
+        }
+
+        g.globalAlpha = faded ? 0.34 : 1;
         g.fillStyle = P.ink;
-        g.font = '600 11.5px "JetBrains Mono", monospace';
-        g.textAlign = 'left';
-        g.fillText(`${r.sku}   ${r.cat.padEnd(9)} ${r.price.padStart(7)}   ${r.active ? 'active' : 'inactive'}`, tx + 14, y + 19);
+        g.font = `600 ${fSize}px "JetBrains Mono", monospace`;
+        const catTxt = narrow && r.cat.length > 9 ? r.cat.slice(0, 8) + '.' : r.cat;
+        g.fillText(r.sku, colX[0], ry + rowH - 8);
+        g.fillText(catTxt, colX[1], ry + rowH - 8);
+        g.fillText(r.price, colX[2], ry + rowH - 8);
+        g.fillStyle = r.active === 'TRUE' ? P.sage : P.warn;
+        g.fillText(r.active, colX[3], ry + rowH - 8);
         g.globalAlpha = 1;
       });
       g.textAlign = 'center';

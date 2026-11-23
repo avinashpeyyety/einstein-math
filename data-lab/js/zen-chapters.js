@@ -29,7 +29,7 @@ const ZenChapters = [
       pgChallengeId: 'pg1-filter',
       peekTable: 'dim_product',
       autoPeek: true,
-      intro: 'Now write your first real PostgreSQL 18 query. Look at dim_product above, filter for active products priced over 30, and sort highest price first.',
+      intro: 'Now write your first real PostgreSQL 18 query. Use the dim_product preview below to filter for active products priced over 30, sorted highest price first.',
       helpers: [
         { label: 'WHERE is_active', insert: 'WHERE is_active' },
         { label: 'AND unit_price > 30', insert: ' AND unit_price > 30' },
@@ -159,7 +159,7 @@ const ZenChapters = [
     id: 'l5-leftjoin',
     num: 5,
     roman: '5',
-    stageLabel: 'Star Schema',
+    stageLabel: 'Joins',
     title: 'Combining Tables Safely',
     subtitle: 'Facts, Dimensions, LEFT JOIN & Unknown (-1) keys',
     level: 'Intermediate',

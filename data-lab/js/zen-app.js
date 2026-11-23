@@ -9,39 +9,39 @@
   const LEGACY_KEY = 'einstein-zen-river-v1';
   const REVIEW_MS = 24 * 60 * 60 * 1000;
 
-  /* Exact snapshots of the seeded PostgreSQL 18 tables so beginners can see the data in 0ms */
+  /* Exact snapshots of the seeded PostgreSQL 18 tables (formatted like SQL NUMERIC(10,2) & BOOLEAN) */
   const TABLE_SNAPSHOTS = {
     dim_product: {
       cols: ['product_sk', 'sku_code', 'category', 'unit_price', 'is_active'],
       rows: [
-        [101, 'A-9042', 'Apparel',          24.99, true],
-        [102, 'A-9042', 'Apparel (Legacy)', 22.99, false],
-        [103, 'B-2210', 'Footwear',        120.00, true],
-        [104, 'C-5501', 'Accessories',      45.00, true],
-        [105, 'D-7310', 'Home',             12.25, true],
-        [106, 'E-1180', 'Apparel',          29.00, true],
-        [107, 'F-6620', 'Home',             15.75, true],
-        [108, 'G-4400', 'Footwear',         89.50, true],
-        [109, 'H-3030', 'Accessories',      64.00, false]
+        [101, 'A-9042', 'Apparel',          '24.99',  'TRUE'],
+        [102, 'A-9042', 'Apparel (Legacy)', '22.99',  'FALSE'],
+        [103, 'B-2210', 'Footwear',         '120.00', 'TRUE'],
+        [104, 'C-5501', 'Accessories',      '45.00',  'TRUE'],
+        [105, 'D-7310', 'Home',             '12.25',  'TRUE'],
+        [106, 'E-1180', 'Apparel',          '29.00',  'TRUE'],
+        [107, 'F-6620', 'Home',             '15.75',  'TRUE'],
+        [108, 'G-4400', 'Footwear',         '89.50',  'TRUE'],
+        [109, 'H-3030', 'Accessories',      '64.00',  'FALSE']
       ]
     },
     stg_pos_sales: {
       cols: ['txn_id', 'store_id', 'sku', 'qty', 'net_amount'],
       rows: [
-        ['T-1001', 12, 'A-9042', 2,  49.98],
-        ['T-1002', 12, 'B-2210', 1, 120.00],
-        ['T-1003', 12, 'C-5501', 1,  45.00],
-        ['T-1004', 12, 'D-7310', 3,  36.75],
-        ['T-1005', 19, 'Z-9999', 3,  75.00],
-        ['T-1006', 19, 'A-9042', 1,  24.99],
-        ['T-1007', 19, 'E-1180', 2,  58.00],
-        ['T-1008', 24, 'C-5501', 4, 180.00],
-        ['T-1009', 24, 'B-2210', 1, 120.00],
-        ['T-1010', 24, 'F-6620', 2,  31.50],
-        ['T-1011',  7, 'A-9042', 1,  24.99],
-        ['T-1012',  7, 'Z-9999', 1,  19.95],
-        ['T-1013', 31, 'D-7310', 2,  24.50],
-        ['T-1014', 31, 'E-1180', 1,  29.00]
+        ['T-1001', 12, 'A-9042', 2,  '49.98'],
+        ['T-1002', 12, 'B-2210', 1, '120.00'],
+        ['T-1003', 12, 'C-5501', 1,  '45.00'],
+        ['T-1004', 12, 'D-7310', 3,  '36.75'],
+        ['T-1005', 19, 'Z-9999', 3,  '75.00'],
+        ['T-1006', 19, 'A-9042', 1,  '24.99'],
+        ['T-1007', 19, 'E-1180', 2,  '58.00'],
+        ['T-1008', 24, 'C-5501', 4, '180.00'],
+        ['T-1009', 24, 'B-2210', 1, '120.00'],
+        ['T-1010', 24, 'F-6620', 2,  '31.50'],
+        ['T-1011',  7, 'A-9042', 1,  '24.99'],
+        ['T-1012',  7, 'Z-9999', 1,  '19.95'],
+        ['T-1013', 31, 'D-7310', 2,  '24.50'],
+        ['T-1014', 31, 'E-1180', 1,  '29.00']
       ]
     },
     stg_work_orders: {
@@ -58,16 +58,16 @@
     pos_eod_summary: {
       cols: ['store_id', 'biz_date', 'pos_eod_total'],
       rows: [
-        [7,  '2021-11-14',  24.99],
-        [7,  '2021-11-15',  19.95],
-        [12, '2021-11-14', 214.98],
-        [12, '2021-11-15',  36.75],
-        [19, '2021-11-14', 124.99],
-        [19, '2021-11-15',  58.00],
-        [24, '2021-11-14', 180.00],
-        [24, '2021-11-15', 151.50],
-        [31, '2021-11-14',  24.50],
-        [31, '2021-11-15',  29.00]
+        [7,  '2021-11-14',  '24.99'],
+        [7,  '2021-11-15',  '19.95'],
+        [12, '2021-11-14', '214.98'],
+        [12, '2021-11-15',  '36.75'],
+        [19, '2021-11-14', '124.99'],
+        [19, '2021-11-15',  '58.00'],
+        [24, '2021-11-14', '180.00'],
+        [24, '2021-11-15', '151.50'],
+        [31, '2021-11-14',  '24.50'],
+        [31, '2021-11-15',  '29.00']
       ]
     },
     fact_shop_floor_events: {
@@ -192,7 +192,8 @@
     if (!_pgBootPromise) {
       updatePgStatusBadges('⏳ Starting PostgreSQL 18 (WASM)…', false);
       _pgBootPromise = (async () => {
-        const mod = await import('../vendor/pglite/index.js');
+        const pgliteUrl = new URL('../vendor/pglite/index.js', window.location.href).href;
+        const mod = await import(pgliteUrl);
         const PGlite = mod.PGlite || mod.default;
         const ver = await PgLab.init(PGlite);
         updatePgStatusBadges(`● ${ver} live in browser`, true);
@@ -221,7 +222,10 @@
   function applyTheme() {
     document.documentElement.classList.toggle('dark', !!state.dark);
     const btn = $('#btn-theme');
-    if (btn) btn.textContent = state.dark ? '☀️ Warm Paper' : '🌙 Night';
+    if (btn) {
+      btn.textContent = state.dark ? '☀️' : '🌙';
+      btn.title = state.dark ? 'Switch to Warm Paper theme' : 'Switch to Night theme';
+    }
     const meta = $('meta[name="theme-color"]');
     if (meta) meta.setAttribute('content', state.dark ? '#16131E' : '#F4EEDF');
   }
@@ -232,7 +236,7 @@
     const btn = $('#btn-journal');
     if (btn) btn.textContent = `📝 Takeaways (${masteredCount()}/${ZenChapters.length})`;
     const sBtn = $('#btn-sound');
-    if (sBtn) sBtn.textContent = state.soundEnabled ? '🔊 Voice On' : '🔇 Muted';
+    if (sBtn) sBtn.textContent = state.soundEnabled ? '🔊 Voice' : '🔇 Muted';
   }
 
   function syncHeaderAndPipeline() {
@@ -349,14 +353,17 @@
     const secs = ch.durationSec || 17;
     return `
       <div class="koan-stage-wrap">
-        <canvas id="koan-stage-canvas" aria-label="Visual diagram for ${esc(ch.title)}"></canvas>
+        <div id="koan-canvas-box" class="koan-canvas-box" title="Click to play visual explanation">
+          <canvas id="koan-stage-canvas" aria-label="Visual diagram for ${esc(ch.title)}"></canvas>
+          <span id="koan-play-overlay" class="koan-play-overlay">▶ Click to play (${secs}s)</span>
+        </div>
         <div class="progress-hairline"><div id="koan-progress-fill" class="progress-hairline-fill"></div></div>
-        <div id="koan-subtitle" class="koan-subtitle-bar" style="font-style:normal;font-family:var(--font);font-size:0.98rem;">${esc(firstCaption)}</div>
+        <div id="koan-subtitle" class="koan-subtitle-bar">${esc(firstCaption)}</div>
       </div>
       <div class="row-between">
         <div class="row">
           <button type="button" id="btn-play-koan" class="btn-quiet">▶ Play Explanation (${secs}s)</button>
-          <span id="koan-time-hint" class="muted">${state.soundEnabled ? 'Plain-English audio + synced visual' : 'Silent visual walkthrough'}</span>
+          <span id="koan-time-hint" class="muted">~2 min · Real PostgreSQL 18 in browser</span>
         </div>
         <button type="button" id="btn-to-beat2" class="btn-saffron">Explore Visually →</button>
       </div>
@@ -370,12 +377,15 @@
     ZenWorld.setKoanState(ch.num, 0.05, ch.cues[0] ? ch.cues[0].scene : 'table');
 
     const playBtn = $('#btn-play-koan');
+    const canvasBox = $('#koan-canvas-box');
+    const overlay = $('#koan-play-overlay');
     const fill = $('#koan-progress-fill');
     const sub = $('#koan-subtitle');
     const hint = $('#koan-time-hint');
 
     const startPlayback = () => {
       if (playBtn) playBtn.textContent = '↺ Replay Explanation';
+      if (overlay) overlay.classList.add('playing');
       if (hint) hint.textContent = state.soundEnabled ? 'Playing walkthrough…' : 'Running silent visual walkthrough…';
 
       ZenAudio.playNarration(
@@ -394,13 +404,23 @@
         () => {
           if (fill) fill.style.width = '100%';
           ZenWorld.setKoanState(ch.num, 1, ch.cues[ch.cues.length - 1].scene);
-          if (hint) hint.textContent = 'Done — ready to try it interactively.';
+          if (overlay) {
+            overlay.textContent = '↺ Replay';
+            overlay.classList.remove('playing');
+          }
+          if (hint) hint.textContent = 'Done — ready to explore interactively.';
         }
       );
     };
 
     if (playBtn) {
       playBtn.addEventListener('click', () => {
+        ZenAudio.tap();
+        startPlayback();
+      });
+    }
+    if (canvasBox) {
+      canvasBox.addEventListener('click', () => {
         ZenAudio.tap();
         startPlayback();
       });
@@ -444,7 +464,7 @@
 
     if (ch.touch.type === 'filter-table') {
       const baseRows = TABLE_SNAPSHOTS.dim_product.rows.map(r => ({
-        sku_code: r[1], category: r[2], unit_price: r[3], is_active: r[4]
+        sku_code: r[1], category: r[2], unit_price: Number(r[3]), priceStr: r[3], is_active: r[4] === 'TRUE'
       }));
       const keptMask = r => (!ts.activeOnly || r.is_active) && (!ts.over30 || r.unit_price > 30);
       const displayRows = baseRows.slice();
@@ -463,35 +483,38 @@
 
       inner = `
         <div class="row">
-          <button type="button" class="pill-btn ${ts.activeOnly ? 'btn-saffron' : ''}" data-ft="activeOnly">${ts.activeOnly ? '✓' : '+'} Active Only (WHERE is_active)</button>
-          <button type="button" class="pill-btn ${ts.over30 ? 'btn-saffron' : ''}" data-ft="over30">${ts.over30 ? '✓' : '+'} Price &gt; $30 (unit_price &gt; 30)</button>
-          <button type="button" class="pill-btn ${ts.sortDesc ? 'btn-saffron' : ''}" data-ft="sortDesc">${ts.sortDesc ? '✓' : '+'} Sort Highest Price (ORDER BY DESC)</button>
+          <button type="button" class="pill-btn ${ts.activeOnly ? 'btn-saffron' : ''}" data-ft="activeOnly"><span class="chip-mark">${ts.activeOnly ? '✓' : '+'}</span> Active Only</button>
+          <button type="button" class="pill-btn ${ts.over30 ? 'btn-saffron' : ''}" data-ft="over30"><span class="chip-mark">${ts.over30 ? '✓' : '+'}</span> Price &gt; $30</button>
+          <button type="button" class="pill-btn ${ts.sortDesc ? 'btn-saffron' : ''}" data-ft="sortDesc"><span class="chip-mark">${ts.sortDesc ? '✓' : '+'}</span> Sort Highest Price</button>
         </div>
-        <div class="table-wrap">
-          <table class="zen-table">
-            <thead>
-              <tr><th>sku_code</th><th>category</th><th>unit_price</th><th>is_active</th></tr>
-            </thead>
-            <tbody>
-              ${displayRows.map(r => {
-                const kept = keptMask(r);
-                const cls = (ts.activeOnly || ts.over30) ? (kept ? 'row-kept' : 'row-excluded') : '';
-                return `<tr class="${cls}">
-                  <td>${esc(r.sku_code)}</td>
-                  <td>${esc(r.category)}</td>
-                  <td>$${r.unit_price.toFixed(2)}</td>
-                  <td>${r.is_active ? 'TRUE' : 'FALSE'}</td>
-                </tr>`;
-              }).join('')}
-            </tbody>
-          </table>
-        </div>
-        <div class="stack-sm" style="gap:4px;">
-          <div class="row-between">
-            <span class="muted"><strong>Matching SQL Query</strong> (updates as you click):</span>
-            <span class="mono muted">${keptCount} of ${displayRows.length} rows kept</span>
+        <div class="explore-split">
+          <div class="table-wrap" style="max-height:245px;overflow-y:auto;">
+            <table class="zen-table">
+              <thead>
+                <tr><th>sku_code</th><th>category</th><th>unit_price</th><th>is_active</th></tr>
+              </thead>
+              <tbody>
+                ${displayRows.map(r => {
+                  const kept = keptMask(r);
+                  const cls = (ts.activeOnly || ts.over30) ? (kept ? 'row-kept' : 'row-excluded') : '';
+                  return `<tr class="${cls}">
+                    <td>${esc(r.sku_code)}</td>
+                    <td>${esc(r.category)}</td>
+                    <td>${esc(r.priceStr)}</td>
+                    <td>${r.is_active ? 'TRUE' : 'FALSE'}</td>
+                  </tr>`;
+                }).join('')}
+              </tbody>
+            </table>
           </div>
-          <pre class="zen-code">${esc(liveSql)}</pre>
+          <div class="stack-sm" style="gap:6px;">
+            <div class="row-between">
+              <span class="muted"><strong>Matching SQL</strong></span>
+              <span class="mono muted">${keptCount} of ${displayRows.length} rows</span>
+            </div>
+            <pre class="zen-code" style="min-height:112px;">${esc(liveSql)}</pre>
+            <div class="muted" style="font-size:12px;">Notice how each button adds one SQL clause. Next, you'll run this on real PostgreSQL 18.</div>
+          </div>
         </div>
       `;
     } else if (ch.touch.type === 'group-fold') {
@@ -499,13 +522,13 @@
       let tableHtml = '';
       let liveSql = '';
       if (!ts.grouped) {
-        liveSql = `SELECT txn_id, store_id, sku, net_amount\nFROM stg_pos_sales;  -- 14 individual receipts`;
+        liveSql = `SELECT txn_id, store_id, sku, net_amount\nFROM stg_pos_sales;\n-- 14 individual receipts`;
         tableHtml = `
-          <div class="table-wrap" style="max-height:220px;overflow-y:auto;">
+          <div class="table-wrap" style="max-height:240px;overflow-y:auto;">
             <table class="zen-table">
               <thead><tr><th>txn_id</th><th>store_id</th><th>sku</th><th>net_amount</th></tr></thead>
               <tbody>
-                ${raw.map(r => `<tr><td>${esc(r[0])}</td><td>Store ${r[1]}</td><td>${esc(r[2])}</td><td>$${Number(r[4]).toFixed(2)}</td></tr>`).join('')}
+                ${raw.map(r => `<tr><td>${esc(r[0])}</td><td>Store ${r[1]}</td><td>${esc(r[2])}</td><td>${esc(r[4])}</td></tr>`).join('')}
               </tbody>
             </table>
           </div>
@@ -521,7 +544,9 @@
         let rows = Object.values(byStore);
         rows.sort((a, b) => ts.sorted ? b.total_sales - a.total_sales : a.store_id - b.store_id);
         liveSql = [
-          'SELECT store_id, COUNT(*) AS txn_count, SUM(net_amount) AS total_sales',
+          'SELECT store_id,',
+          '       COUNT(*) AS txn_count,',
+          '       SUM(net_amount) AS total_sales',
           'FROM stg_pos_sales',
           'GROUP BY store_id',
           ts.sorted ? 'ORDER BY total_sales DESC' : null
@@ -531,7 +556,7 @@
             <table class="zen-table">
               <thead><tr><th>store_id</th><th>txn_count</th><th>total_sales</th></tr></thead>
               <tbody>
-                ${rows.map(r => `<tr class="row-kept"><td>Store ${r.store_id}</td><td>${r.txn_count} txns</td><td>$${r.total_sales.toFixed(2)}</td></tr>`).join('')}
+                ${rows.map(r => `<tr class="row-kept"><td>Store ${r.store_id}</td><td>${r.txn_count} txns</td><td>${r.total_sales.toFixed(2)}</td></tr>`).join('')}
               </tbody>
             </table>
           </div>
@@ -540,11 +565,17 @@
       inner = `
         <div class="row">
           <button type="button" class="pill-btn ${!ts.grouped ? 'btn-saffron' : ''}" data-gf="raw">14 Raw Receipts</button>
-          <button type="button" class="pill-btn ${ts.grouped ? 'btn-saffron' : ''}" data-gf="grouped">✓ Fold with GROUP BY store_id (5 Stores)</button>
-          ${ts.grouped ? `<button type="button" class="pill-btn ${ts.sorted ? 'btn-saffron' : ''}" data-gf="sort">${ts.sorted ? '✓' : '+'} Sort Highest Sales (ORDER BY DESC)</button>` : ''}
+          <button type="button" class="pill-btn ${ts.grouped ? 'btn-saffron' : ''}" data-gf="grouped"><span class="chip-mark">${ts.grouped ? '✓' : '+'}</span> GROUP BY store_id (5 Stores)</button>
+          ${ts.grouped ? `<button type="button" class="pill-btn ${ts.sorted ? 'btn-saffron' : ''}" data-gf="sort"><span class="chip-mark">${ts.sorted ? '✓' : '+'}</span> Sort Highest Sales</button>` : ''}
         </div>
-        ${tableHtml}
-        <pre class="zen-code">${esc(liveSql)}</pre>
+        <div class="explore-split">
+          ${tableHtml}
+          <div class="stack-sm" style="gap:6px;">
+            <span class="muted"><strong>Matching SQL</strong></span>
+            <pre class="zen-code" style="min-height:118px;">${esc(liveSql)}</pre>
+            <div class="muted" style="font-size:12px;">${ts.grouped ? '14 receipts collapsed into 5 store totals.' : 'Click GROUP BY store_id to fold receipts by store.'}</div>
+          </div>
+        </div>
       `;
     } else if (ch.touch.type === 'toggle') {
       const on = !!ts.on;
@@ -803,13 +834,14 @@
   function renderTablePeekHtml(tableName, autoOpen) {
     const snap = TABLE_SNAPSHOTS[tableName];
     if (!snap) return '';
+    const tall = snap.rows.length > 9;
     return `
       <details class="peek-details" ${autoOpen ? 'open' : ''}>
         <summary>
           <span>👀 Input Table Preview: <code class="mono">${esc(tableName)}</code> (${snap.rows.length} rows)</span>
-          <span class="muted" style="font-weight:400;">Click to toggle</span>
+          <span class="muted" style="font-weight:400;">${tall ? 'Scrollable · click to toggle' : 'Click to toggle'}</span>
         </summary>
-        <div class="table-wrap" style="max-height:190px;overflow-y:auto;">
+        <div class="table-wrap" style="${tall ? 'max-height:240px;overflow-y:auto;' : ''}">
           <table class="zen-table">
             <thead><tr>${snap.cols.map(c => `<th>${esc(c)}</th>`).join('')}</tr></thead>
             <tbody>

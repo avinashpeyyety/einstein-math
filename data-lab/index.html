@@ -20,21 +20,21 @@
         <a class="back-link" href="../#data" title="Return to Einstein Math">← Einstein Math</a>
         <div class="brand-wordmark">
           <h1>Data Lab</h1>
-          <span>Beginner → Production · PostgreSQL 18 · SQL Server · SSIS · Python</span>
+          <span>PostgreSQL 18 · SQL Server · SSIS · Python</span>
         </div>
       </div>
       <nav class="zen-actions" aria-label="Data Lab tools">
         <button type="button" id="btn-map" class="pill-btn">🗺️ Lessons</button>
         <button type="button" id="btn-journal" class="pill-btn">📝 Takeaways (0/9)</button>
         <button type="button" id="btn-studio" class="pill-btn">🐘 SQL Playground</button>
-        <button type="button" id="btn-sound" class="pill-btn" title="Toggle voice explanations &amp; sound">🔊 Voice On</button>
-        <button type="button" id="btn-theme" class="pill-btn" title="Switch Warm Paper / Night theme">🌙 Night</button>
+        <button type="button" id="btn-sound" class="pill-btn" title="Toggle voice explanations &amp; sound" aria-label="Toggle voice">🔊 Voice</button>
+        <button type="button" id="btn-theme" class="pill-btn" title="Switch Warm Paper / Night theme" aria-label="Switch theme">🌙</button>
       </nav>
     </header>
 
     <!-- Live End-to-End Data Pipeline Panorama -->
     <section class="river-card" aria-label="Interactive Data Pipeline Progress">
-      <canvas id="zen-river-canvas" style="height:132px;"></canvas>
+      <canvas id="zen-river-canvas"></canvas>
       <div class="river-caption">
         <span id="river-status">Pipeline progress: 0/9 stages · Start with Lesson 1 to light up Stage 1.</span>
         <span id="river-right" class="mono">Postgres 18 Labs: 0/13</span>

@@ -65,12 +65,12 @@ body {
 }
 
 .zen-shell {
-  max-width: 920px;
+  max-width: 980px;
   margin: 0 auto;
-  padding: 20px 18px 64px;
+  padding: 14px 18px 48px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 14px;
 }
 
 /* —— Minimal Serene Header —— */
@@ -79,15 +79,15 @@ body {
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 12px;
-  padding-bottom: 12px;
+  gap: 10px;
+  padding-bottom: 10px;
   border-bottom: 1px solid var(--border);
 }
 
 .zen-brand {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 
 .back-link {
@@ -95,10 +95,11 @@ body {
   color: var(--sepia);
   font-size: 12.5px;
   font-weight: 600;
-  padding: 6px 12px;
+  padding: 5px 11px;
   border-radius: 999px;
   border: 1px solid var(--border);
   background: var(--surface);
+  white-space: nowrap;
   transition: all 0.18s ease;
 }
 .back-link:hover { border-color: var(--saffron); color: var(--ink); }
@@ -110,20 +111,21 @@ body {
 .brand-wordmark h1 {
   margin: 0;
   font-family: var(--font-serif);
-  font-size: 1.25rem;
+  font-size: 1.2rem;
   font-weight: 600;
   color: var(--ink);
   letter-spacing: -0.01em;
+  line-height: 1.15;
 }
 .brand-wordmark span {
-  font-size: 11.5px;
+  font-size: 11px;
   color: var(--muted);
 }
 
 .zen-actions {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   flex-wrap: wrap;
 }
 
@@ -136,11 +138,12 @@ button {
 }
 
 .pill-btn {
-  padding: 6px 13px;
+  padding: 5px 11px;
   border: 1px solid var(--border);
   background: var(--surface);
   color: var(--ink);
   font-weight: 500;
+  white-space: nowrap;
 }
 .pill-btn:hover { border-color: var(--sepia); background: var(--surface-soft); }
 
@@ -175,7 +178,7 @@ button {
 #zen-river-canvas {
   display: block;
   width: 100%;
-  height: 155px;
+  height: 96px;
 }
 .river-caption {
   display: flex;
@@ -183,10 +186,10 @@ button {
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 8px;
-  padding: 9px 16px;
+  padding: 7px 14px;
   background: var(--surface);
   border-top: 1px solid var(--border);
-  font-size: 12px;
+  font-size: 11.5px;
   color: var(--muted);
 }
 
@@ -195,11 +198,11 @@ button {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 28px 30px;
+  padding: 20px 24px;
   box-shadow: var(--shadow);
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 15px;
   animation: breathIn 0.35s ease;
 }
 
@@ -213,13 +216,13 @@ button {
   align-items: flex-start;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 10px;
 }
 
 .chapter-eyebrow {
-  font-size: 11.5px;
+  font-size: 11px;
   text-transform: uppercase;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.13em;
   color: var(--saffron);
   font-weight: 700;
 }
@@ -227,15 +230,15 @@ button {
 .chapter-title {
   margin: 2px 0 0;
   font-family: var(--font-serif);
-  font-size: 1.75rem;
+  font-size: 1.55rem;
   font-weight: 500;
   color: var(--ink);
-  line-height: 1.2;
+  line-height: 1.18;
 }
 
 .chapter-sub {
-  margin: 4px 0 0;
-  font-size: 13.5px;
+  margin: 3px 0 0;
+  font-size: 13px;
   color: var(--muted);
 }
 
@@ -243,16 +246,18 @@ button {
 .beat-dots {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
+  flex-wrap: wrap;
 }
 .beat-dot {
-  padding: 5px 12px;
+  padding: 5px 11px;
   font-size: 11.5px;
   font-weight: 600;
   border-radius: 999px;
   border: 1px solid var(--border);
   background: transparent;
   color: var(--muted);
+  white-space: nowrap;
 }
 .beat-dot.active {
   background: var(--saffron-soft);
@@ -265,28 +270,49 @@ button {
   color: var(--sage);
 }
 
-/* Beat 1: Motion Koan Canvas + Synced Captions */
+/* Beat 1: Visual Diagram Stage + Synced Captions */
 .koan-stage-wrap {
   border-radius: 12px;
   overflow: hidden;
   border: 1px solid var(--border);
   background: var(--paper);
 }
+.koan-canvas-box {
+  position: relative;
+  cursor: pointer;
+}
 #koan-stage-canvas {
   display: block;
   width: 100%;
-  height: 230px;
+  height: 196px;
 }
+.koan-play-overlay {
+  position: absolute;
+  right: 16px;
+  bottom: 14px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border-strong);
+  background: rgba(255, 253, 247, 0.88);
+  color: var(--ink);
+  font-size: 11.5px;
+  font-weight: 600;
+  backdrop-filter: blur(4px);
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+html.dark .koan-play-overlay {
+  background: rgba(31, 27, 43, 0.88);
+}
+.koan-play-overlay.playing { opacity: 0; }
 .koan-subtitle-bar {
-  padding: 14px 18px;
+  padding: 11px 16px;
   background: var(--surface-soft);
   border-top: 1px solid var(--border);
-  font-family: var(--font-serif);
-  font-size: 1.05rem;
-  font-style: italic;
+  font-size: 0.96rem;
   color: var(--ink);
   text-align: center;
-  min-height: 54px;
+  min-height: 46px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -351,12 +377,23 @@ button {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 12px;
   padding: 8px 14px;
   background: rgba(255, 255, 255, 0.04);
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   font-family: var(--mono);
   font-size: 11.5px;
   color: #c2b9cf;
+}
+.sql-bar > span:first-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+.sql-bar > span:last-child {
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 textarea.zen-sql {
   width: 100%;
@@ -534,16 +571,35 @@ table.zen-table tr:last-child td { border-bottom: none; }
   color: var(--ink);
   background: var(--saffron-soft);
 }
+.explore-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+}
+.chip-mark {
+  display: inline-block;
+  width: 12px;
+  text-align: center;
+}
 tr.row-excluded td {
-  opacity: 0.28;
+  opacity: 0.46;
   text-decoration: line-through;
 }
 tr.row-kept td {
   background: var(--sage-soft);
 }
 
+@media (max-width: 760px) {
+  .explore-split { grid-template-columns: 1fr; }
+}
+
 @media (max-width: 640px) {
-  .focus-stage { padding: 20px 16px; }
-  .chapter-title { font-size: 1.4rem; }
-  #koan-stage-canvas { height: 190px; }
+  .zen-shell { padding: 12px 12px 40px; gap: 12px; }
+  .focus-stage { padding: 16px 14px; }
+  .chapter-title { font-size: 1.32rem; }
+  #zen-river-canvas { height: 84px; }
+  #koan-stage-canvas { height: 184px; }
+  .pill-btn, .back-link { padding: 5px 9px; font-size: 11.5px; }
+  .beat-dot { padding: 4px 8px; font-size: 10.5px; }
 }

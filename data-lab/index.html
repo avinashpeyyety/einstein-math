@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#F4EEDF" />
-  <title>The River of Data · Zen Data Lab — Einstein Math</title>
+  <title>Data Lab · Beginner to Production SQL &amp; Data Pipelines — Einstein Math</title>
   <link rel="icon" href="../assets/icons/icon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -14,77 +14,77 @@
 <body>
   <div class="zen-shell">
 
-    <!-- Minimal Serene Header -->
+    <!-- Clean Minimal Header -->
     <header class="zen-header">
       <div class="zen-brand">
-        <a class="back-link" href="../#data" title="Return to Einstein Math Data Lab">← Einstein Math</a>
+        <a class="back-link" href="../#data" title="Return to Einstein Math">← Einstein Math</a>
         <div class="brand-wordmark">
-          <h1>The River of Data</h1>
-          <span>Zen Data Lab · PostgreSQL 18 · T-SQL · SSIS · Python</span>
+          <h1>Data Lab</h1>
+          <span>Beginner → Production · PostgreSQL 18 · SQL Server · SSIS · Python</span>
         </div>
       </div>
       <nav class="zen-actions" aria-label="Data Lab tools">
-        <button type="button" id="btn-map" class="pill-btn">🗺️ Map</button>
-        <button type="button" id="btn-journal" class="pill-btn">📖 Journal (0/7)</button>
-        <button type="button" id="btn-studio" class="pill-btn">🐘 SQL Studio</button>
-        <button type="button" id="btn-sound" class="pill-btn" title="Toggle Orion voice &amp; Zen chimes">🔊 Voice On</button>
-        <button type="button" id="btn-theme" class="pill-btn" title="Switch Warm Paper / Cozy Night">🌙 Night</button>
+        <button type="button" id="btn-map" class="pill-btn">🗺️ Lessons</button>
+        <button type="button" id="btn-journal" class="pill-btn">📝 Takeaways (0/9)</button>
+        <button type="button" id="btn-studio" class="pill-btn">🐘 SQL Playground</button>
+        <button type="button" id="btn-sound" class="pill-btn" title="Toggle voice explanations &amp; sound">🔊 Voice On</button>
+        <button type="button" id="btn-theme" class="pill-btn" title="Switch Warm Paper / Night theme">🌙 Night</button>
       </nav>
     </header>
 
-    <!-- Living River World Panorama (permanently heals as you master chapters) -->
-    <section class="river-card" aria-label="Living River of Data">
-      <canvas id="zen-river-canvas"></canvas>
+    <!-- Live End-to-End Data Pipeline Panorama -->
+    <section class="river-card" aria-label="Interactive Data Pipeline Progress">
+      <canvas id="zen-river-canvas" style="height:132px;"></canvas>
       <div class="river-caption">
-        <span id="river-status">A quiet mountain stream awaits. Master each chapter to heal the river.</span>
+        <span id="river-status">Pipeline progress: 0/9 stages · Start with Lesson 1 to light up Stage 1.</span>
         <span id="river-right" class="mono">Postgres 18 Labs: 0/13</span>
       </div>
     </section>
 
-    <!-- Single-Focus Chapter Stage (One Beat at a Time) -->
+    <!-- Single-Focus Lesson Stage (One Step at a Time) -->
     <main id="focus-stage" class="focus-stage" aria-live="polite">
-      <p class="muted">Opening the sketchbook…</p>
+      <p class="muted">Loading Data Lab…</p>
     </main>
 
   </div>
 
-  <!-- Quiet Modal 1: World Map -->
+  <!-- Modal 1: Lessons & Curriculum -->
   <div id="modal-map" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="modal-map-title">
     <div class="modal-sheet">
       <div class="row-between">
         <div>
-          <div class="chapter-eyebrow">World Map</div>
-          <h2 id="modal-map-title" class="chapter-title" style="font-size:1.35rem;">Seven Chapters Along the River</h2>
+          <div class="chapter-eyebrow">Curriculum</div>
+          <h2 id="modal-map-title" class="chapter-title" style="font-size:1.35rem;">9-Lesson Data Pipeline Path</h2>
         </div>
-        <button type="button" class="pill-btn" data-close-modal aria-label="Close World Map">✕ Close</button>
+        <button type="button" class="pill-btn" data-close-modal aria-label="Close Lessons">✕ Close</button>
       </div>
       <div id="modal-map-body" class="stack-sm" style="gap:12px;"></div>
     </div>
   </div>
 
-  <!-- Quiet Modal 2: Field Journal (Collected Koans & Spaced Recall) -->
+  <!-- Modal 2: Key Takeaways & Quick Review -->
   <div id="modal-journal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="modal-journal-title">
     <div class="modal-sheet">
       <div class="row-between">
         <div>
-          <div class="chapter-eyebrow">Field Journal</div>
-          <h2 id="modal-journal-title" class="chapter-title" style="font-size:1.35rem;">Collected Koans &amp; Recall</h2>
+          <div class="chapter-eyebrow">Summary Sheet</div>
+          <h2 id="modal-journal-title" class="chapter-title" style="font-size:1.35rem;">Key Takeaways &amp; Quick Review</h2>
         </div>
-        <button type="button" class="pill-btn" data-close-modal aria-label="Close Field Journal">✕ Close</button>
+        <button type="button" class="pill-btn" data-close-modal aria-label="Close Takeaways">✕ Close</button>
       </div>
       <div id="modal-journal-body" class="stack-sm" style="gap:12px;"></div>
     </div>
   </div>
 
-  <!-- Quiet Modal 3: Full PostgreSQL 18 SQL Studio (All 13 Labs, Schema, Scratchpad & T-SQL Map) -->
+  <!-- Modal 3: Full PostgreSQL 18 SQL Playground -->
   <div id="modal-studio" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="modal-studio-title">
     <div class="modal-sheet" style="width:min(920px, 100%);">
       <div class="row-between">
         <div>
-          <div class="chapter-eyebrow">Full SQL Studio</div>
-          <h2 id="modal-studio-title" class="chapter-title" style="font-size:1.35rem;">Real PostgreSQL 18 (WASM) · 13 Labs &amp; Dialect Map</h2>
+          <div class="chapter-eyebrow">SQL Playground</div>
+          <h2 id="modal-studio-title" class="chapter-title" style="font-size:1.35rem;">Real PostgreSQL 18 (WASM) · 13 Labs &amp; Dialect Guide</h2>
         </div>
-        <button type="button" class="pill-btn" data-close-modal aria-label="Close SQL Studio">✕ Close</button>
+        <button type="button" class="pill-btn" data-close-modal aria-label="Close SQL Playground">✕ Close</button>
       </div>
       <div id="modal-studio-body" class="stack-sm" style="gap:12px;"></div>
     </div>

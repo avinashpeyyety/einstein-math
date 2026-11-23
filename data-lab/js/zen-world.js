@@ -1,6 +1,6 @@
-/* The River of Data — Hand-Drawn Sketchbook World Canvas + Beat-1 Interactive Motion Koan Stage
- * Aesthetic: Warm sketchbook paper (#F4EEDF), graphite & sepia ink (#3A3631 / #6B4F3A),
- * selective color ONLY where meaningful (river slate-blue #4A6B82, saffron #E8892F, sage #6B8E63, earth #9A8C74).
+/* Data Lab — Calm Sketchbook Live Pipeline Panorama + Step-1 Synced Visual Diagrams
+ * Spirit: Effortless clarity, generous breathing room, warm paper (#F4EEDF), sepia ink (#3A3631 / #6B4F3A),
+ * selective functional color (slate blue #4A6B82, saffron #E8892F, sage #5E7D54, warn #C25E3E).
  */
 const ZenWorld = {
   _riverCanvas: null,
@@ -9,28 +9,42 @@ const ZenWorld = {
   _koanCtx: null,
   _raf: null,
   _mastered: {},
+  _activeChapter: 1,
   _ripples: [],
-  _crates: [],
+  _packets: [],
   _lastTs: 0,
   _spawnAcc: 0,
 
-  /* Active Motion Koan state */
+  /* Active Step-1 Visual Diagram state */
   _koanChapter: 1,
-  _koanProgress: 0, // 0..1
-  _koanScene: 'stream',
+  _koanProgress: 0,
+  _koanScene: 'table',
 
-  setMastered(map) {
+  STAGES: [
+    { id: 'l1-filter',     label: 'Filter' },
+    { id: 'l2-groupby',    label: 'Group' },
+    { id: 'l3-dupes',      label: 'Quality' },
+    { id: 'l4-python',     label: 'Python' },
+    { id: 'l5-leftjoin',   label: 'Join -1' },
+    { id: 'l6-bulkload',   label: 'Bulk Load' },
+    { id: 'l7-dialects',   label: 'Dialects' },
+    { id: 'l8-partitions', label: 'Partitions' },
+    { id: 'l9-reconcile',  label: 'Audit' }
+  ],
+
+  setMastered(map, activeNum = 1) {
     this._mastered = { ...(map || {}) };
+    this._activeChapter = activeNum || 1;
   },
 
   setKoanState(chNum, progress, scene) {
     this._koanChapter = chNum;
     this._koanProgress = Math.max(0, Math.min(1, progress));
-    this._koanScene = scene || 'stream';
+    this._koanScene = scene || 'table';
   },
 
   ripple(xFrac = 0.5) {
-    this._ripples.push({ xFrac, r: 6, life: 1.0 });
+    this._ripples.push({ xFrac, r: 8, life: 1.0 });
   },
 
   mount(riverCanvas, koanCanvas) {
@@ -44,9 +58,9 @@ const ZenWorld = {
     const loop = (now) => {
       const dt = Math.min(0.05, (now - this._lastTs) / 1000);
       this._lastTs = now;
-      this._tickRiver(dt);
-      if (this._riverCanvas && this._riverCanvas.offsetParent !== null) this._drawRiver(now);
-      if (this._koanCanvas && this._koanCanvas.offsetParent !== null) this._drawKoan(now);
+      this._tickPipeline(dt);
+      if (this._riverCanvas && this._riverCanvas.offsetParent !== null) this._drawPipeline(now);
+      if (this._koanCanvas && this._koanCanvas.offsetParent !== null) this._drawDiagram(now);
       this._raf = requestAnimationFrame(loop);
     };
     this._raf = requestAnimationFrame(loop);
@@ -55,7 +69,7 @@ const ZenWorld = {
   _setupHiDPI(canvas, ctx) {
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     const w = canvas.clientWidth || 760;
-    const h = canvas.clientHeight || 180;
+    const h = canvas.clientHeight || 150;
     if (canvas.width !== Math.round(w * dpr) || canvas.height !== Math.round(h * dpr)) {
       canvas.width = Math.round(w * dpr);
       canvas.height = Math.round(h * dpr);
@@ -70,224 +84,189 @@ const ZenWorld = {
     return {
       dark,
       paper: dark ? '#181422' : '#F4EEDF',
-      ink: dark ? '#E8DFD0' : '#3A3631',
+      card: dark ? '#231E30' : '#FFFDF7',
+      ink: dark ? '#EDE5D7' : '#3A3631',
       sepia: dark ? '#B8A590' : '#6B4F3A',
-      water: dark ? '#3B566E' : '#8DA3B8',
-      waterDeep: dark ? '#26394B' : '#4A6B82',
+      muted: dark ? '#90857A' : '#85796B',
+      water: dark ? '#4E6F8C' : '#6D8DA6',
+      waterSoft: dark ? 'rgba(78,111,140,0.28)' : 'rgba(109,141,166,0.22)',
       saffron: '#E8892F',
-      torch: '#D9772B',
-      sage: dark ? '#7E9C74' : '#7C8A5E',
-      earth: dark ? '#8A7C67' : '#9A8C74',
-      warn: '#D9534F'
+      saffronSoft: dark ? 'rgba(232,137,47,0.24)' : 'rgba(232,137,47,0.18)',
+      sage: dark ? '#82A677' : '#5E7D54',
+      sageSoft: dark ? 'rgba(130,166,119,0.24)' : 'rgba(94,125,84,0.18)',
+      warn: '#C25E3E',
+      orphan: '#8B74C9'
     };
   },
 
+  _nodeX(idx, w) {
+    const pad = Math.max(38, w * 0.065);
+    const span = w - pad * 2;
+    return pad + (idx / (this.STAGES.length - 1)) * span;
+  },
+
   /* ============================================================
-     LIVING RIVER WORLD (Top Panorama — heals with each chapter!)
+     LIVE END-TO-END DATA PIPELINE PANORAMA
   ============================================================ */
-  _tickRiver(dt) {
-    const hasAqueduct = !!this._mastered['ch4-aqueduct'];
-    const hasSluice = !!this._mastered['ch2-sluice'];
-    const hasShape = !!this._mastered['ch3-shape'];
-    this._spawnAcc += dt * (hasAqueduct ? 2.4 : 0.9);
+  _tickPipeline(dt) {
+    const hasBulk = !!this._mastered['l6-bulkload'];
+    const hasPy = !!this._mastered['l4-python'];
+    const hasJoin = !!this._mastered['l5-leftjoin'];
+
+    this._spawnAcc += dt * (hasBulk ? 2.6 : 1.05);
     while (this._spawnAcc >= 1) {
       this._spawnAcc -= 1;
       const r = Math.random();
       const kind = r < 0.16 ? 'dirty' : (r < 0.30 ? 'orphan' : 'clean');
-      this._crates.push({ u: -0.02, kind, yOff: (Math.random() - 0.5) * 14, diverted: false, alpha: 1 });
+      this._packets.push({ u: 0.0, kind, yOff: 0, diverted: false, alpha: 1 });
     }
-    const spd = hasAqueduct ? 0.24 : 0.11;
-    for (let i = this._crates.length - 1; i >= 0; i--) {
-      const c = this._crates[i];
-      if (c.diverted) {
-        c.yOff += dt * 36;
-        c.alpha -= dt * 1.4;
-        if (c.alpha <= 0) this._crates.splice(i, 1);
+
+    const spd = hasBulk ? 0.25 : 0.12;
+    for (let i = this._packets.length - 1; i >= 0; i--) {
+      const p = this._packets[i];
+      if (p.diverted) {
+        p.yOff += dt * 42;
+        p.alpha -= dt * 1.5;
+        if (p.alpha <= 0) this._packets.splice(i, 1);
         continue;
       }
-      c.u += dt * spd;
-      if (c.kind === 'dirty' && Math.abs(c.u - 0.27) < 0.02 && hasSluice) {
-        c.diverted = true;
+      p.u += dt * spd;
+      // Node 4 (Python cleaner) sits at u = 3/8 = 0.375
+      if (p.kind === 'dirty' && Math.abs(p.u - 0.375) < 0.025 && hasPy) {
+        p.diverted = true;
       }
-      if (c.kind === 'orphan' && Math.abs(c.u - 0.43) < 0.02) {
-        if (hasShape) c.kind = 'rescued';
-        else c.diverted = true;
+      // Node 5 (LEFT JOIN -1) sits at u = 4/8 = 0.5
+      if (p.kind === 'orphan' && Math.abs(p.u - 0.5) < 0.025) {
+        if (hasJoin) p.kind = 'rescued';
+        else p.diverted = true;
       }
-      if (c.u > 1.04) this._crates.splice(i, 1);
+      if (p.u > 1.02) this._packets.splice(i, 1);
     }
+
     for (let i = this._ripples.length - 1; i >= 0; i--) {
       const rp = this._ripples[i];
-      rp.r += dt * 95;
-      rp.life -= dt * 0.85;
+      rp.r += dt * 90;
+      rp.life -= dt * 0.9;
       if (rp.life <= 0) this._ripples.splice(i, 1);
     }
   },
 
-  _riverY(u, h) {
-    return h * 0.62 + Math.sin(u * Math.PI * 2.1) * (h * 0.09);
-  },
-
-  _drawRiver(now) {
+  _drawPipeline(now) {
     const g = this._riverCtx;
     const { w, h } = this._setupHiDPI(this._riverCanvas, g);
     const P = this._palette();
+    const cy = h * 0.50;
 
-    const m1 = !!this._mastered['ch1-stillness'];
-    const m2 = !!this._mastered['ch2-sluice'];
-    const m3 = !!this._mastered['ch3-shape'];
-    const m4 = !!this._mastered['ch4-aqueduct'];
-    const m5 = !!this._mastered['ch5-dialects'];
-    const m6 = !!this._mastered['ch6-depth'];
-    const m7 = !!this._mastered['ch7-mirror'];
-
-    // Warm paper backdrop
+    // Warm sketchbook backdrop
     g.fillStyle = P.paper;
     g.fillRect(0, 0, w, h);
 
-    // Distant Sahyadri sketchbook hills (gentle graphite silhouette)
-    g.beginPath();
-    g.moveTo(0, h * 0.42);
-    g.quadraticCurveTo(w * 0.16, h * 0.18, w * 0.34, h * 0.36);
-    g.quadraticCurveTo(w * 0.56, h * 0.16, w * 0.78, h * 0.34);
-    g.quadraticCurveTo(w * 0.90, h * 0.24, w, h * 0.36);
-    g.lineTo(w, h); g.lineTo(0, h); g.closePath();
-    g.fillStyle = m1 ? (P.dark ? 'rgba(124,138,94,0.14)' : 'rgba(124,138,94,0.12)') : (P.dark ? 'rgba(154,140,116,0.08)' : 'rgba(154,140,116,0.10)');
-    g.fill();
-    g.strokeStyle = P.sepia;
-    g.globalAlpha = 0.35;
-    g.lineWidth = 1.2;
-    g.stroke();
+    // Subtle drafting dot grid (very faint architectural paper feel)
+    g.fillStyle = P.sepia;
+    g.globalAlpha = P.dark ? 0.10 : 0.12;
+    for (let x = 18; x < w; x += 26) {
+      for (let y = 18; y < h; y += 26) {
+        g.fillRect(x, y, 1.2, 1.2);
+      }
+    }
     g.globalAlpha = 1;
 
-    // Flowing River Ribbon
-    const riverW = m4 ? 36 : 22;
-    g.beginPath();
-    for (let i = 0; i <= 40; i++) {
-      const u = i / 40;
-      const x = u * w, y = this._riverY(u, h);
-      if (i === 0) g.moveTo(x, y); else g.lineTo(x, y);
-    }
-    g.strokeStyle = m1 ? P.water : P.earth;
-    g.globalAlpha = m1 ? 0.55 : 0.40;
-    g.lineWidth = riverW;
+    const x0 = this._nodeX(0, w);
+    const xEnd = this._nodeX(this.STAGES.length - 1, w);
+    const hasBulk = !!this._mastered['l6-bulkload'];
+
+    // Soft pipeline conduit background rail
+    g.strokeStyle = P.waterSoft;
+    g.lineWidth = hasBulk ? 16 : 10;
     g.lineCap = 'round';
-    g.stroke();
-    g.globalAlpha = 1;
-
-    // Gentle ink wave strokes along river
     g.beginPath();
-    for (let i = 0; i <= 40; i++) {
-      const u = i / 40;
-      const x = u * w, y = this._riverY(u, h);
-      if (i === 0) g.moveTo(x, y); else g.lineTo(x, y);
-    }
-    g.strokeStyle = P.waterDeep;
-    g.lineWidth = 1.5;
-    g.setLineDash([12, 16]);
-    g.lineDashOffset = -(now * (m4 ? 0.05 : 0.02));
+    g.moveTo(x0, cy);
+    g.lineTo(xEnd, cy);
+    g.stroke();
+
+    // Animated dashed flow line inside the conduit
+    g.strokeStyle = P.water;
+    g.lineWidth = 1.6;
+    g.setLineDash([8, 12]);
+    g.lineDashOffset = -(now * (hasBulk ? 0.065 : 0.028));
+    g.beginPath();
+    g.moveTo(x0, cy);
+    g.lineTo(xEnd, cy);
     g.stroke();
     g.setLineDash([]);
 
-    // Landmark 1 (Ch II): Bamboo Sluice Gate at x = 0.27
-    const sx = w * 0.27, sy = this._riverY(0.27, h);
-    if (m2) {
+    // Moving data packets along the conduit
+    for (const pkt of this._packets) {
+      const px = x0 + pkt.u * (xEnd - x0);
+      const py = cy + pkt.yOff;
+      g.globalAlpha = Math.max(0, pkt.alpha);
+      g.fillStyle = pkt.kind === 'dirty' ? P.warn
+        : (pkt.kind === 'orphan' ? P.orphan
+        : (pkt.kind === 'rescued' ? P.sage : P.card));
       g.strokeStyle = P.ink;
-      g.lineWidth = 2;
+      g.lineWidth = 1.2;
       g.beginPath();
-      g.moveTo(sx - 8, sy - 24); g.lineTo(sx - 8, sy + 20);
-      g.moveTo(sx + 8, sy - 24); g.lineTo(sx + 8, sy + 20);
-      g.moveTo(sx - 12, sy - 16); g.lineTo(sx + 12, sy - 16);
+      g.roundRect(px - 4.5, py - 4.5, 9, 9, 2.5);
+      g.fill();
       g.stroke();
-      this._label(g, sx, sy - 30, 'Sluice Gate', P);
-    }
-
-    // Landmark 2 (Ch III): Fact & Dimension Storehouses + (-1) Basket at x = 0.43
-    const hx = w * 0.43, hy = this._riverY(0.43, h);
-    if (m3) {
-      g.fillStyle = P.paper; g.strokeStyle = P.ink; g.lineWidth = 1.8;
-      g.fillRect(hx - 16, hy - 34, 15, 16); g.strokeRect(hx - 16, hy - 34, 15, 16);
-      g.fillRect(hx + 2, hy - 30, 14, 12); g.strokeRect(hx + 2, hy - 30, 14, 12);
-      // Roofs
-      g.beginPath();
-      g.moveTo(hx - 19, hy - 34); g.lineTo(hx - 8.5, hy - 43); g.lineTo(hx + 2, hy - 34);
-      g.moveTo(hx, hy - 30); g.lineTo(hx + 9, hy - 37); g.lineTo(hx + 18, hy - 30);
-      g.stroke();
-      this._label(g, hx, hy - 48, 'Star Houses · (-1)', P);
-    }
-
-    // Landmark 3 (Ch IV): Stone Aqueduct Arches at x = 0.59
-    const ax = w * 0.59, ay = this._riverY(0.59, h);
-    if (m4) {
-      g.strokeStyle = P.ink; g.fillStyle = P.earth; g.lineWidth = 1.8;
-      for (let k = -1; k <= 1; k++) {
-        const bx = ax + k * 18;
-        g.beginPath();
-        g.arc(bx, ay + 12, 8, Math.PI, 0);
-        g.stroke();
-      }
-      g.beginPath(); g.moveTo(ax - 28, ay - 2); g.lineTo(ax + 28, ay - 2); g.stroke();
-      this._label(g, ax, ay - 16, 'COPY Aqueduct', P);
-    }
-
-    // Landmark 4 (Ch V): Twin Dialect Archways at x = 0.72
-    const dx = w * 0.72, dy = this._riverY(0.72, h);
-    if (m5) {
-      g.strokeStyle = P.sepia; g.lineWidth = 2;
-      g.beginPath();
-      g.arc(dx - 7, dy - 10, 9, Math.PI, 0);
-      g.arc(dx + 7, dy - 10, 9, Math.PI, 0);
-      g.stroke();
-      this._label(g, dx, dy - 26, 'T-SQL ↔ PG', P);
-    }
-
-    // Landmark 5 (Ch VI): Tidal Partition Locks at x = 0.83
-    const px = w * 0.83, py = this._riverY(0.83, h);
-    if (m6) {
-      for (let k = 0; k < 5; k++) {
-        g.fillStyle = k === 2 ? P.saffron : P.paper;
-        g.strokeStyle = P.ink; g.lineWidth = 1.4;
-        g.fillRect(px - 20 + k * 8, py - 24, 6, 16);
-        g.strokeRect(px - 20 + k * 8, py - 24, 6, 16);
-      }
-      this._label(g, px, py - 30, '72 Locks', P);
-    }
-
-    // Landmark 6 (Ch VII): Harbour Watchtower & Saffron Lantern at x = 0.93
-    const lx = w * 0.93, ly = this._riverY(0.93, h);
-    g.strokeStyle = P.ink; g.fillStyle = P.paper; g.lineWidth = 1.8;
-    g.fillRect(lx - 8, ly - 40, 16, 36); g.strokeRect(lx - 8, ly - 40, 16, 36);
-    g.beginPath(); g.moveTo(lx - 11, ly - 40); g.lineTo(lx, ly - 52); g.lineTo(lx + 11, ly - 40); g.closePath(); g.stroke();
-    if (m7) {
-      // Glowing saffron lantern!
-      const grd = g.createRadialGradient(lx, ly - 44, 2, lx, ly - 44, 26);
-      grd.addColorStop(0, 'rgba(232,137,47,0.85)');
-      grd.addColorStop(1, 'rgba(232,137,47,0)');
-      g.fillStyle = grd;
-      g.beginPath(); g.arc(lx, ly - 44, 26, 0, Math.PI * 2); g.fill();
-      g.fillStyle = P.saffron;
-      g.beginPath(); g.arc(lx, ly - 44, 4.5, 0, Math.PI * 2); g.fill();
-    }
-
-    // Draw flowing wooden data crates
-    for (const c of this._crates) {
-      const x = c.u * w;
-      const y = this._riverY(Math.max(0, Math.min(1, c.u)), h) + c.yOff;
-      g.globalAlpha = Math.max(0, c.alpha);
-      g.fillStyle = c.kind === 'dirty' ? P.torch : (c.kind === 'orphan' ? '#9B7EDE' : (c.kind === 'rescued' ? P.sage : P.paper));
-      g.strokeStyle = P.ink;
-      g.lineWidth = 1.4;
-      g.fillRect(x - 4.5, y - 4.5, 9, 9);
-      g.strokeRect(x - 4.5, y - 4.5, 9, 9);
       g.globalAlpha = 1;
     }
 
-    // Celebratory ripples
+    // Draw the 9 Pipeline Stage Nodes
+    const compact = w < 620;
+    const r = compact ? 13 : 16;
+    this.STAGES.forEach((st, idx) => {
+      const nx = this._nodeX(idx, w);
+      const done = !!this._mastered[st.id];
+      const active = (idx + 1) === this._activeChapter;
+
+      // Active lesson subtle breathing halo
+      if (active) {
+        const pulse = 5 + Math.sin(now * 0.004) * 2.5;
+        g.fillStyle = P.saffronSoft;
+        g.beginPath();
+        g.arc(nx, cy, r + pulse, 0, Math.PI * 2);
+        g.fill();
+      }
+
+      // Node circle
+      g.fillStyle = done ? P.sage : (active ? P.saffron : P.card);
+      g.strokeStyle = done ? P.sage : (active ? P.saffron : P.sepia);
+      g.lineWidth = active ? 2.4 : 1.6;
+      g.beginPath();
+      g.arc(nx, cy, r, 0, Math.PI * 2);
+      g.fill();
+      g.stroke();
+
+      // Number or checkmark inside circle
+      g.fillStyle = (done || active) ? '#FFFFFF' : P.sepia;
+      g.font = `700 ${compact ? 10 : 11.5}px "DM Sans", sans-serif`;
+      g.textAlign = 'center';
+      g.textBaseline = 'middle';
+      g.fillText(done ? '✓' : String(idx + 1), nx, cy + 0.5);
+
+      // Stage label below node
+      g.fillStyle = active ? P.ink : (done ? P.sage : P.muted);
+      g.font = `${active ? 700 : 600} ${compact ? 9.5 : 11}px "DM Sans", sans-serif`;
+      g.textBaseline = 'alphabetic';
+      g.fillText(st.label, nx, cy + r + 16);
+
+      // Small Quarantine note under Stage 4 when Python cleaner is active
+      if (idx === 3 && this._mastered['l4-python'] && !compact) {
+        g.fillStyle = P.warn;
+        g.font = '600 9px "DM Sans", sans-serif';
+        g.fillText('↳ Quarantine', nx, cy + r + 29);
+      }
+    });
+
+    // Celebratory completion ripples
     for (const rp of this._ripples) {
+      const rx = x0 + rp.xFrac * (xEnd - x0);
       g.strokeStyle = P.saffron;
       g.globalAlpha = Math.max(0, rp.life);
-      g.lineWidth = 2.5;
+      g.lineWidth = 2.4;
       g.beginPath();
-      g.arc(rp.xFrac * w, this._riverY(rp.xFrac, h), rp.r, 0, Math.PI * 2);
+      g.arc(rx, cy, rp.r, 0, Math.PI * 2);
       g.stroke();
       g.globalAlpha = 1;
     }
@@ -297,140 +276,206 @@ const ZenWorld = {
 
   _label(g, x, y, txt, P) {
     g.fillStyle = P.sepia;
-    g.font = '600 10px "DM Sans", sans-serif';
+    g.font = '600 11px "DM Sans", sans-serif';
     g.textAlign = 'center';
+    g.textBaseline = 'alphabetic';
     g.fillText(txt, x, y);
   },
 
   /* ============================================================
-     BEAT 1: SYNCHRONIZED MOTION KOAN SKETCHBOOK STAGE
+     STEP 1: SYNCED VISUAL LESSON DIAGRAMS (9 LESSONS)
   ============================================================ */
-  _drawKoan(now) {
+  _drawDiagram(now) {
     const g = this._koanCtx;
     const { w, h } = this._setupHiDPI(this._koanCanvas, g);
     const P = this._palette();
-    const p = this._koanProgress; // 0..1 synced to Orion audio
+    const p = this._koanProgress;
     const ch = this._koanChapter;
 
     g.fillStyle = P.paper;
     g.fillRect(0, 0, w, h);
 
-    // Subtle sketchbook frame border
+    // Clean sketchbook frame
     g.strokeStyle = P.sepia;
-    g.globalAlpha = 0.28;
-    g.lineWidth = 1.5;
+    g.globalAlpha = 0.22;
+    g.lineWidth = 1.4;
     g.strokeRect(10, 10, w - 20, h - 20);
     g.globalAlpha = 1;
 
-    const cx = w / 2, cy = h / 2;
-    const sway = Math.sin(now * 0.002) * 3;
+    const cx = w / 2;
+    const cy = h / 2;
+    const sway = Math.sin(now * 0.0022) * 2.5;
 
     g.strokeStyle = P.ink;
     g.fillStyle = P.ink;
-    g.lineWidth = 2;
+    g.lineWidth = 1.8;
     g.textAlign = 'center';
 
     if (ch === 1) {
-      // Stillness: Two duplicate crates A-9042 causing a glowing fan-out mirror
-      this._sketchBox(g, cx - 150, cy - 26, 110, 52, 'SKU: A-9042', p > 0.15 ? P.saffron : null, P);
-      if (p > 0.28) this._sketchBox(g, cx - 150, cy + 36, 110, 44, 'SKU: A-9042 (dup)', P.torch, P);
-      if (p > 0.50) {
-        g.beginPath(); g.moveTo(cx - 35, cy); g.lineTo(cx + 35, cy - 22); g.moveTo(cx - 35, cy); g.lineTo(cx + 35, cy + 28); g.stroke();
-        this._sketchBox(g, cx + 45, cy - 48, 130, 42, 'Sale × 2 = +$18.4K', p > 0.75 ? P.sage : P.warn, P);
-        this._sketchBox(g, cx + 45, cy + 6, 130, 42, 'HAVING COUNT > 1', P.water, P);
-      }
+      // Lesson 1: Table rows -> WHERE filter -> ORDER BY DESC
+      const rows = p > 0.68
+        ? [
+            { sku: 'B-2210', cat: 'Footwear', price: '$120.00', active: true, keep: true },
+            { sku: 'G-4400', cat: 'Footwear', price: '$89.50',  active: true, keep: true },
+            { sku: 'C-5501', cat: 'Access.',  price: '$45.00',  active: true, keep: true },
+            { sku: 'H-3030', cat: 'Access.',  price: '$64.00',  active: false, keep: false }
+          ]
+        : [
+            { sku: 'A-9042', cat: 'Apparel',  price: '$24.99',  active: true,  keep: false },
+            { sku: 'B-2210', cat: 'Footwear', price: '$120.00', active: true,  keep: true },
+            { sku: 'C-5501', cat: 'Access.',  price: '$45.00',  active: true,  keep: true },
+            { sku: 'H-3030', cat: 'Access.',  price: '$64.00',  active: false, keep: false }
+          ];
+      const tw = Math.min(430, w - 56);
+      const tx = cx - tw / 2;
+      const startY = 38;
+      this._label(g, cx, 28, p > 0.68 ? 'ORDER BY unit_price DESC (Highest First)' : (p > 0.30 ? 'WHERE is_active AND unit_price > 30' : 'Table: dim_product (Rows & Columns)'), P);
+      rows.forEach((r, idx) => {
+        const y = startY + idx * 38;
+        const faded = p > 0.30 && !r.keep;
+        g.globalAlpha = faded ? 0.25 : 1;
+        g.fillStyle = (p > 0.30 && r.keep) ? P.sageSoft : P.card;
+        g.strokeStyle = (p > 0.30 && r.keep) ? P.sage : P.sepia;
+        g.lineWidth = 1.5;
+        g.beginPath();
+        g.roundRect(tx, y, tw, 30, 6);
+        g.fill();
+        g.stroke();
+        g.fillStyle = P.ink;
+        g.font = '600 11.5px "JetBrains Mono", monospace';
+        g.textAlign = 'left';
+        g.fillText(`${r.sku}   ${r.cat.padEnd(9)} ${r.price.padStart(7)}   ${r.active ? 'active' : 'inactive'}`, tx + 14, y + 19);
+        g.globalAlpha = 1;
+      });
+      g.textAlign = 'center';
     } else if (ch === 2) {
-      // Sluice Gate: Muddy CSV crates entering bamboo filter -> Clean vs Quarantine
-      this._sketchBox(g, cx - 210, cy - 22 + sway, 105, 44, 'Latin-1 CSV', P.torch, P);
-      this._sketchBox(g, cx - 210, cy + 32, 105, 44, 'SKU "00421"', P.water, P);
-      if (p > 0.35) {
-        g.strokeStyle = P.sage; g.lineWidth = 3;
-        g.beginPath(); g.moveTo(cx - 40, 32); g.lineTo(cx - 40, h - 32); g.stroke();
-        g.strokeStyle = P.ink; g.lineWidth = 2;
-        this._label(g, cx - 40, 26, 'Python Sluice Gate', P);
+      // Lesson 2: GROUP BY folding 6 raw receipts into 3 store totals
+      const leftX = cx - 190;
+      const rightX = cx + 65;
+      this._label(g, leftX + 60, 28, 'Raw Receipts (stg_pos_sales)', P);
+      const receipts = ['Store 12 · $49.98', 'Store 12 · $120.00', 'Store 19 · $75.00', 'Store 19 · $24.99', 'Store 24 · $180.00'];
+      receipts.forEach((txt, i) => {
+        this._sketchBox(g, leftX, 38 + i * 32, 130, 26, txt, i < 2 ? P.water : (i < 4 ? P.saffron : P.sage), P, 10.5);
+      });
+      if (p > 0.32) {
+        g.strokeStyle = P.sepia; g.lineWidth = 2;
+        g.beginPath(); g.moveTo(leftX + 136, cy); g.lineTo(rightX - 10, cy); g.stroke();
+        this._label(g, cx - 2, cy - 10, 'GROUP BY', P);
       }
-      if (p > 0.60) {
-        this._sketchBox(g, cx + 45, cy - 46, 145, 44, 'Clean UTF-8 + str', P.sage, P);
-        this._sketchBox(g, cx + 45, cy + 16, 145, 44, 'Quarantine Cove', P.saffron, P);
+      if (p > 0.45) {
+        this._label(g, rightX + 70, 28, 'Store Totals (COUNT + SUM)', P);
+        this._sketchBox(g, rightX, 46, 145, 38, 'Store 24 · 3 txns · $331.50', P.sage, P, 10.5);
+        this._sketchBox(g, rightX, 94, 145, 38, 'Store 12 · 4 txns · $251.73', P.water, P, 10.5);
+        this._sketchBox(g, rightX, 142, 145, 38, 'Store 19 · 3 txns · $157.99', P.saffron, P, 10.5);
       }
     } else if (ch === 3) {
-      // Shape: Facts + Dimensions + Unknown (-1) Basket
-      this._sketchBox(g, cx - 190, cy - 26, 120, 52, 'FactSales\n(Z-9999 · $75)', P.water, P);
-      this._sketchBox(g, cx + 70, cy - 58, 125, 46, 'DimProduct\n(Known SKUs)', P.earth, P);
-      if (p > 0.45) {
-        this._sketchBox(g, cx + 70, cy + 12 + sway * 0.5, 125, 50, 'Basket (-1)\nUnknown SKU', P.saffron, P);
-        g.strokeStyle = P.saffron; g.lineWidth = 2.2;
-        g.beginPath(); g.moveTo(cx - 66, cy + 4); g.quadraticCurveTo(cx, cy + 35, cx + 66, cy + 35); g.stroke();
+      // Lesson 3: Duplicate SKU A-9042 causing 2× fan-out -> caught by HAVING COUNT(*) > 1
+      this._sketchBox(g, cx - 185, cy - 42, 130, 44, 'SKU: A-9042\n(Active)', P.water, P);
+      if (p > 0.25) this._sketchBox(g, cx - 185, cy + 12, 130, 44, 'SKU: A-9042\n(Duplicate!)', P.warn, P);
+      if (p > 0.48) {
+        g.strokeStyle = P.ink; g.lineWidth = 1.8;
+        g.beginPath(); g.moveTo(cx - 50, cy - 18); g.lineTo(cx + 35, cy - 22); g.moveTo(cx - 50, cy + 32); g.lineTo(cx + 35, cy + 28); g.stroke();
+        this._sketchBox(g, cx + 40, cy - 46, 155, 44, 'Blind Join: Sale × 2\n+$18,420 phantom', P.warn, P);
+        this._sketchBox(g, cx + 40, cy + 10, 155, 44, 'HAVING COUNT(*) > 1\nCaught Early ✓', P.sage, P);
       }
     } else if (ch === 4) {
-      // Aqueduct: Teacup (14h) vs COPY Aqueduct (2.5h) + Idempotent wheel
-      const fast = p > 0.42;
-      this._sketchBox(g, cx - 200, cy - 26, 120, 52, fast ? 'COPY Stream\n85,000 rows/s' : 'Row INSERT\n1,000 rows/s', fast ? P.sage : P.torch, P);
-      // Flow lines
-      g.strokeStyle = fast ? P.waterDeep : P.earth;
+      // Lesson 4: Python CSV Cleaner -> Clean UTF-8 vs Quarantine
+      this._sketchBox(g, cx - 210, cy - 42 + sway, 120, 42, 'Latin-1 0xE9\n(Encoding Err)', P.warn, P);
+      this._sketchBox(g, cx - 210, cy + 12, 120, 42, 'SKU "00421"\n(Keep Leading 0)', P.water, P);
+      if (p > 0.30) {
+        g.strokeStyle = P.sage; g.lineWidth = 3;
+        g.beginPath(); g.moveTo(cx - 35, 36); g.lineTo(cx - 35, h - 32); g.stroke();
+        this._label(g, cx - 35, 28, 'Python pandas Cleaner', P);
+      }
+      if (p > 0.55) {
+        this._sketchBox(g, cx + 35, cy - 46, 160, 44, 'Clean UTF-8 + str\nReady for SQL ✓', P.sage, P);
+        this._sketchBox(g, cx + 35, cy + 12, 160, 44, 'Quarantine Table\nBad Rows Logged', P.saffron, P);
+      }
+    } else if (ch === 5) {
+      // Lesson 5: FactSales + DimProduct + Unknown (-1)
+      this._sketchBox(g, cx - 200, cy - 26, 130, 54, 'stg_pos_sales\nZ-9999 · $75.00', P.water, P);
+      this._sketchBox(g, cx + 65, cy - 58, 135, 46, 'dim_product\nKnown Active SKUs', P.sage, P);
+      if (p > 0.42) {
+        this._sketchBox(g, cx + 65, cy + 12 + sway * 0.4, 135, 50, 'Unknown Key (-1)\nZ-9999 Preserved ✓', P.saffron, P);
+        g.strokeStyle = P.saffron; g.lineWidth = 2.2;
+        g.beginPath(); g.moveTo(cx - 66, cy + 4); g.quadraticCurveTo(cx, cy + 36, cx + 62, cy + 36); g.stroke();
+      }
+    } else if (ch === 6) {
+      // Lesson 6: Bulk COPY vs Row-by-Row INSERT + ON CONFLICT
+      const fast = p > 0.38;
+      this._sketchBox(g, cx - 205, cy - 28, 132, 56, fast ? 'COPY / Fast Load\n85,000 rows/sec' : 'Row INSERT\n1,000 rows/sec', fast ? P.sage : P.warn, P);
+      g.strokeStyle = fast ? P.water : P.muted;
       g.lineWidth = fast ? 6 : 2;
       g.setLineDash([10, 8]);
       g.lineDashOffset = -(now * (fast ? 0.14 : 0.03));
-      g.beginPath(); g.moveTo(cx - 75, cy); g.lineTo(cx + 65, cy); g.stroke();
+      g.beginPath(); g.moveTo(cx - 70, cy); g.lineTo(cx + 62, cy); g.stroke();
       g.setLineDash([]);
-      this._sketchBox(g, cx + 70, cy - 26, 135, 52, p > 0.7 ? 'ON CONFLICT\nRetry-Safe ✓' : 'Target Table\n50M Rows', p > 0.7 ? P.saffron : P.water, P);
-    } else if (ch === 5) {
-      // Two Tongues: T-SQL & PostgreSQL arches uniting
-      this._sketchBox(g, cx - 195, cy - 34, 140, 64, 'SQL Server\nTOP · ISNULL', P.water, P);
-      this._sketchBox(g, cx + 55, cy - 34, 140, 64, 'PostgreSQL\nLIMIT · COALESCE', P.saffron, P);
-      g.beginPath(); g.arc(cx, cy - 34, 52, Math.PI, 0); g.stroke();
-      this._label(g, cx, cy + 54, p > 0.55 ? 'Watch casing & MVCC — One Relational Truth' : 'Two Dialects, One Grammar', P);
-    } else if (ch === 6) {
-      // Effortless Speed: 12 monthly drawers, 11 pruned, March glows saffron
+      this._sketchBox(g, cx + 68, cy - 28, 142, 56, p > 0.68 ? 'ON CONFLICT\nRetry-Safe ✓' : 'Target Warehouse\n50M Rows', p > 0.68 ? P.saffron : P.water, P);
+    } else if (ch === 7) {
+      // Lesson 7: T-SQL vs PostgreSQL
+      this._sketchBox(g, cx - 200, cy - 34, 148, 66, 'SQL Server (T-SQL)\nTOP · ISNULL · GETDATE', P.water, P);
+      this._sketchBox(g, cx + 52, cy - 34, 148, 66, 'PostgreSQL\nLIMIT · COALESCE · NOW', P.saffron, P);
+      g.strokeStyle = P.sepia; g.lineWidth = 2;
+      g.beginPath(); g.moveTo(cx - 48, cy); g.lineTo(cx + 48, cy); g.stroke();
+      this._label(g, cx, cy - 12, 'Same Logic', P);
+      this._label(g, cx, cy + 56, p > 0.52 ? 'PostgreSQL is case-sensitive & uses MVCC (no NOLOCK needed)' : 'Two SQL Dialects, One Relational Model', P);
+    } else if (ch === 8) {
+      // Lesson 8: 12 Monthly Partitions -> 11 Pruned, March glows
       const cols = 12;
-      const bw = Math.min(44, (w - 90) / cols);
+      const bw = Math.min(44, (w - 84) / cols);
       const startX = cx - (cols * (bw + 4)) / 2;
       for (let i = 0; i < cols; i++) {
         const isMar = i === 2;
-        const pruned = p > 0.45 && !isMar;
-        g.globalAlpha = pruned ? 0.22 : 1;
-        g.fillStyle = isMar && p > 0.45 ? P.saffron : P.paper;
-        g.strokeStyle = P.ink;
-        g.lineWidth = isMar ? 2.4 : 1.3;
-        g.fillRect(startX + i * (bw + 4), cy - 34, bw, 68);
-        g.strokeRect(startX + i * (bw + 4), cy - 34, bw, 68);
-        g.fillStyle = P.ink;
+        const pruned = p > 0.42 && !isMar;
+        g.globalAlpha = pruned ? 0.20 : 1;
+        g.fillStyle = isMar && p > 0.42 ? P.saffron : P.card;
+        g.strokeStyle = isMar && p > 0.42 ? P.saffron : P.ink;
+        g.lineWidth = isMar ? 2.2 : 1.3;
+        g.beginPath();
+        g.roundRect(startX + i * (bw + 4), cy - 34, bw, 64, 5);
+        g.fill();
+        g.stroke();
+        g.fillStyle = (isMar && p > 0.42) ? '#fff' : P.ink;
         g.font = '600 10px "JetBrains Mono", monospace';
         g.fillText(`M${String(i + 1).padStart(2, '0')}`, startX + i * (bw + 4) + bw / 2, cy + 4);
       }
       g.globalAlpha = 1;
-      this._label(g, cx, cy + 56, p > 0.45 ? 'Sargable Range: 11 Drawers Skipped → 1.4s' : 'Unpartitioned Scan: Reading All Months → 21.4s', P);
+      this._label(g, cx, cy + 54, p > 0.42 ? 'Sargable Range (>= & <): 11 of 12 Partitions Skipped → 1.4s' : 'Wrapped Column EXTRACT(): Scans All 12 Partitions → 21.4s', P);
     } else {
-      // Chapter 7: Still Mirror & Saffron Harbour Lantern
-      this._sketchBox(g, cx - 195, cy - 26, 125, 52, 'CTE: Legacy Sum\n$169.98', P.earth, P);
-      this._sketchBox(g, cx + 70, cy - 26, 125, 52, 'CTE: DW Sum\n$169.98', P.water, P);
-      if (p > 0.55) {
-        const grd = g.createRadialGradient(cx, cy, 3, cx, cy, 34);
-        grd.addColorStop(0, 'rgba(232,137,47,0.85)');
-        grd.addColorStop(1, 'rgba(232,137,47,0)');
-        g.fillStyle = grd;
-        g.beginPath(); g.arc(cx, cy, 34, 0, Math.PI * 2); g.fill();
+      // Lesson 9: Aggregate-First CTE Reconciliation
+      this._sketchBox(g, cx - 205, cy - 28, 138, 56, 'CTE 1: Legacy EOD\nSUM per Store', P.water, P);
+      this._sketchBox(g, cx + 67, cy - 28, 138, 56, 'CTE 2: Warehouse\nSUM per Store', P.sage, P);
+      if (p > 0.50) {
+        g.strokeStyle = P.saffron; g.lineWidth = 2.2;
+        g.beginPath(); g.moveTo(cx - 62, cy); g.lineTo(cx + 62, cy); g.stroke();
         g.fillStyle = P.saffron;
-        g.beginPath(); g.arc(cx, cy, 8, 0, Math.PI * 2); g.fill();
-        this._label(g, cx, cy + 48, 'Variance = 0.00 · Harbour Lantern Lit', P);
+        g.beginPath(); g.arc(cx, cy, 16, 0, Math.PI * 2); g.fill();
+        g.fillStyle = '#fff';
+        g.font = '700 12px "DM Sans", sans-serif';
+        g.fillText('✓', cx, cy + 4);
+        this._label(g, cx, cy + 54, '1 Row per Store on Both Sides → Zero Fan-Out · Exact Variance Caught', P);
       }
     }
     g.restore();
   },
 
-  _sketchBox(g, x, y, w, h, text, wash, P) {
-    g.fillStyle = wash || P.paper;
-    g.globalAlpha = wash ? 0.28 : 1;
-    g.fillRect(x, y, w, h);
+  _sketchBox(g, x, y, w, h, text, wash, P, fontSize = 11) {
+    g.fillStyle = wash || P.card;
+    g.globalAlpha = wash ? 0.22 : 1;
+    g.beginPath();
+    g.roundRect(x, y, w, h, 7);
+    g.fill();
     g.globalAlpha = 1;
-    g.strokeStyle = P.ink;
-    g.lineWidth = 1.8;
-    g.strokeRect(x, y, w, h);
+    g.strokeStyle = wash || P.ink;
+    g.lineWidth = 1.6;
+    g.beginPath();
+    g.roundRect(x, y, w, h, 7);
+    g.stroke();
     g.fillStyle = P.ink;
-    g.font = '600 11.5px "DM Sans", sans-serif';
+    g.font = `600 ${fontSize}px "DM Sans", sans-serif`;
     const lines = String(text).split('\n');
     lines.forEach((ln, idx) => {
-      g.fillText(ln, x + w / 2, y + h / 2 + (idx - (lines.length - 1) / 2) * 15 + 4);
+      g.fillText(ln, x + w / 2, y + h / 2 + (idx - (lines.length - 1) / 2) * 14 + 4);
     });
   }
 };

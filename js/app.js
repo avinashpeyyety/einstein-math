@@ -2069,6 +2069,9 @@
 
     Einstein.mount($('#landing-einstein'), 'idle');
     refreshStudentCast();
+    if (typeof DataLabCatalog !== 'undefined' && DataLabCatalog.renderHomeSlot) {
+      DataLabCatalog.renderHomeSlot($('#home-datalab-slot'));
+    }
 
     if (users.length === 0) {
       createPanel?.classList.remove('hidden');
@@ -2474,7 +2477,9 @@
     showScreen('screen-data');
     if (location.hash !== '#data') history.replaceState(null, '', '#data');
     Einstein.mount($('#data-einstein'), 'explain');
-    Einstein.speak($('#data-speech'), 'Welcome to Data Lab! Pick a workbench — climb from Beginner to Expert in PostgreSQL 18, SQL Server, SSIS & Python, or fire up a live SQL query.');
+    Einstein.speak($('#data-speech'), 'Welcome to Data Lab! Test the live SQL filter preview below, jump straight into any lesson across Track 1 or Track 2, or open the 5-Layer Agentic Data Stack.');
+    const sc = $('#data-showcase');
+    if (sc && typeof DataLabCatalog !== 'undefined' && DataLabCatalog.mountShowcase) DataLabCatalog.mountShowcase(sc);
     const g = $('#data-grid');
     if (g && typeof DataLabCatalog !== 'undefined') g.innerHTML = DataLabCatalog.cardsHtml();
   }

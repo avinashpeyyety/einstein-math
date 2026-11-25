@@ -3,8 +3,13 @@
  * Track 2 (L10–L15): Analytical SQL & Dimensional Modeling (Windows, Dedup, SCD-2, Timezones, Recursive BOM, JSONB)
  */
 const ZenTracks = [
-  { id: 1, name: 'Track 1 · Core SQL & Pipelines', short: 'Track 1 (L1–9)', range: [1, 9] },
-  { id: 2, name: 'Track 2 · Analytical SQL & Modeling', short: 'Track 2 (L10–15)', range: [10, 15] }
+  { id: 1, status: 'live', name: 'Track 1 · Core SQL & Pipelines', short: 'Track 1 (L1–9)', range: [1, 9], desc: 'SQL fundamentals, Python CSV hygiene, Star Schema joins, bulk loading, dialects, partitioning & reconciliation.' },
+  { id: 2, status: 'live', name: 'Track 2 · Analytical SQL & Modeling', short: 'Track 2 (L10–15)', range: [10, 15], desc: 'Window functions, ROW_NUMBER() dedup, SCD Type 2 history, timezones, WITH RECURSIVE trees & JSONB pipelines.' },
+  { id: 3, status: 'planned', name: 'Track 3 · Authoritative Platforms, Parquet & Internals', short: 'Track 3 (L16–21)', range: [16, 21], desc: 'DuckDB-WASM Parquet, Medallion/dbt DAGs, Data Contracts, Semantic Layers, B-Tree/Covering indexes & MVCC locks.' },
+  { id: 4, status: 'planned', name: 'Track 4 · Distributed Compute, Lakehouse & Streaming', short: 'Track 4 (L22–27)', range: [22, 27], desc: 'Spark shuffles & skew salting, Iceberg/Delta snapshots, Kafka partitions, watermarks, WAL CDC & Hybrid Vector Search.' },
+  { id: 5, status: 'planned', name: 'Track 5 · Agentic Data Workflows & Harnesses', short: 'Track 5 (L28–33)', range: [28, 33], desc: 'Inline vs. post-hoc agent analysis, typed tools, EXPLAIN cost guards, code sandboxes, RBAC/approvals & trajectory evals.' },
+  { id: 6, status: 'planned', name: 'Track 6 · LLM Serving, Compilers & Silicon (CUDA / TPU)', short: 'Track 6 (L34–39)', range: [34, 39], desc: 'Prefill FLOPS vs. Decode HBM bandwidth, KV/Prefix caching, quantization/routing, CUDA/Triton vs. TPU/XLA & datacenter locality.' },
+  { id: 7, status: 'planned', name: 'Track 7 · On-Call Incident Labs & Capstone', short: 'Track 7 (Capstone)', range: [40, 47], desc: '8 live break-fix incidents across SQL, agents & serving clusters + end-to-end real-time architecture simulator.' }
 ];
 
 const ZenChapters = [
@@ -240,6 +245,7 @@ const ZenChapters = [
       ]
     },
     koan: 'Stream bulk data with COPY or Fast Load, and make every write idempotent so retries are always safe.',
+    metrics: ['14.0h → 2.5h backfill', '85× bulk throughput', '0 duplicates on retry'],
     worldUpgrade: 'Stage 6 active: High-speed bulk streaming and retry-proof upserts protect nightly pipelines.'
   },
   {
@@ -318,6 +324,7 @@ const ZenChapters = [
       ]
     },
     koan: 'Never wrap an indexed or partitioned column in a function inside WHERE—use half-open range bounds (>= and <).',
+    metrics: ['21.4s → 1.4s query', '91.7% partitions pruned', 'Real EXPLAIN verified'],
     worldUpgrade: 'Stage 8 active: Partition pruning skips 98%+ of irrelevant historical data on large analytical queries.'
   },
   {
@@ -357,6 +364,7 @@ const ZenChapters = [
       ]
     },
     koan: 'Aggregate each table to the same grain in its own CTE before joining—otherwise 1-to-many joins multiply your sums.',
+    metrics: ['0× join fan-out', '100% ledger parity', 'Exact $25 variance caught'],
     worldUpgrade: 'Track 1 complete! End-to-end automated reconciliation verifies 100% parity across your core pipeline.'
   },
   /* ==================== TRACK 2: ANALYTICAL SQL & MODELING (L10–L15) ==================== */
@@ -464,6 +472,7 @@ const ZenChapters = [
       ]
     },
     koan: 'Never join historical facts on is_current = TRUE; use point-in-time range joins (event_date BETWEEN valid_from AND valid_to).',
+    metrics: ['0 retroactive price drift', 'Exact point-in-time joins', 'Audit-grade history'],
     worldUpgrade: 'Track 2 Stage 3 active: Historical analytics preserve point-in-time truth across price and attribute changes.'
   },
   {
@@ -572,6 +581,7 @@ const ZenChapters = [
       ]
     },
     koan: 'Use -> for nested JSON objects, ->> for text values, and CROSS JOIN LATERAL jsonb_array_elements() to unnest arrays safely.',
+    metrics: ['3 nested JSONB → 5 typed rows', 'Native numeric math', 'API/webhook ready'],
     worldUpgrade: 'Track 2 Complete! You now command analytical SQL, SCD-2 history, timezones, recursive hierarchies, and JSONB pipelines.'
   }
 ];

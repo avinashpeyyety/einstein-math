@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/zen.css?v=2.6.29" />
+  <link rel="stylesheet" href="css/zen.css?v=2.6.30" />
 </head>
 <body>
   <div class="zen-shell">
@@ -20,14 +20,15 @@
         <a class="back-link" href="../#data" title="Return to Einstein Math">← Einstein Math</a>
         <div class="brand-wordmark">
           <h1>Data Lab</h1>
-          <span>PostgreSQL 18 · SQL Server · SSIS · Python</span>
+          <span>SQL · Pipelines · Agentic Data · AI Systems</span>
         </div>
       </div>
       <nav class="zen-actions" aria-label="Data Lab tools">
         <button type="button" id="btn-map" class="pill-btn">🗺️ Lessons</button>
+        <button type="button" id="btn-stack" class="pill-btn" title="Explore the 5-layer Data &amp; Agentic AI Stack">🏛️ Stack Map</button>
         <button type="button" id="btn-journal" class="pill-btn">📝 Takeaways (0/15)</button>
-        <button type="button" id="btn-studio" class="pill-btn">🐘 SQL Playground</button>
-        <button type="button" id="btn-sound" class="pill-btn" title="Toggle voice explanations &amp; sound" aria-label="Toggle voice">🔊 Voice</button>
+        <button type="button" id="btn-studio" class="pill-btn" title="Open Full PostgreSQL 18 SQL Playground">🐘 SQL</button>
+        <button type="button" id="btn-sound" class="pill-btn" title="Toggle voice explanations &amp; sound" aria-label="Toggle voice">🔊</button>
         <button type="button" id="btn-theme" class="pill-btn" title="Switch Warm Paper / Night theme" aria-label="Switch theme">🌙</button>
       </nav>
     </header>
@@ -60,7 +61,7 @@
       <div class="row-between">
         <div>
           <div class="chapter-eyebrow">Curriculum</div>
-          <h2 id="modal-map-title" class="chapter-title" style="font-size:1.35rem;">15-Lesson Data Engineering Path (2 Tracks)</h2>
+          <h2 id="modal-map-title" class="chapter-title" style="font-size:1.35rem;">7-Track Data &amp; Agentic AI Engineering Path</h2>
         </div>
         <button type="button" class="pill-btn" data-close-modal aria-label="Close Lessons">✕ Close</button>
       </div>
@@ -96,11 +97,25 @@
     </div>
   </div>
 
-  <script src="js/pg-lab.js?v=2.6.29"></script>
-  <script src="js/sql-engine.js?v=2.6.29"></script>
-  <script src="js/zen-chapters.js?v=2.6.29"></script>
-  <script src="js/zen-audio.js?v=2.6.29"></script>
-  <script src="js/zen-world.js?v=2.6.29"></script>
-  <script src="js/zen-app.js?v=2.6.29"></script>
+  <!-- Modal 4: Full-Stack System Map (Data Platforms -> Agentic Harnesses -> LLM Serving & Silicon) -->
+  <div id="modal-stack" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="modal-stack-title">
+    <div class="modal-sheet" style="width:min(920px, 100%);">
+      <div class="row-between">
+        <div>
+          <div class="chapter-eyebrow">Big-Picture Architecture</div>
+          <h2 id="modal-stack-title" class="chapter-title" style="font-size:1.35rem;">The 5-Layer Real-Time Agentic Data Insights Stack</h2>
+        </div>
+        <button type="button" class="pill-btn" data-close-modal aria-label="Close Stack Map">✕ Close</button>
+      </div>
+      <div id="modal-stack-body" class="stack-sm" style="gap:12px;"></div>
+    </div>
+  </div>
+
+  <script src="js/pg-lab.js?v=2.6.30"></script>
+  <script src="js/sql-engine.js?v=2.6.30"></script>
+  <script src="js/zen-chapters.js?v=2.6.30"></script>
+  <script src="js/zen-audio.js?v=2.6.30"></script>
+  <script src="js/zen-world.js?v=2.6.30"></script>
+  <script src="js/zen-app.js?v=2.6.30"></script>
 </body>
 </html>

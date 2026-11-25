@@ -146,6 +146,61 @@
   let _studioSubTab = 'labs';
   let _studioLabId = 'pg1-filter';
   let _studioLabDrafts = {};
+  let _selectedStackIdx = 0;
+
+  /* 5-Layer Full-Stack Architecture Map: connects Day-1 SQL all the way to Agentic Harnesses & CUDA/TPU Silicon */
+  const STACK_LAYERS = [
+    {
+      num: 1,
+      title: 'Authoritative Data Platforms & Governance',
+      status: 'Live in Tracks 1–2 (L1–15) · Expanding in Track 3',
+      tech: 'PostgreSQL 18 · Star Schema · SCD-2 · Parquet/Iceberg · Semantic Layer · MVCC',
+      why: 'The authoritative source of truth. If keys duplicate, history drifts, or metrics lack a shared semantic definition, every BI dashboard and AI agent downstream hallucinates.',
+      bottlenecks: ['Duplicate keys → silent join fan-out', 'Non-sargable predicates → full table scans', 'Missing semantic layer → agents invent conflicting KPIs'],
+      metrics: ['0% ledger variance', '91%+ partition pruning', 'Point-in-time SCD-2'],
+      jumpLesson: 1
+    },
+    {
+      num: 2,
+      title: 'Real-Time Flow, Distributed Compute & Hybrid Retrieval',
+      status: 'Planned · Track 4 (L22–27)',
+      tech: 'Kafka · WAL CDC (Debezium) · Spark Shuffles · Iceberg Compaction · Feature Stores · Vector/BM25',
+      why: 'Moves petabytes and live operational changes with low latency and zero data loss so both analytical tables and agent retrieval indexes stay fresh.',
+      bottlenecks: ['Skewed join keys → 1 straggler task holds up 95% of job', 'Small Parquet files → metadata/IO explosion', 'Post-filtered vector search → collapsed recall'],
+      metrics: ['Sub-second CDC freshness', '12× skew-salted speedup', 'Online/offline parity'],
+      jumpLesson: 8
+    },
+    {
+      num: 3,
+      title: 'Intelligent Data Workflows (In-Pipeline vs. Post-Hoc Agents)',
+      status: 'Planned · Track 5 (L28–29)',
+      tech: 'Inline Structured Enrichment · Autonomous Root-Cause Investigation · Human-in-the-Loop Routing',
+      why: 'Two distinct patterns: high-throughput inline AI enriches/classifies rows inside pipelines under strict latency & $/1M-row budgets; post-hoc agents investigate anomalies autonomously or alongside humans.',
+      bottlenecks: ['Dumping raw tables into LLM context → token blowup & hallucination', 'No confidence routing → silent corrupted rows', 'Wrong model tier for inline volume → runaway cost'],
+      metrics: ['10K+ inline rows/sec', 'Confidence quarantine', 'Human-led or autonomous'],
+      jumpLesson: 15
+    },
+    {
+      num: 4,
+      title: 'Agent Harnesses & Safe Actions on Authoritative Data',
+      status: 'Planned · Track 5 (L30–33)',
+      tech: 'Typed SQL/Semantic Tools · EXPLAIN Cost Guards · Sandboxed Code Execution · RBAC/RLS · Evals',
+      why: 'Production agents never receive raw unchecked DB admin access. Harnesses constrain cost before execution, keep 50M rows inside compute sandboxes, enforce approval gates on writes, and audit every action.',
+      bottlenecks: ['Unbounded agent SQL → accidental Seq Scan takes down prod', 'Unverified mutations → corrupted authoritative tables', 'No trajectory evals → silent accuracy regressions'],
+      metrics: ['EXPLAIN cost gate', 'Dry-run diffs & rollback', 'Deterministic SQL evals'],
+      jumpLesson: 9
+    },
+    {
+      num: 5,
+      title: 'LLM Serving Physics, Compilers & Silicon (Datacenter → Chips)',
+      status: 'Planned · Track 6 (L34–39)',
+      tech: 'Prefill FLOPS vs. Decode HBM Bandwidth · PagedAttention · Prefix Cache · CUDA/Triton vs. TPU/XLA · NVLink/ICI',
+      why: 'At real-time agentic scale, pipeline latency and unit economics are governed by silicon physics: Prefill is compute-bound (FLOPS), Decode is memory-bandwidth-bound (HBM TB/s), and prefix caching shared schemas slashes TTFT by 80–90%.',
+      bottlenecks: ['KV-cache fragmentation → OOM under concurrent agents', 'HBM round-trips → fixed by FlashAttention SRAM tiling', 'Cross-region egress between lakehouse & GPU/TPU pods'],
+      metrics: ['80–90% prefix-cache hit', 'FP8/INT4 + model routing', 'CUDA/GPU vs. XLA/TPU'],
+      jumpLesson: null
+    }
+  ];
   let _studioScratchSql = `SELECT s.store_id, st.store_name, COUNT(*) AS txns, SUM(s.net_amount) AS revenue\nFROM stg_pos_sales s\nJOIN dim_store st ON st.store_id = s.store_id\nGROUP BY s.store_id, st.store_name\nORDER BY revenue DESC;`;
 
   const $ = (sel, root = document) => root.querySelector(sel);
@@ -284,7 +339,10 @@
     const btn = $('#btn-journal');
     if (btn) btn.textContent = `📝 Takeaways (${masteredCount()}/${ZenChapters.length})`;
     const sBtn = $('#btn-sound');
-    if (sBtn) sBtn.textContent = state.soundEnabled ? '🔊 Voice' : '🔇 Muted';
+    if (sBtn) {
+      sBtn.textContent = state.soundEnabled ? '🔊' : '🔇';
+      sBtn.title = state.soundEnabled ? 'Voice & chimes on (click to mute)' : 'Muted (click to enable voice)';
+    }
   }
 
   function syncHeaderAndPipeline() {
@@ -1162,6 +1220,17 @@
     const currentSql = _draftSql[ch.id] != null ? _draftSql[ch.id] : (mastered ? pgCh.solution : pgCh.starter);
     const pgStatusText = PgLab.ready ? `● ${PgLab.version} live in browser` : '⏳ Ready to run on PostgreSQL 18 (WASM)';
     const helpers = ch.spell.helpers || [];
+    const helperChipsHtml = helpers.map((h, i) => `<button type="button" class="helper-chip" data-helper-idx="${i}">+ ${esc(h.label)}</button>`).join('');
+    // Graduated scaffolding: visible immediately in Track 1 (Beginner), tucked behind toggle in Track 2+
+    const helperBlockHtml = !helpers.length ? '' : ((ch.track || 1) === 1
+      ? `<div class="helper-bar">
+           <span class="muted" style="font-weight:600;">SQL Building Blocks (click to insert):</span>
+           ${helperChipsHtml}
+         </div>`
+      : `<details class="scaffold-details">
+           <summary>🧱 Need SQL Building Blocks? (Try writing it yourself first — click to reveal)</summary>
+           <div class="helper-bar">${helperChipsHtml}</div>
+         </details>`);
 
     return `
       <p style="margin:0;color:var(--sepia);font-weight:500;">${esc(ch.spell.intro)}</p>
@@ -1169,12 +1238,7 @@
         <strong>Goal:</strong> ${esc(pgCh.prompt)}
       </div>
       ${ch.spell.peekTable ? renderTablePeekHtml(ch.spell.peekTable, !!ch.spell.autoPeek) : ''}
-      ${helpers.length ? `
-        <div class="helper-bar">
-          <span class="muted" style="font-weight:600;">SQL Building Blocks (click to insert):</span>
-          ${helpers.map((h, i) => `<button type="button" class="helper-chip" data-helper-idx="${i}">+ ${esc(h.label)}</button>`).join('')}
-        </div>
-      ` : ''}
+      ${helperBlockHtml}
       <div class="sql-box">
         <div class="sql-bar">
           <span id="pg-status">${esc(pgStatusText)}</span>
@@ -1464,15 +1528,20 @@
   function renderBeat4Html(ch) {
     const isLast = state.currentChapterIdx >= ZenChapters.length - 1;
     const nextCh = isLast ? null : ZenChapters[state.currentChapterIdx + 1];
+    const metricsHtml = (ch.metrics && ch.metrics.length)
+      ? `<div class="metrics-strip">${ch.metrics.map(m => `<span class="metric-pill">${esc(m)}</span>`).join('')}</div>`
+      : '';
     return `
       <div class="koan-card">
         <div class="chapter-eyebrow">Lesson ${ch.num} Complete · Key Takeaway</div>
         <blockquote class="koan-quote" style="font-style:normal;">${esc(ch.koan)}</blockquote>
+        ${metricsHtml}
         <p style="margin:0;max-width:48ch;color:var(--sepia);">${esc(ch.worldUpgrade)}</p>
         <div class="row" style="margin-top:8px;">
           ${nextCh
             ? `<button type="button" id="btn-next-chapter" class="btn-saffron">Next: Lesson ${nextCh.num} — ${esc(nextCh.title)} →</button>`
             : `<button type="button" id="btn-finish-journal" class="btn-saffron">📝 Review All ${ZenChapters.length} Key Takeaways</button>
+               <button type="button" id="btn-finish-stack" class="btn-quiet">🏛️ View Full 5-Layer Stack Map</button>
                <button type="button" id="btn-finish-studio" class="btn-quiet">🐘 Explore All ${PgLab.CHALLENGES.length} Postgres Labs</button>`
           }
           <button type="button" id="btn-replay-chapter" class="btn-quiet">↺ Replay Lesson</button>
@@ -1499,12 +1568,14 @@
     }
     const jBtn = $('#btn-finish-journal', body);
     if (jBtn) jBtn.addEventListener('click', () => { ZenAudio.tap(); openModal('journal'); });
+    const kBtn = $('#btn-finish-stack', body);
+    if (kBtn) kBtn.addEventListener('click', () => { ZenAudio.tap(); openModal('stack'); });
     const sBtn = $('#btn-finish-studio', body);
     if (sBtn) sBtn.addEventListener('click', () => { ZenAudio.tap(); openModal('studio'); });
   }
 
   /* ============================================================
-     3 CLEAN MODALS: LESSONS, KEY TAKEAWAYS, SQL PLAYGROUND
+     4 CLEAN MODALS: LESSONS, STACK MAP, TAKEAWAYS, SQL PLAYGROUND
   ============================================================ */
   function closeAllModals() {
     $$('.modal-overlay').forEach(m => m.classList.add('hidden'));
@@ -1517,31 +1588,91 @@
     if (!modal) return;
     modal.classList.remove('hidden');
     if (kind === 'map') renderMapModal();
+    else if (kind === 'stack') renderStackModal();
     else if (kind === 'journal') renderJournalModal();
     else if (kind === 'studio') renderStudioModal();
+  }
+
+  function renderStackModal() {
+    const body = $('#modal-stack-body');
+    if (!body) return;
+    const sel = STACK_LAYERS[_selectedStackIdx] || STACK_LAYERS[0];
+    body.innerHTML = `
+      <p class="muted" style="margin:0;">Every scalable real-time agentic data insights pipeline spans 5 coupled layers—from authoritative tables up through agent harnesses down to LLM serving &amp; silicon physics. Click any layer to inspect:</p>
+      <div class="explore-split">
+        <div class="stack-sm">
+          ${STACK_LAYERS.map((ly, idx) => `
+            <button type="button" class="stack-layer-btn ${idx === _selectedStackIdx ? 'selected' : ''}" data-stack-idx="${idx}">
+              <div class="row-between">
+                <strong>Layer ${ly.num} · ${esc(ly.title)}</strong>
+              </div>
+              <span class="muted" style="font-size:11.5px;">${esc(ly.status)}</span>
+            </button>
+          `).join('')}
+        </div>
+        <div class="stack-detail-card">
+          <div class="chapter-eyebrow">Layer ${sel.num} of 5 · Systems Deep Dive</div>
+          <h3 style="margin:0;font-family:var(--font-serif);font-size:1.2rem;">${esc(sel.title)}</h3>
+          <div class="mono muted" style="font-size:11.5px;">${esc(sel.tech)}</div>
+          <p style="margin:0;font-size:13.5px;">${esc(sel.why)}</p>
+          <div class="stack-sm" style="gap:4px;">
+            <div style="font-size:12px;font-weight:700;color:var(--warn);">What Breaks Without Mastery:</div>
+            ${sel.bottlenecks.map(b => `<div style="font-size:12.5px;">• ${esc(b)}</div>`).join('')}
+          </div>
+          <div class="metrics-strip" style="justify-content:flex-start;">
+            ${sel.metrics.map(m => `<span class="metric-pill">${esc(m)}</span>`).join('')}
+          </div>
+          ${sel.jumpLesson ? `
+            <div style="padding-top:4px;">
+              <button type="button" id="btn-stack-jump" class="btn-saffron" data-jump-lesson="${sel.jumpLesson}">Explore Related Live Lesson (L${sel.jumpLesson}) →</button>
+            </div>
+          ` : `<div class="muted" style="font-size:12px;">Interactive Roofline, KV-Cache, CUDA/TPU &amp; Datacenter simulators scheduled in Track 6 (L34–39).</div>`}
+        </div>
+      </div>
+    `;
+
+    $$('[data-stack-idx]', body).forEach(btn => {
+      btn.addEventListener('click', () => {
+        ZenAudio.tap();
+        _selectedStackIdx = Number(btn.dataset.stackIdx);
+        renderStackModal();
+      });
+    });
+    const jumpBtn = $('#btn-stack-jump', body);
+    if (jumpBtn) {
+      jumpBtn.addEventListener('click', () => {
+        ZenAudio.tap();
+        const n = Number(jumpBtn.dataset.jumpLesson);
+        closeAllModals();
+        openChapter(n - 1, 1, false);
+      });
+    }
   }
 
   function renderMapModal() {
     const body = $('#modal-map-body');
     if (!body) return;
     const done = masteredCount();
-    const tracks = window.ZenTracks || [
-      { id: 1, name: 'Track 1 · Core SQL & Pipelines' },
-      { id: 2, name: 'Track 2 · Analytical SQL & Modeling' }
+    const allTracks = window.ZenTracks || [
+      { id: 1, status: 'live', name: 'Track 1 · Core SQL & Pipelines' },
+      { id: 2, status: 'live', name: 'Track 2 · Analytical SQL & Modeling' }
     ];
+    const liveTracks = allTracks.filter(t => t.status !== 'planned');
+    const plannedTracks = allTracks.filter(t => t.status === 'planned');
+
     body.innerHTML = `
       <div class="row-between">
-        <span class="muted">${done} of ${ZenChapters.length} lessons completed across ${tracks.length} tracks.</span>
+        <span class="muted">${done} of ${ZenChapters.length} live lessons completed · 7-track full-stack roadmap.</span>
         <label class="row" style="font-size:13px;cursor:pointer;">
           <input type="checkbox" id="chk-unlock-all" ${state.unlockAll ? 'checked' : ''} style="accent-color:var(--saffron);" />
-          <span>Unlock all lessons (jump freely)</span>
+          <span>Unlock all live lessons</span>
         </label>
       </div>
-      ${tracks.map(tr => {
+      ${liveTracks.map(tr => {
         const list = ZenChapters.map((ch, idx) => ({ ch, idx })).filter(x => (x.ch.track || 1) === tr.id);
         return `
           <div class="stack-sm" style="gap:6px;">
-            <div class="chapter-eyebrow" style="margin-top:4px;">${esc(tr.name)}</div>
+            <div class="chapter-eyebrow" style="margin-top:4px;">${esc(tr.name)} · Live</div>
             ${list.map(({ ch, idx }) => {
               const unlocked = isChapterUnlocked(idx);
               const isDone = !!state.mastered[ch.id];
@@ -1560,6 +1691,20 @@
           </div>
         `;
       }).join('')}
+      ${plannedTracks.length ? `
+        <div class="stack-sm" style="gap:6px;padding-top:8px;border-top:1px solid var(--border);">
+          <div class="chapter-eyebrow">Upcoming Tracks · Beginner → Hardcore Agentic &amp; AI Systems</div>
+          ${plannedTracks.map(tr => `
+            <div class="chapter-list-item mist" style="cursor:default;">
+              <div>
+                <div style="font-weight:700;">${esc(tr.name)}</div>
+                <div class="muted" style="font-size:11.5px;">${esc(tr.desc || '')}</div>
+              </div>
+              <span class="mono muted" style="font-size:11px;white-space:nowrap;">Planned</span>
+            </div>
+          `).join('')}
+        </div>
+      ` : ''}
       <div class="row-between" style="padding-top:8px;border-top:1px solid var(--border);">
         <span class="muted">Saved locally on this device — works offline.</span>
         <button type="button" id="btn-reset-journey" class="pill-btn" style="color:var(--warn);">↺ Reset Progress</button>
@@ -2015,6 +2160,8 @@
 
     if (viewParam === 'playground' || viewParam === 'studio' || legacyTab === 'sql') {
       setTimeout(() => openModal('studio'), 60);
+    } else if (viewParam === 'stack') {
+      setTimeout(() => openModal('stack'), 60);
     } else if (viewParam === 'takeaways' || viewParam === 'journal') {
       setTimeout(() => openModal('journal'), 60);
     } else if (viewParam === 'lessons' || viewParam === 'map' || legacyTab === 'academy') {
@@ -2049,12 +2196,14 @@
 
     // Header actions
     const mapBtn = $('#btn-map');
+    const stackBtn = $('#btn-stack');
     const journalBtn = $('#btn-journal');
     const studioBtn = $('#btn-studio');
     const soundBtn = $('#btn-sound');
     const themeBtn = $('#btn-theme');
 
     if (mapBtn) mapBtn.addEventListener('click', () => { ZenAudio.tap(); openModal('map'); });
+    if (stackBtn) stackBtn.addEventListener('click', () => { ZenAudio.tap(); openModal('stack'); });
     if (journalBtn) journalBtn.addEventListener('click', () => { ZenAudio.tap(); openModal('journal'); });
     if (studioBtn) studioBtn.addEventListener('click', () => { ZenAudio.tap(); openModal('studio'); });
     if (soundBtn) soundBtn.addEventListener('click', () => {

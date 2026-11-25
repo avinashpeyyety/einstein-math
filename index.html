@@ -380,7 +380,7 @@
     </div>
 
     <footer class="site-footer">
-      Einstein Math · Ages 5–12 · v2.6.17 · Progress stays on your device (no accounts) · Installable / offline after first visit
+      Einstein Math · Ages 5–12 · v2.6.32 · Progress stays on your device (no accounts) · Installable / offline after first visit
     </footer>
   </div>
 
@@ -402,7 +402,7 @@
       var proto = location.protocol;
       if (proto !== 'http:' && proto !== 'https:') return;
       window.addEventListener('load', function () {
-        navigator.serviceWorker.register('./sw.js').catch(function (err) {
+        navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' }).catch(function (err) {
           console.warn('SW register failed', err);
         });
       });

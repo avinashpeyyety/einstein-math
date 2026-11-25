@@ -1,5 +1,5 @@
 /* Einstein Math service worker — caches app shell + curriculum + panels for offline play */
-const CACHE = 'einstein-math-v2.6.31';
+const CACHE = 'einstein-math-v2.6.32';
 // W1b: on-device comic-avatar model (~40 MB) is cached on first use only, and kept across app versions
 const MODEL_CACHE = 'einstein-math-models-v1';
 // X2: subject packs (data/subjects/<id>.json). math is precached (default subject, offline after first visit);
@@ -39,7 +39,9 @@ const PRECACHE = [
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE).then((cache) => cache.addAll(PRECACHE)).then(() => self.skipWaiting())
+    caches.open(CACHE).then((cache) =>
+      Promise.all(PRECACHE.map((u) => fetch(new Request(u, { cache: 'reload' })).then((r) => (r.ok ? cache.put(u, r) : undefined))))
+    ).then(() => self.skipWaiting())
   );
 });
 

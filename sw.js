@@ -61,9 +61,9 @@ self.addEventListener('fetch', (event) => {
 
   // Network-first for HTML navigations so updates land; fall back to cache offline
   const isNav = req.mode === 'navigate' || (req.headers.get('accept') || '').includes('text/html');
-  // v2.5.0+: Standalone portal pages (cosmos/, data-lab/) are their own HTML documents — cache them under their own path
+  // v2.5.0+: Standalone portal pages (cosmos/, data-lab/, dev-jokes/) are their own HTML documents — cache them under their own path
   // (query stripped, so ?mode= deep links share one entry) and never let them overwrite the app shell's ./index.html.
-  const isSpace = url.pathname.includes('/cosmos/') || url.pathname.includes('/data-lab/');
+  const isSpace = url.pathname.includes('/cosmos/') || url.pathname.includes('/data-lab/') || url.pathname.includes('/dev-jokes/');
   if (isNav) {
     const spaceKey = isSpace ? new Request(url.origin + url.pathname) : null;
     event.respondWith(
